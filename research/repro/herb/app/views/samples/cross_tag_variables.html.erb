@@ -1,0 +1,6 @@
+<% total = items.sum(&:price) %>
+<p><%= total %></p>
+<% unused = 1 %>
+<% items.each do |item| %>
+  <li><%= item.name %></li>
+<% end %>

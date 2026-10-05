@@ -1,0 +1,16 @@
+# Recommended configuration from ruumba's README.
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  Include:
+    - '**/*.erb'
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Layout/HashAlignment:
+  Enabled: false
+Layout/ParameterAlignment:
+  Enabled: false
+Layout/IndentationWidth:
+  Enabled: false
+Layout/TrailingEmptyLines:
+  Enabled: false

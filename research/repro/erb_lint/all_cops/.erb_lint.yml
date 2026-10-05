@@ -1,0 +1,10 @@
+---
+# Rubocop linter only, with every cop enabled.
+EnableDefaultLinters: false
+linters:
+  Rubocop:
+    enabled: true
+    rubocop_config:
+      AllCops:
+        NewCops: enable
+        SuggestExtensions: false
