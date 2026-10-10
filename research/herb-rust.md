@@ -70,12 +70,11 @@
 | | tk0miya/rubocop-herb | Marco Roth 氏のプロトタイプ |
 |---|---|---|
 | Ruby パート | 独自の変換で RuboCop の cop をかける | 検査しない（`Lint` / `Style` / `Layout` を除外） |
-| HTML パート | `Herb/Lint` cop が Node.js の herb-lint を子プロセスで実行 | `Herb/Linting` cop が Rust 製 linter を同じプロセス内で実行 |
+| HTML パート | `Herb/Linting` cop が Node.js の herb-lint を子プロセスで実行 | `Herb/Linting` cop が Rust 製 linter を同じプロセス内で実行 |
 | 状態 | 開発中（未公開） | 未マージのブランチ。gem 名だけ確保 |
 
-- 2 つは補い合う関係にある。Rust 製 linter がリリースされれば、tk0miya/rubocop-herb の `Herb/Lint` cop は子プロセスをやめて Rust 製 linter を直接呼べる。Node.js も要らなくなる
-- 一方で、どちらも「RuboCop で ERB を検査するプラグイン」で gem 名も同じなので、利用者から見ると 2 つの `rubocop-herb` が並ぶことになる。統合するのか、名前を分けるのかは Marco Roth 氏と相談が必要
-- herb-tools-ruby（Ruby 版 herb-lint / herb-format）とも目的が重なる。Rust 製 linter が出たあと herb-tools-ruby をどう位置付けるかも整理が要る
+- 2 つは補い合う関係にある。Rust 製 linter がリリースされれば、tk0miya/rubocop-herb の `Herb/Linting` cop は子プロセスをやめて Rust 製 linter を直接呼べる。Node.js も要らなくなる
+- 一方で、どちらも「RuboCop で ERB を検査するプラグイン」で、gem 名も HTML 側の cop 名（`Herb/Linting`）も同じなので、利用者から見ると 2 つの `rubocop-herb` が並ぶことになる。統合するのか、名前を分けるのかは Marco Roth 氏と相談が必要
 
 ## 未確認
 
