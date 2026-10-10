@@ -127,3 +127,57 @@ $ npx herb-lint app/views/samples
 - `cross_tag_variables.html.erb`: タグを跨いだ変数を追跡し、本当に未使用の `unused` だけを `erb-no-unused-local-variable` で検出する
 - `missing_end.html.erb`: `end` の抜けを `RUBY_PARSE_ERROR` と `MISSING_ERB_END_TAG_ERROR` で検出する
 - `ruby_style.html.erb`: `link_to( 'Home',root_path )` のようなスタイル違反や未定義メソッドは検出されない（offense 0 件）
+
+## rubocop-herb
+
+[../report.md](../report.md) の再現手順です。rubocop-herb は rubygems に公開されていないので、リポジトリを clone して、その `Gemfile` と開発用の設定（`config/develop/*.yml`）を使います。
+
+```console
+$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 46ae1f50959736530280d75eea69deeaf739b317 && bundle install)
+$ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
+$ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Lint'
+```
+
+- `-c "$RUBOCOP_HERB/config/develop/rubocop.yml"` が `html_visualization: false`（既定）、`-c "$RUBOCOP_HERB/config/develop/rubocop-html-visualization.yml"` が `html_visualization: true` の設定です
+- `--except Herb/Lint` は、herb-lint（Node.js の `@herb-tools/linter`）を入れていない環境で、セットアップを促すエラーを出さないためのものです。RuboCop の結果だけを比べます
+
+### 既存ツールの再現例にかける
+
+```console
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" erb_lint rubocop-erb ruumba herb/app
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop-html-visualization.yml" erb_lint rubocop-erb ruumba herb/app
+```
+
+- erb_lint / rubocop-erb で見逃していた `Style/NilComparison`、`Style/NegatedIf` などを検出する
+- erb_lint の `Lint/UselessAssignment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は出ない
+- `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` には、どちらの設定でも `Style/EmptyElse` / `Lint/EmptyConditionalBody` が出る
+- `herb/app/views/samples/missing_end.html.erb` に `Lint/Syntax` が出る
+
+autocorrect はコピーに対して実行します。
+
+```console
+$ cp -R . "$TMPDIR/repro-herb" && cd "$TMPDIR/repro-herb"
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" -A erb_lint rubocop-erb ruumba herb/app
+$ diff -r "$OLDPWD" .
+```
+
+- `count -1` は `count - 1`、`user && user.admin?` は `user&.admin?` に正しく修正される
+- `herb/app/views/samples/cross_tag_variables.html.erb` は壊れる（下の「文の削除が `<%` ごと消す」）
+
+### 未解決の問題
+
+`rubocop-herb/` の再現例です。autocorrect はコピーに対して実行します。
+
+```console
+$ cd rubocop-herb
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" .
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop-html-visualization.yml" .
+$ cp -R . "$TMPDIR/rubocop-herb-ac" && cd "$TMPDIR/rubocop-herb-ac"
+$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" -a .
+$ diff -r "$OLDPWD" .
+```
+
+- 文の削除が `<%` ごと消す（`void_removal.html.erb`, `useless_assignment_removal.html.erb`）: どちらの設定でも、`-a` で `<% 1 %>` や `<% x = 1 %>` の `<% …` の部分が消え、` %>` だけが残る（前に行があれば、その行の末尾につながる）
+- 条件の統合で HTML が消える・移る（`sole_nested_conditional.html.erb`, `if_inside_else.html.erb`）: visualization 無効時、`Style/SoleNestedConditional` と `Style/IfInsideElse` が出る。`-a` で、前者は `<p>x</p>` と外側の `<% end %>` が消え、後者は `<p>y</p>` が `<% elsif b %>` の中に移る。visualization 有効時はどちらも出ない
+- `Lint/UnusedBlockArgument` の見逃し（`unused_block_arg.html.erb`）: visualization 無効時は出ない（有効時は出る）
