@@ -9,7 +9,7 @@
 - 15 分なので、**lint（RuboCop × ERB）に絞る**。フォーマット・型チェック・LSP は最後に「この基盤の先」として 1〜2 枚で触れる
 - 話の軸は「Ruby だけを取り出すと、分割しても連結しても文脈が失われる → HTML と Ruby の両方を理解して解析する」
 - 既存ツールの問題は、どれも再現例（`research/repro/`）で実測したものだけを見せる
-- `-a` でテンプレートを壊す例が残っているうちは「autocorrect が安全」とは言わない（[switching-decision.md](../research/switching-decision.md#発表に向けて)）
+- `-A` で出力が変わる例が残っているうちは「autocorrect が安全」とは言わない（[switching-decision.md](../research/switching-decision.md#発表に向けて)）
 
 ## 時間配分
 
@@ -148,7 +148,7 @@ div;
 - タグの中身は元の位置に、それ以外は空白に（改行は残す）
 - `<%=` は `_ =` に → 「出力する」意味が残るので `Lint/Void` / `Style/SymbolProc` の誤検知が出ない
 - `<%` `%>` の分の空白があるので `;` を補っても位置がずれない
-- 変換結果は rubocop-herb `1483080` の `bin/erb2ruby` の出力（行末の空白は省略）
+- 変換結果は rubocop-herb `6601d3e` の `bin/erb2ruby` の出力（行末の空白は省略）
 
 ### 15. HTML も Ruby として見せる
 
@@ -170,7 +170,7 @@ div;
 ### 17. 残る誤検知は ERB の構造を見て抑える
 
 - ファイル全体で除外する cop は 9 個だけ（rubocop-erb は約 55 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
-- それ以外は、誤検知になる**その行だけ**で cop を無効化（19 個）
+- それ以外は、誤検知になる**その行だけ**で cop を無効化（20 個）
   - 本文に HTML を含む分岐・ブロック: `Lint/EmptyConditionalBody` など → 本当に空の `else` は検出できる
   - ERB タグに跨がる `<% end %>` や本文: `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中に書いた Ruby は検査される
 - 図: ERB の上に「この行ではこの cop を無効化」を重ねて示す
@@ -227,12 +227,16 @@ div;
 | herb-lint | ◎ | ◎ | × | ○ | ○ |
 | **rubocop-herb** | ◎ | ○ | ○ | ○ | △ → ○ にしたい |
 
-### 22. 残っている課題（正直に）
+### 22. autocorrect がテンプレートを壊さないようにする
 
-- `-a` で文の削除が `<%` ごと消す（`Lint/Void`, `Lint/UselessAssignment`）
-- 原因: Ruby では空白でも、ERB では区切りの部分を corrector が書き換える
-- 方針: 修正範囲が ERB タグの中身の外にかかる修正を捨てる（`Team#collate_corrections` で cop ごとに検査）
-- ノート: 発表までに直せていれば「直した」話に差し替える。1 枚で「どう直したか」を見せられると強い
+- 問題: Ruby では空白でも、ERB では区切りや HTML の部分を corrector が書き換える
+  - 例: `Lint/Void` が `<% 1 %>` の `1` を左の空白ごと消す → `<% ` も消え、` %>` だけが残る
+- 対策: 修正を元の ERB に当ててみて、HTML が変わる・Herb のパースエラーが増える修正は捨てる（`CopCorrectionGuard`）
+  - 捨てた offense は「autocorrect できない」として報告する
+  - cop を個別に除外しなくても、未知の cop の壊れ方も止められる
+- 残っている課題（正直に）: ガードは ERB タグの中身を見ていない。`-A` で `Style/IdenticalConditionalBranches` が `<%= foo %>` を `<% end`⏎`   _ = foo %>` に書き換え、`foo` が出力されなくなる（[report.md](../research/report.md#未解決の問題実測)）
+  - また、捨てるだけなので修正が途中で止まることがある: `<% unused = 1 %>` は `<% 1 %>` になり、`Lint/Void` が残る（Ruby ファイルなら代入文ごと消える）
+- ノート: 発表までに直せていれば、残っている課題の項目を削る
 
 ## 5. この基盤の先・まとめ（1:15）
 
@@ -254,7 +258,7 @@ div;
 ## 発表までに決めること・確かめること
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、15 分では lint で手一杯。パート 5 で構想として触れる形でよいか。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
-- **autocorrect の課題**: 直してから発表するか、課題として見せるか（スライド 22 の扱いが変わる）
+- **autocorrect の課題**: `-A` の問題（`Style/IdenticalConditionalBranches`）と `<% 1 %>` で止まる問題を直してから発表するか、課題として見せるか（スライド 22 の最後の項目の扱いが変わる）
 - **Marco Roth 氏との調整**: 氏は Rust 製 linter を RuboCop に公開する RuboCop プラグインのプロトタイプも作っていて、herb#475 で「調整が必要」と述べている。rubygems の `rubocop-herb` / `herb-linter` 0.0.1 もこの計画のためと思われる（[herb-rust.md](../research/herb-rust.md)）。スライド 20 で氏の計画に触れる前に、役割分担（Ruby パートはこちら、HTML パートは Rust 製 linter）と gem 名について話しておきたい
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく
 - **デモ**: ライブか録画か。15 分ならスライド 18 の Before / After を録画で見せるのが安全

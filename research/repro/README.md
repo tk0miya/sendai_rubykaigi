@@ -130,13 +130,13 @@ $ npx herb-lint app/views/samples
 
 ## rubocop-herb
 
-[../report.md](../report.md) の再現手順です。rubocop-herb は rubygems に公開されていないので、リポジトリを clone して、その `Gemfile` と開発用の設定（`config/develop/*.yml`）を使います。
+[../report.md](../report.md) の再現手順です。rubocop-herb は rubygems に公開されていないので、リポジトリを clone して、その `Gemfile` と開発用の設定（`config/develop/rubocop.yml`）を使います。
 
 ```console
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 14830806e5deb61e27744e9fed09c5380ccbeee7 && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 6601d3efd1dd1310f5d896a9e0e643061af835ff && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
-$ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting'
+$ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$RUBOCOP_HERB/config/develop/rubocop.yml"'
 ```
 
 - `--except Herb/Linting` は、herb-lint（Node.js の `@herb-tools/linter`）を入れていない環境で、セットアップを促すエラーを出さないためのものです。RuboCop の結果だけを比べます
@@ -144,10 +144,10 @@ $ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop
 ### 既存ツールの再現例にかける
 
 ```console
-$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" erb_lint rubocop-erb ruumba herb/app
+$ rubocop-herb erb_lint rubocop-erb ruumba herb/app
 ```
 
-- erb_lint / rubocop-erb で見逃していた `Style/NilComparison`、`Style/NegatedIf` などを検出する
+- erb_lint / rubocop-erb で見逃していた `Style/NilComparison`、`Style/NegatedIf`、`Lint/UnusedBlockArgument` などを検出する
 - erb_lint の `Lint/UselessAssignment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は出ない
 - `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` には `Style/EmptyElse` / `Lint/EmptyConditionalBody` が出る
 - `herb/app/views/samples/missing_end.html.erb` に `Lint/Syntax` が出る
@@ -156,12 +156,29 @@ autocorrect はコピーに対して実行します。
 
 ```console
 $ cp -R . "$TMPDIR/repro-herb" && cd "$TMPDIR/repro-herb"
-$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" -A erb_lint rubocop-erb ruumba herb/app
+$ rubocop-herb -A erb_lint rubocop-erb ruumba herb/app
 $ diff -r "$OLDPWD" .
 ```
 
 - `count -1` は `count - 1`、`user && user.admin?` は `user&.admin?` に正しく修正される
-- `herb/app/views/samples/cross_tag_variables.html.erb` は壊れる（下の「文の削除が `<%` ごと消す」）
+- `herb/app/views/samples/cross_tag_variables.html.erb` の `<% unused = 1 %>` は `<% 1 %>` になる。続いて出る `Lint/Void` は、修正すると `<%` が消えるので修正されない（autocorrect できない offense として残る。下の「未解決の問題」）
+
+### Herb/Linting（herb-lint）
+
+`Herb/Linting` は `@herb-tools/linter` を RuboCop のプロジェクトのルート（上へたどって最初に見つかる `Gemfile` のディレクトリ）から読み込みます。`herb/` で実行すると `research/repro/Gemfile` のある `research/repro` がルートになって見つからないので、`Gemfile` のないディレクトリにコピーして実行します。
+
+```console
+$ (cd herb && npm install)
+$ mkdir "$TMPDIR/herb-lint" && cp -R herb/. "$TMPDIR/herb-lint/" && cp rubocop-herb/*.html.erb "$TMPDIR/herb-lint/app/views/samples/"
+$ printf '<div><span></div>\n' > "$TMPDIR/herb-lint/app/views/samples/missing_close.html.erb"
+$ cd "$TMPDIR/herb-lint"
+$ BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c "$RUBOCOP_HERB/config/develop/rubocop.yml" app
+$ npx herb-lint app/views/samples
+```
+
+- `missing_close.html.erb`、`cross_tag_variables.html.erb`、`identical_branches_output.html.erb` に、herb-lint 単体と同じ offense が `Herb/Linting: [rule-name] …` として出る
+- `missing_end.html.erb` には herb-lint 単体では `parser-no-errors` が出るが、`Herb/Linting` は出ない（Ruby の構文エラーがあるファイルでは herb-lint を実行しない）。`Lint/Syntax` は出る
+- `herb/` で実行すると、`@herb-tools/linter is not installed in …/research/repro` というエラーが出る
 
 ### 未解決の問題
 
@@ -169,10 +186,18 @@ $ diff -r "$OLDPWD" .
 
 ```console
 $ cd rubocop-herb
-$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" .
+$ rubocop-herb .
 $ cp -R . "$TMPDIR/rubocop-herb-ac" && cd "$TMPDIR/rubocop-herb-ac"
-$ rubocop-herb -c "$RUBOCOP_HERB/config/develop/rubocop.yml" -a .
+$ rubocop-herb -A --only Style/IdenticalConditionalBranches .
 $ diff -r "$OLDPWD" .
 ```
 
-- 文の削除が `<%` ごと消す（`void_removal.html.erb`, `useless_assignment_removal.html.erb`）: `-a` で `<% 1 %>` や `<% x = 1 %>` の `<% …` の部分が消え、` %>` だけが残る（前に行があれば、その行の末尾につながる）
+- 同じ出力タグを分岐の外に移すと、出力されなくなる（`identical_branches_output.html.erb`）: `Style/IdenticalConditionalBranches`（`[Correctable]`。安全でない修正なので `-a` では修正されない）が出る。`-A` で、両方の分岐の `<%= foo %>` が消え、`<% end %>` が `<% end`⏎`   _ = foo %>` になる（`foo` が出力されなくなる）
+- `--only` を付けずに `-A` すると、続けて `Style/EmptyElse` なども修正される
+
+```console
+$ rubocop-herb -a useless_assignment_leaves_void.html.erb
+$ diff "$OLDPWD/useless_assignment_leaves_void.html.erb" useless_assignment_leaves_void.html.erb
+```
+
+- 未使用の変数への代入が `<% 1 %>` で止まる（`useless_assignment_leaves_void.html.erb`）: `-a` で `Lint/UselessAssignment` が修正され、`<% unused = 1 %>` が `<% 1 %>` になる。続いて出る `Lint/Void` は修正されず（`[Correctable]` が付かない）、offense が残る。同じ内容の Ruby ファイルなら、代入文ごと消える
