@@ -8,21 +8,20 @@ When `Lint/Void` removes a statement, it also removes the whitespace on its left
 
 ## Environment
 
-- rubocop-herb `46ae1f50959736530280d75eea69deeaf739b317`
+- rubocop-herb `14830806e5deb61e27744e9fed09c5380ccbeee7`
 - rubocop 1.91.0
 - herb 0.11.0
 - ruby 4.0.5
-- Happens with both `html_visualization: false` and `true`
 
 ## Steps to reproduce
 
-In a checkout of rubocop-herb (`--except Herb/Lint` only avoids the herb-lint setup error when `@herb-tools/linter` is not installed):
+In a checkout of rubocop-herb (`--except Herb/Linting` only avoids the herb-lint setup error when `@herb-tools/linter` is not installed):
 
 ```console
 $ printf '<p>a</p>\n<%% 1 %%>\n<%%= b %%>\n' \
-    | bin/rubocop -c config/develop/rubocop.yml --except Herb/Lint -a --stdin test.html.erb
+    | bin/rubocop -c config/develop/rubocop.yml --except Herb/Linting -a --stdin test.html.erb
 $ printf '<p>a</p>\n<%% x = 1 %%>\n<%%= b %%>\n' \
-    | bin/rubocop -c config/develop/rubocop.yml --except Herb/Lint -a --stdin test.html.erb
+    | bin/rubocop -c config/develop/rubocop.yml --except Herb/Linting -a --stdin test.html.erb
 ```
 
 Input (the first case):
@@ -56,12 +55,12 @@ If the tag is on the first line, only ` %>` is left on that line.
 
 ## Analysis
 
-`bin/erb2ruby --disable-html-visualization` shows the converted Ruby code:
+`bin/erb2ruby` shows the converted Ruby code (trailing whitespace omitted):
 
 ```ruby
-
+p;
    1;
-   _ = b;
+_ = b;
 ```
 
 `Lint/Void#autocorrect_void_expression` in rubocop 1.91.0 (`lib/rubocop/cop/lint/void.rb:274`) removes the node with this range:
@@ -70,7 +69,7 @@ If the tag is on the first line, only ` %>` is left on that line.
 corrector.remove(range_with_surrounding_space(range: node.source_range, side: :left))
 ```
 
-In the Ruby code, the whitespace to the left of `1` is the newline after `<p>a</p>` and 3 spaces. In the ERB source, they are the newline and `<% `. So the correction removes `\n<% 1` and leaves ` %>`.
+In the Ruby code, the whitespace to the left of `1` is the newline at the end of the first line and 3 spaces. In the ERB source, they are the newline and `<% `. So the correction removes `\n<% 1` and leaves ` %>`.
 
 ## Possible directions
 
