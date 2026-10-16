@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# herb はビルド済みの gem（arm64-darwin など）を使い、C 拡張をビルドしない。
+# Gemfile.lock から ruby プラットフォームを外してあるので、BUNDLE_FROZEN=true bundle install で入れる
+gem "herb", "0.11.0"
+gem "rubocop", "1.91.0"
+
+# marcoroth/herb#2260 の gems/rubocop-herb（Ruby のみ）。gemspec だけを git から読む
+gem "rubocop-herb",
+    git: "https://github.com/marcoroth/herb.git",
+    ref: "d0323df360553502e31b14ff570990f907f46b2a",
+    glob: "gems/rubocop-herb/*.gemspec"

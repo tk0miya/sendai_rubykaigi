@@ -1,0 +1,7 @@
+# marcoroth/herb#2260 の rubocop-herb 用
+plugins:
+  - rubocop-herb
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.4

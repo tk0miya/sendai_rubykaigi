@@ -1,0 +1,105 @@
+GIT
+  remote: https://github.com/marcoroth/herb.git
+  revision: d0323df360553502e31b14ff570990f907f46b2a
+  ref: d0323df360553502e31b14ff570990f907f46b2a
+  glob: gems/rubocop-herb/*.gemspec
+  specs:
+    rubocop-herb (0.11.0)
+      herb (= 0.11.0)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.72.1, < 2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.3)
+    herb (0.11.0-aarch64-linux-gnu)
+    herb (0.11.0-aarch64-linux-musl)
+    herb (0.11.0-arm-linux-gnu)
+    herb (0.11.0-arm-linux-musl)
+    herb (0.11.0-arm64-darwin)
+    herb (0.11.0-x86-linux-gnu)
+    herb (0.11.0-x86-linux-musl)
+    herb (0.11.0-x86_64-darwin)
+    herb (0.11.0-x86_64-linux-gnu)
+    herb (0.11.0-x86_64-linux-musl)
+    json (3.1.0)
+    language_server-protocol (3.17.0.6)
+    lint_roller (1.1.0)
+    parallel (2.3.0)
+    parser (3.3.12.0)
+      ast (~> 2.4.1)
+      racc
+    prism (1.9.0)
+    racc (1.8.1)
+    rainbow (3.1.1)
+    regexp_parser (2.13.1)
+    rubocop (1.91.0)
+      json (>= 2.3)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.1.0)
+      parallel (>= 1.10)
+      parser (>= 3.3.0.2)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.49.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.50.0)
+      parser (>= 3.3.7.2)
+      prism (~> 1.7)
+    ruby-progressbar (1.13.0)
+    unicode-display_width (3.3.0)
+      unicode-emoji (~> 4.3)
+    unicode-emoji (4.3.0)
+
+PLATFORMS
+  aarch64-linux-gnu
+  aarch64-linux-musl
+  arm-linux-gnu
+  arm-linux-musl
+  arm64-darwin
+  arm64-darwin-24
+  x86-linux-gnu
+  x86-linux-musl
+  x86_64-darwin
+  x86_64-linux
+  x86_64-linux-gnu
+  x86_64-linux-musl
+
+DEPENDENCIES
+  herb (= 0.11.0)
+  rubocop (= 1.91.0)
+  rubocop-herb!
+
+CHECKSUMS
+  ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
+  bundler (4.0.19) sha256=b48056e4c77fb3853cc47775b5447ede44aaa4f53c32f168014ab4fe86587d47
+  herb (0.11.0-aarch64-linux-gnu) sha256=7d8244655bb99a50b2d52ea13408c2a76b3fbd70bcca8ccee4229d3e1902bb0b
+  herb (0.11.0-aarch64-linux-musl) sha256=8b19e8ce70cae1a016468cd6c3a88a051e47fd68f3f8b1bd3ffb751a62109982
+  herb (0.11.0-arm-linux-gnu) sha256=8fd8e3c4d45c3b6bc8a2b7f056ac4bf961cfb03407fef26f7e1d5ef69406bf5d
+  herb (0.11.0-arm-linux-musl) sha256=0ac4e441389d8e67ef1afcabdb1bff94f5b7cd1c2811159647f61fc7bc241f8d
+  herb (0.11.0-arm64-darwin) sha256=8972ac3e5a7ee7296a89d78fceb40d8fb85c3ea8d40c9781a9c8db3e58194501
+  herb (0.11.0-x86-linux-gnu) sha256=3059da43892860326523d40fdf22b10f5c1c676241b1bfa849dbaebe33dede01
+  herb (0.11.0-x86-linux-musl) sha256=50d0768f16e998375fd6fa3133156a4c47f2b7cb7b196564ac836478c6cfb14b
+  herb (0.11.0-x86_64-darwin) sha256=2eb9db026a1949cb2ad8cfa1944ef8402feab784c7d37a35c48575a9e0d79912
+  herb (0.11.0-x86_64-linux-gnu) sha256=aba19094bc1618e1bc0fb59db52ba251c93a24598f5228815616b282f10bb8a0
+  herb (0.11.0-x86_64-linux-musl) sha256=e27a08fe72304c8043e851b568ed30eaa45f06b5333d151939a7834e936c01aa
+  json (3.1.0) sha256=3ce7ccf8fde58960177a3a756c31f292a4c1e1dedee884547096a5b0604e3bd8
+  language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
+  lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
+  parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
+  parser (3.3.12.0) sha256=21a6d7f755d5a24dfbdc6e6b772e4e879a52e7631a88bc5a3a134606052c9828
+  prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
+  racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
+  rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
+  regexp_parser (2.13.1) sha256=5aedb6b7c35688f51e86eef17a15374dfd287c83f4ca644b2c5f3ec50a33b44b
+  rubocop (1.91.0) sha256=9c82b7bf391c5d7e3798c5b9996e22a1fe3bd7468e351dfdeb96140c058296d0
+  rubocop-ast (1.50.0) sha256=b9ca88300da0803ee222ad20cdb30494c0a784eed06fdc35d254b06d662788db
+  rubocop-herb (0.11.0)
+  ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
+  unicode-display_width (3.3.0) sha256=4b7aa66a4b11db50f6f7e98411215cd0dd10eaecb665d36eec5bcacb3fa0b613
+  unicode-emoji (4.3.0) sha256=11c02fa73290378c066bb0562cd4c87d8e1b706fbbe0059ca12746a4244de8ce
+
+BUNDLED WITH
+  4.0.19
