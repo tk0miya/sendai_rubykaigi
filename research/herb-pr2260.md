@@ -1,6 +1,6 @@
 # herb 公式の rubocop-herb（marcoroth/herb#2260）と tk0miya/rubocop-herb の比較
 
-調査日: 2026-10-16
+調査日: 2026-10-17
 
 herb 本体のリポジトリに提案されている RuboCop プラグイン（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)、以下「PR 版」）を、tk0miya/rubocop-herb（以下「rubocop-herb」）と比べた結果です。
 【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#herb-pr-2260)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
@@ -8,7 +8,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 ## 対象
 
 - PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head。Draft）の `gems/rubocop-herb`
-- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `2cf8414fb988dac08bc5d78cabf9c5bfe1328a8c`（2026-10-16 時点の main）
+- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `24ec03477642aa4c8162d2d7d075aa623c72d062`（2026-10-17 時点の main）
 - herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.91.0 / ruby 4.0.5
 - 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/herb-pr2260/](repro/herb-pr2260/)）
 - 入力
@@ -22,7 +22,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 - ただし変換は `Herb.extract_ruby` で ERB タグ以外を空白にするだけで、`<%=` の「出力する」という意味が残りません。HTML も空白になるので、HTML だけを本文に持つ分岐やブロックは空に見えます。誤検知への対策は、cop をファイル全体で除外することだけです
 - autocorrect の結果を検査する仕組みがありません。このため **`-a`（安全な修正だけ）でもテンプレートを壊します**。実際のビュー 333 ファイルでは、63 ファイルで HTML が変わり、59 ファイルで Herb のパースエラーが増えました。rubocop-herb では、どちらも 0 ファイルでした
 - 主な原因は、既定で有効な `Layout/ExtraSpacing` と、メンテナの要望で除外を外した `Lint/Void` です。どちらも、空白にした HTML や ERB の区切りを Ruby の空白として扱い、修正で削除します
-- rubocop-herb の側にも、PR 版では出ない誤検知が実際のビューで 3 種類ありました（`Lint/EmptyFile`、`Naming/FileName`、`Layout/EmptyLineAfterMagicComment`）
+- rubocop-herb の側には、PR 版では出ない指摘が実際のビューで出ます。`Layout/LineLength`（162 件）と `Lint/EmptyFile`（16 件）は妥当な指摘です。`Layout/EmptyLineAfterMagicComment` は、判定は正しいものの ERB には合わず、`-a` でテンプレートの出力が変わります。`Naming/FileName` は 3 件のうち 1 件（ハイフンを含むロケールのテンプレート）が誤検知です
 
 ## PR の状況【出典】
 
@@ -84,7 +84,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 | | PR 版 | rubocop-herb |
 |---|---|---|
-| 規模 | plugin.rb 74 行 + default.yml 108 行 | `lib/` 全体で約 3,100 行 |
+| 規模 | plugin.rb 74 行 + default.yml 108 行 | `lib/` 全体で約 3,200 行 |
 | ERB の読み方 | Herb の lexer のトークン（C 実装） | Herb の AST |
 | `<%= foo %>` | `foo;` | `_ = foo;` |
 | HTML | 空白 | `div;` や `_a;` などの識別子 |
@@ -200,11 +200,11 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | | PR 版 | rubocop-herb |
 |---|---|---|
-| offense の数 | 2,455 | 992 |
+| offense の数 | 2,455 | 935 |
 | `-a` で書き換わったファイル | 251 | 140 |
 | うち HTML が変わったファイル | 63 | 0 |
 | うちパースエラーが増えたファイル | 59 | 0 |
-| 実行時間（`--cache false`、検出のみ） | 2.4 秒 | 3.0 秒 |
+| 実行時間（`--cache false`、検出のみ） | 1.9 秒 | 2.8 秒 |
 
 片方にだけ多く出る cop:
 
@@ -214,16 +214,73 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `Lint/Void` | 50 | 0 | 変数 29 件（`<%= event.name %>` など）、リテラル 20 件（`<%= event.ongoing? ? "true" : "" %>`、`<%= ' current' if page.current? %>` など）、演算子 1 件。いずれも出力する式 |
 | `Lint/EmptyBlock` | 30 | 2 | PR 版の 28 件は、本文が HTML だけのブロック（`<%= link_to path do %>…<% end %>` など）。2 件は両方に出る、本当に空のブロック |
 | `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 10, 8 | 0, 0 | `<%= cache "fragment" do %><p>ERB</p><% end %>` のように 1 行に書いた、本文が HTML のブロック |
-| `Layout/LineLength` | 0 | 217 | PR 版はファイル全体で除外している。rubocop-herb は ERB の行の長さを検査する |
-| `Lint/EmptyFile` | 0 | 16 | 0 バイトのテンプレート（rails のテスト用の fixture、conference-app の `admin/signage_devices/edit.html.erb`） |
-| `Naming/FileName` | 0 | 3 | `_FooBar.html.erb`、`_a-in.html.erb`、`hello_world.pt-BR.html.erb` |
-| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | `<%# encoding: utf-8 -%>` の次の行 |
+| `Layout/LineLength` | 0 | 162 | 下記 |
+| `Lint/EmptyFile` | 0 | 16 | 下記 |
+| `Naming/FileName` | 0 | 3 | 下記 |
+| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | 下記 |
+| `Style/IfUnlessModifier` | 0 | 1 | `<%= '\|' unless names.last == name %>` の行（HTML を含めて 121 桁）に、修飾子の `unless` で行が長すぎると出る。`-a` では修正されない |
 
 `Lint/Void` の誤検知には、[marcoroth/herb#1619](https://github.com/marcoroth/herb/issues/1619) のもとになった rails の `active_storage/blobs/_blob.html.erb`（`<%= blob.representable? ? "preview" : "file" %>`）も含まれます。
+
+### rubocop-herb だけに出る指摘の内容
+
+#### `Layout/LineLength`
+
+rubocop-herb は、ERB タグを含む行について、HTML も含めた行全体の長さを測ります。ERB タグを含まない行と、`<%%` だけの行（テキスト）は測りません。162 件を、行のうち ERB タグ（`<%` 〜 `%>`）が占める長さで分けると、次のようになります。
+
+| 区分 | 件数 | 例 |
+|---|---|---|
+| ERB タグ 1 つだけで 120 桁を超える | 86（conference-app 81） | `<%= f.select :status, Announcement.statuses, {}, class: "block rounded-sm border-1 cursor-pointer disabled:bg-gray-200 …", disabled: @announcement.published? %>`（タグだけで 191 桁） |
+| 周りの HTML を除いても、ERB タグとインデントで超える | 23 | `<%= f.color_field :border_color_code, class: "block mb-4", data: { action: "…" } %>` |
+| 周りの HTML を含めると超える | 53 | `<span class="rounded-xl bg-theme-primary-300 px-3 text-sm ml-2"><%= current_user!.unread_announcement_count %></span>`（131 桁のうちタグは 46 桁） |
+
+- 前の 2 つ（109 件）は、Tailwind の長い `class:` の文字列をヘルパーに渡しているものがほとんど。ERB タグの中の Ruby を引数ごとに改行すれば短くできる
+- 残りの 53 件は、タグの外の HTML を改行すれば短くできる（属性を 1 行に 1 つずつ並べるなど）。RuboCop では autocorrect できないが、Herb の formatter（`herb-format`）が `maxLineLength` で属性やテキストを折り返す
+- `herb-format` の `maxLineLength` の既定値は 80（`javascript/packages/formatter/src/options.ts`）で、`Layout/LineLength` の既定値 120 と異なる
+- `-a` では、ERB タグの中の引数を改行する修正が入る。HTML は変わらないが、2 行目が 120 桁を超えたまま残り、`%>` が行頭に置かれる
+
+```erb
+    <%= f.select :status, Announcement.statuses, {},
+                 class: 'block rounded-sm border-1 cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed mb-8', disabled: @announcement.published?
+%>
+```
+
+- 120 桁は RuboCop の既定値で、conference-app は RuboCop を導入していない
+
+#### `Lint/EmptyFile`
+
+- 16 件とも 0 バイトのテンプレート。HTML だけのテンプレート、改行だけのテンプレート、`<%# … %>` だけのテンプレートには出ない。Ruby のファイルと同じく、0 バイトのときだけ出る
+- conference-app の `admin/signage_devices/edit.html.erb` は、ルーティング（`resources :signage_devices, only: [:new, :create, :edit, :update]`）とコントローラーの `edit` があるのに、テンプレートが空。編集画面が空のページになる
+- rails の 15 件は、空のテンプレートの描画を確かめるテスト用の fixture（actionmailer のメールのパート、actionview の digestor のテストなど）
+
+#### `Layout/EmptyLineAfterMagicComment`
+
+- 3 件とも rails の actionview のテスト用 fixture の `<%# encoding: utf-8 -%>` の次の行。ActionView は、テンプレート先頭の `<%# encoding: … -%>` をテンプレートのエンコーディング指定として読む（`action_view/template/handlers/erb.rb` の `ENCODING_TAG`）ので、マジックコメントという判定は正しい
+- `<%# frozen_string_literal: true %>` にも出る。ActionView がテンプレートの先頭から読むのは encoding だけ
+- `-a` で、マジックコメントの後に空行が挿入される。空行はテンプレートの出力の改行になるので、出力が変わる。`CopCorrectionGuard` は HTML の両端の空白の違いを無視するので、この修正を止めない
+
+```erb
+<%# encoding: utf-8 -%>
+
+Русский <%= render partial: 'test/utf8_partial_magic' %>
+```
+
+- この fixture を使う rails のテスト（`test_render_utf8_template_with_magic_comment`）は、描画結果を文字列で完全に比べている
+
+#### `Naming/FileName`
+
+| ファイル | 内容 |
+|---|---|
+| `_FooBar.html.erb`, `_a-in.html.erb` | 大文字やハイフンを含む partial 名でも描画できることを確かめる rails のテスト用 fixture（`test_render_partial_starting_with_a_capital`、`test_render_partial_with_hyphen`）。アプリでは snake_case の命名規約からの逸脱 |
+| `hello_world.pt-BR.html.erb` | `pt-BR` ロケールのテンプレート。Rails はロケール付きのテンプレートをこの名前で探すので、名前を変えられない |
 
 ## 評価【推測】
 
 - PR 版の誤検知と壊れる autocorrect は、変換の段階で `<%=` の意味と HTML の存在を落としていることから生じている。除外する cop を増やせば `Layout/ExtraSpacing` などは止められるが、`Lint/Void` のように除外しないと決めた cop では、出力する式の誤検知が残る
 - `Layout/ExtraSpacing` は RuboCop の既定で有効なので、PR 版を既定の設定で入れて `rubocop -a` を実行すると、同じ行に ERB タグが 2 つ以上あるテンプレートが壊れる。修正後の ERB を検査する仕組み（rubocop-herb の `CopCorrectionGuard` に当たるもの）がない限り、autocorrect を安全に使えない
 - 一方で、PR 版は小さく、herb 本体の C 実装に乗っているので保守しやすい。herb 公式の gem として出すための土台としては妥当で、`<%=` を `_ =` にするような変換を `extract_ruby` のオプションとして C 側に足す方向もありうる
-- rubocop-herb で実際のビューに出た `Lint/EmptyFile`、`Naming/FileName`、`Layout/EmptyLineAfterMagicComment` は、テンプレートでは誤検知とみなせる。ERB の既定の設定で除外を検討する余地がある
+- rubocop-herb の `Layout/LineLength` は、行全体の長さを測るので、HTML が原因の長い行も指摘する。テンプレートも読むためのソースファイルなので、どれも改行で短くすべき行と言える。違いは直す道具で、ERB タグの中は RuboCop、タグの外の HTML は `herb-format` が直す。両方を使うなら、`Layout/LineLength` の `Max` と `herb-format` の `maxLineLength` を揃えないと、基準が食い違う
+- `Layout/LineLength` の autocorrect は、ERB では `%>` の位置が崩れ、行の長さも収まらないことがある。修正を ERB に合う形にできないなら、ガードで拒否して指摘だけを残すほうがよい
+- `Lint/EmptyFile` は、作りかけの空のテンプレートを見つけられる。わざと空にしたテンプレートは、`<%# … %>` を置けば指摘されない
+- `Layout/EmptyLineAfterMagicComment` は、autocorrect でテンプレートの出力が変わるので、ERB では除外するか、少なくとも autocorrect を拒否するのが妥当
+- `Naming/FileName` は、ロケールやフォーマットなどのテンプレートの variant（`.pt-BR.` など）を考慮しないと誤検知になる
