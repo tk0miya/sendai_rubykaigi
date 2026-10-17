@@ -201,3 +201,80 @@ $ diff "$OLDPWD/useless_assignment_leaves_void.html.erb" useless_assignment_leav
 ```
 
 - 未使用の変数への代入が `<% 1 %>` で止まる（`useless_assignment_leaves_void.html.erb`）: `-a` で `Lint/UselessAssignment` が修正され、`<% unused = 1 %>` が `<% 1 %>` になる。続いて出る `Lint/Void` は修正されず（`[Correctable]` が付かない）、offense が残る。同じ内容の Ruby ファイルなら、代入文ごと消える
+
+## herb PR #2260
+
+[../herb-pr2260.md](../herb-pr2260.md) の再現手順です。herb 本体のリポジトリに提案されている rubocop-herb（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)）と、tk0miya/rubocop-herb を同じ入力にかけて比べます。
+
+### セットアップ
+
+PR 版の gem（`gems/rubocop-herb`）は Ruby だけでできているので、herb のリポジトリはビルドしません。`herb-pr2260/Gemfile` は次のように作ってあります。
+
+- herb は rubygems のビルド済み gem（`herb-0.11.0-arm64-darwin` など）を使う。`Gemfile.lock` からは `ruby` プラットフォーム（ソースからビルドする gem）を外してある
+- `bundle install` は必ず `BUNDLE_FROZEN=true` を付けて実行する。付けないと、`Gemfile.lock` にないプラットフォームでは Bundler がそのプラットフォームを足して解決し直し、ビルド済み gem がなければソースの gem を選んでビルドを始める。付けると「Add the current platform to the lockfile」というエラーで止まる
+- PR 版の gem は Bundler の git ソースで、PR の head（`d0323df`）の `gems/rubocop-herb/*.gemspec` だけを読む。herb のリポジトリで `bundle install` や `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）
+- 実行すると `already initialized constant Herb::VERSION` という警告が出る。PR 版の gemspec が、git から取ってきたリポジトリの `lib/herb/version.rb` を読むためで、どちらも 0.11.0 なので影響はない
+
+```console
+$ cd research/repro
+$ (cd herb-pr2260 && BUNDLE_FROZEN=true bundle install)
+$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-2cf8414"
+$ (cd "$TMPDIR/rubocop-herb-2cf8414" && git checkout 2cf8414fb988dac08bc5d78cabf9c5bfe1328a8c && bundle install)
+$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb-2cf8414"
+$ alias pr2260='BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec rubocop --cache false -c "$PR2260/pr.yml"'
+$ alias rubocop-herb-head='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$PR2260/tk.yml"'
+```
+
+- `pr.yml` は PR 版を読み込む設定、`tk.yml` は `$RUBOCOP_HERB/config/develop/rubocop.yml` を継承する設定。どちらも `NewCops: enable` と `TargetRubyVersion: 3.4` に揃えてある
+- 比べる対象の rubocop-herb のコミットが「rubocop-herb」の節と違うので、別のディレクトリに clone する
+
+### 再現例と境界ケースにかける
+
+```console
+$ pr2260 --format offenses erb_lint rubocop-erb ruumba rubocop-herb herb/app
+$ rubocop-herb-head --format offenses erb_lint rubocop-erb ruumba rubocop-herb herb/app
+$ pr2260 --format emacs herb-pr2260/edge
+$ rubocop-herb-head --format emacs herb-pr2260/edge
+```
+
+- 再現例 22 ファイルで、PR 版は 97 件（うち `Layout/ExtraSpacing` 62 件）、rubocop-herb は 32 件
+- PR 版だけに `Lint/Void`、`Style/SymbolProc`、`Lint/EmptyBlock` が、rubocop-herb だけに `Lint/UnusedBlockArgument`、`Style/EmptyElse`、`Lint/EmptyConditionalBody`、`Style/IdenticalConditionalBranches` が出る
+- `herb-pr2260/edge/case.html.erb` に、PR 版だけ `Lint/EmptyWhen` が出る。`herb-pr2260/edge/disable.html.erb` の `<%# rubocop:disable … %>` は PR 版では効かない
+
+### autocorrect（コピーに対して実行すること）
+
+```console
+$ W="$TMPDIR/pr2260-ac" && mkdir -p "$W/orig/herb"
+$ for d in erb_lint rubocop-erb ruumba rubocop-herb; do ditto "$d" "$W/orig/$d"; done
+$ ditto herb/app "$W/orig/herb/app" && ditto herb-pr2260/edge "$W/orig/edge"
+$ for t in pr-safe pr-all tk-safe tk-all; do ditto "$W/orig" "$W/$t"; done
+$ (cd "$W/pr-safe" && pr2260 -a .)
+$ (cd "$W/pr-all" && pr2260 -A .)
+$ (cd "$W/tk-safe" && rubocop-herb-head -a .)
+$ (cd "$W/tk-all" && rubocop-herb-head -A .)
+$ diff -r "$W/orig" "$W/pr-safe"
+$ for t in pr-safe pr-all tk-safe tk-all; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$W/orig" "$W/$t"; done
+```
+
+- macOS のファイルシステムは大文字と小文字を区別しないので、`-a` と `-A` のコピーに `pr_a` / `pr_A` のような名前を付けない（同じディレクトリになる）
+- `html_changes.rb` は、書き換わったファイルのうち、HTML（空白の違いは無視）が変わったものと Herb のパースエラーが増えたものを数える
+- PR 版は `-a` でも 9 ファイルで HTML が変わる。`edge/two_tags_line.html.erb` が `<td><%= user.name%> user.email%></td>` に、`edge/inline_if.html.erb` が `<% if a%> else%> end%>` になる。rubocop-herb は `-a`、`-A` とも 0 ファイル
+
+### 実際のビューにかける
+
+rails/rails と kaigionrails/conference-app の `*.html.erb` を、コミットを固定して取得します。
+
+```console
+$ S="$TMPDIR/views-src" && mkdir -p "$S/rails" "$S/conference-app"
+$ (cd "$S/rails" && git init -q && git fetch --depth 1 https://github.com/rails/rails.git 0f591639b864de6bf3fd760a6921f5eda17b2905 && git checkout -q FETCH_HEAD)
+$ (cd "$S/conference-app" && git init -q && git fetch --depth 1 https://github.com/kaigionrails/conference-app.git 25a02cc871861dd94d76a4af983fad7b08008333 && git checkout -q FETCH_HEAD)
+$ V="$TMPDIR/views" && rsync -a --prune-empty-dirs --exclude node_modules --exclude vendor --exclude tmp --exclude .git --include '*/' --include '*.html.erb' --exclude '*' "$S/" "$V/orig/"
+$ (cd "$V/orig" && pr2260 --format offenses .)
+$ (cd "$V/orig" && rubocop-herb-head --format offenses .)
+$ ditto "$V/orig" "$V/pr" && ditto "$V/orig" "$V/tk"
+$ (cd "$V/pr" && pr2260 -a .) ; (cd "$V/tk" && rubocop-herb-head -a .)
+$ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
+```
+
+- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 992 件
+- `-a` で HTML が変わるファイルは、PR 版が 63、rubocop-herb が 0
