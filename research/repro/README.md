@@ -134,7 +134,7 @@ $ npx herb-lint app/views/samples
 
 ```console
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 6601d3efd1dd1310f5d896a9e0e643061af835ff && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 96d31cf8dff39109dbe4506b808e19693a92b2e2 && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 $ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$RUBOCOP_HERB/config/develop/rubocop.yml"'
 ```
@@ -161,7 +161,7 @@ $ diff -r "$OLDPWD" .
 ```
 
 - `count -1` は `count - 1`、`user && user.admin?` は `user&.admin?` に正しく修正される
-- `herb/app/views/samples/cross_tag_variables.html.erb` の `<% unused = 1 %>` は `<% 1 %>` になる。続いて出る `Lint/Void` は、修正すると `<%` が消えるので修正されない（autocorrect できない offense として残る。下の「未解決の問題」）
+- `herb/app/views/samples/cross_tag_variables.html.erb` の `<% unused = 1 %>` は、行ごと消える（`Lint/UselessAssignment`、`Lint/Void`、`Herb/EmptyErbTag` の順に修正される）
 
 ### Herb/Linting（herb-lint）
 
@@ -176,7 +176,8 @@ $ BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c "$
 $ npx herb-lint app/views/samples
 ```
 
-- `missing_close.html.erb`、`cross_tag_variables.html.erb`、`identical_branches_output.html.erb` に、herb-lint 単体と同じ offense が `Herb/Linting: [rule-name] …` として出る
+- `missing_close.html.erb`、`cross_tag_variables.html.erb` に、herb-lint 単体と同じ offense が `Herb/Linting: [rule-name] …` として出る
+- `empty_tag_after_output_tag.html.erb` には herb-lint 単体では `erb-no-empty-tags` が出るが、`Herb/Linting` は出さない。代わりに `Herb/EmptyErbTag` が出る
 - `missing_end.html.erb` には herb-lint 単体では `parser-no-errors` が出るが、`Herb/Linting` は出ない（Ruby の構文エラーがあるファイルでは herb-lint を実行しない）。`Lint/Syntax` は出る
 - `herb/` で実行すると、`@herb-tools/linter is not installed in …/research/repro` というエラーが出る
 
@@ -188,19 +189,12 @@ $ npx herb-lint app/views/samples
 $ cd rubocop-herb
 $ rubocop-herb .
 $ cp -R . "$TMPDIR/rubocop-herb-ac" && cd "$TMPDIR/rubocop-herb-ac"
-$ rubocop-herb -A --only Style/IdenticalConditionalBranches .
+$ rubocop-herb -a .
 $ diff -r "$OLDPWD" .
 ```
 
-- 同じ出力タグを分岐の外に移すと、出力されなくなる（`identical_branches_output.html.erb`）: `Style/IdenticalConditionalBranches`（`[Correctable]`。安全でない修正なので `-a` では修正されない）が出る。`-A` で、両方の分岐の `<%= foo %>` が消え、`<% end %>` が `<% end`⏎`   _ = foo %>` になる（`foo` が出力されなくなる）
-- `--only` を付けずに `-A` すると、続けて `Style/EmptyElse` なども修正される
-
-```console
-$ rubocop-herb -a useless_assignment_leaves_void.html.erb
-$ diff "$OLDPWD/useless_assignment_leaves_void.html.erb" useless_assignment_leaves_void.html.erb
-```
-
-- 未使用の変数への代入が `<% 1 %>` で止まる（`useless_assignment_leaves_void.html.erb`）: `-a` で `Lint/UselessAssignment` が修正され、`<% unused = 1 %>` が `<% 1 %>` になる。続いて出る `Lint/Void` は修正されず（`[Correctable]` が付かない）、offense が残る。同じ内容の Ruby ファイルなら、代入文ごと消える
+- 出力タグの直後の空のタグを消すと、出力タグの `%>` も消える（`empty_tag_after_output_tag.html.erb`）: `-a` で `<% %>`⏎`<%= b %><% %>` が `<%= b ` になる。`--only Herb/EmptyErbTag` や `--only Layout/SpaceBeforeSemicolon` を付けて片方だけ修正すると壊れない
+- HTML を含むテンプレートで、パースし直して確かめる cop の指摘・修正が消える（`reparse_cops_in_html.html.erb`）: `<div>` の中の `root_path()`、`(foo)` に `Style/MethodCallWithoutArgsParentheses`、`Style/RedundantParentheses` が出ない。`(a == b) ? …` に `Style/TernaryParentheses` は出るが、`[Correctable]` が付かず修正されない。`<div>` と `</div>` の行を消すと、3 つとも出て修正される
 
 ## herb PR #2260
 
