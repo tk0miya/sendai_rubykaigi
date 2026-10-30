@@ -16,6 +16,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
   - [repro/](repro/) の既存ツールの再現例と、[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/) の境界ケース（32 ファイル）
   - 0.8 系向けの境界ケース（[repro/rubocop-erb-0.8/edge/](repro/rubocop-erb-0.8/edge/)、9 ファイル）
   - 無効化コメントの書き方ごとの例（[repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/)、6 ファイル）
+  - 指摘の表示を見るための例（[repro/rubocop-erb-0.8/display/](repro/rubocop-erb-0.8/display/)、3 ファイル）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -137,6 +138,16 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 - コメントの後で改行してから `%>` を書けば、補われる `;` が次の行に回るので、通常の Ruby のコメントとして扱われる。ファイル全体に効き、`# rubocop:enable` で範囲を区切れる
 - 0.7.2 はタグ 1 つを 1 つの Ruby として検査するので、無効化コメントは同じタグの中にしか効かない。`<% # rubocop:disable … %>` では、そのタグに `Lint/MissingCopEnableDirective` が出る
 - rubocop-herb は、右側に別のタグや HTML がない `<%# … %>` を Ruby のコメントに変換するので、どの書き方でも効く。右側にタグや HTML があって効かない書き方は、`Herb/IgnoredCopDirective` が報告する（[report.md](report.md#herbignoredcopdirective-cop)）
+
+## 指摘の表示【実測・出典】
+
+0.8 系は、HTML を空白にした Ruby（`Herb.extract_ruby` の出力）を RuboCop に渡します。rubocop-herb は、HTML を識別子にした Ruby を渡し、表示用に HTML を書き戻したソース（hybrid code）を使います。指摘の表示に違いが出るかを確かめました。
+
+- 指摘の行の表示（`--format clang` などのソースの抜粋とキャレット）は、3 つとも元の ERB の行になる。HTML やマルチバイト文字を含む行でも、HTML は空白にならず、キャレットの位置も同じ（`display/show.html.erb`）
+  - RuboCop 1.92 は、extractor が返した fragment で見つかった offense の範囲を、元のファイルのバッファに付け替えてから報告する（`RuboCop::Cop::Base#range_for_original`）。0.8 系は文字位置を元の ERB に揃えているので、付け替えた範囲がそのまま元の ERB の正しい位置になる
+- 実際のビュー 333 ファイルで、同じ位置に出た offense のメッセージは、0.8.2 と rubocop-herb で 1 件を除いて同じだった。違ったのは rails の `syntax_error.html.erb` の `Lint/Syntax` で、0.8.2 は「unexpected ';'; expected an argument」、rubocop-herb は「unexpected end-of-input; expected a `)` to close the arguments」
+- 構文エラーのメッセージには、ERB に書かれていない `;` が出ることがある。0.8.2 も rubocop-herb もタグの終わりに `;` を補うためで、`<p><%= link_to("a", path %></p>` には両方で「unexpected ';'; expected a `)` to close the arguments」が出る（`display/unclosed_paren.html.erb`）。キャレットは、0.8.2 では `%>` の `>` を、rubocop-herb では `%>` の前の空白を指す
+- メッセージにコードを引用する cop では、変換後の Ruby が出ることがある。rubocop-herb の `Style/IdenticalConditionalBranches` は、`<%= foo %>` について「Move `_ = foo` out of the conditional.」と報告する（`display/identical_branches.html.erb`）。`_ =` は rubocop-herb が `<%=` の位置に書く印で、ERB には書かれていない。0.8 系はこの cop を除外しているので出ない
 
 ## autocorrect の結果【実測】
 

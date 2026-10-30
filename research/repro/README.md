@@ -318,6 +318,16 @@ $ for f in rubocop-erb-0.8/disable/*.html.erb; do for t in erb072 erb082 tkherb;
 - `trailing.html.erb`、`trailing_output_tag.html.erb`（タグの中の行末のコメント）は 3 つとも効くが、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
 - `multiline_range.html.erb`（複数行のタグで `rubocop:disable` と `rubocop:enable` を書く）は、0.8.2 と rubocop-herb では範囲の中だけに効く。0.7.2 では効かない
 
+指摘の表示は `--format clang` で比べます。
+
+```console
+$ for t in erb072 erb082 tkherb; do echo "== $t"; $t --format clang rubocop-erb-0.8/display; done
+```
+
+- `show.html.erb`: 3 つとも、指摘の行は元の ERB（HTML と日本語を含む行）のまま表示され、キャレットの位置も同じ
+- `unclosed_paren.html.erb`: 0.8.2 と rubocop-herb の両方で、`Lint/Syntax` のメッセージに ERB にない `;` が出る
+- `identical_branches.html.erb`: rubocop-herb だけ、`Style/IdenticalConditionalBranches` のメッセージに `_ = foo` が出る
+
 ### autocorrect（コピーに対して実行すること）
 
 ```console
