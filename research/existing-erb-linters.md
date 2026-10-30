@@ -105,7 +105,8 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 ## rubocop-erb
 
 - リポジトリ: https://github.com/r7kamura/rubocop-erb
-- 最新: 0.7.1（2026-03-29）。0.7.0 で ERB パーサを better_html から Herb に移行（[#57](https://github.com/r7kamura/rubocop-erb/issues/57), [#59](https://github.com/r7kamura/rubocop-erb/pull/59)）
+- 対象: 0.7.1（2026-03-29）。0.7.0 で ERB パーサを better_html から Herb に移行（[#57](https://github.com/r7kamura/rubocop-erb/issues/57), [#59](https://github.com/r7kamura/rubocop-erb/pull/59)）
+- 0.8.0（2026-10-29）で、Ruby の取り出し方をタグ単位から `Herb.extract_ruby` による文書全体の変換に切り替えた（[#70](https://github.com/r7kamura/rubocop-erb/pull/70)）。この節は 0.7 系の内容。0.8 系は [rubocop-erb-0.8.md](rubocop-erb-0.8.md)
 
 ### 仕組み【出典】
 

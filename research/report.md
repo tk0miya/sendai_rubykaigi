@@ -16,7 +16,7 @@
 ## まとめ
 
 - rubocop-herb は、ruumba と同じく **文書全体を 1 本の Ruby にする**方式です。HTML は空白で埋めるのではなく、元の位置に識別子（`div;` など）として書き込みます
-- タグ単位の方式（erb_lint, rubocop-erb）で起きていた見逃し・誤検知・テンプレートを壊す autocorrect は、research の再現例ではすべて解消しています
+- タグ単位の方式（erb_lint, rubocop-erb 0.7 系）で起きていた見逃し・誤検知・テンプレートを壊す autocorrect は、research の再現例ではすべて解消しています
 - ruumba で新たに生じていた問題も、大半は解消しています
   - `<%=` を `_ =` に置き換えて「出力する」という意味を残すので、`Lint/Void` や `Style/SymbolProc` の誤検知が出ない
   - 文字位置を変えずに変換するので、autocorrect の結果をそのまま元の ERB に書き戻せる（ruumba のように黙って書き戻しを諦めることがない）
@@ -102,7 +102,7 @@ ERB では `--disable-uncorrectable` も無効にします（挿入される `# 
 
 `Layout/CommentIndentation`, `Layout/ExtraSpacing`, `Layout/IndentationConsistency`, `Layout/InitialIndentation`, `Layout/LeadingEmptyLines`, `Layout/TrailingEmptyLines`, `Metrics/BlockLength`, `Style/FrozenStringLiteralComment`, `Style/Semicolon`
 
-rubocop-erb は約 55 個、ruumba の推奨設定は 5 個です。`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void` は除外していません。
+rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個（[rubocop-erb-0.8.md](rubocop-erb-0.8.md#除外している-cop)）、ruumba の推奨設定は 5 個です。`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void` は除外していません。
 
 さらに、ERB の構造を見て、誤検知になる行でだけ cop を無効にしています（`<%# rubocop:disable %>` と同じ仕組み）。対象は 31 個です。
 
@@ -248,7 +248,8 @@ research の再現例（`repro/erb_lint`, `repro/rubocop-erb`, `repro/ruumba`, `
 | ツール | HTML 構造 | Ruby の構文 | Ruby のスタイル (RuboCop) | タグを跨いだ Ruby 解析 | autocorrect | 型・意味解析 |
 |---|---|---|---|---|---|---|
 | erb_lint (Rubocop linter) | ○ (better_html) | △ (タグ単位。不完全な文はスキップ) | △ (タグ単位) | × | △ (テンプレートを壊す) | × |
-| rubocop-erb | × | △ (タグ単位。Lint/Syntax を除外) | △ (タグ単位。約 55 cop を除外) | × | △ (意味・構文を壊す) | × |
+| rubocop-erb 0.7 系 | × | △ (タグ単位。Lint/Syntax を除外) | △ (タグ単位。53 cop を除外) | × | △ (意味・構文を壊す) | × |
+| rubocop-erb 0.8 系 | × | ○ (文書全体) | △ (文書全体。65 cop を除外) | ○ | ○ (1 つのタグの Ruby に収まらない修正は捨てる) | × |
 | ruumba (メンテ停止) | × | ○ (文書全体) | △ (文書全体。出力・HTML 本文が失われ誤検知) | ○ | △ (実験的。黙って書き戻さないことがある) | × |
 | **rubocop-herb** | ◎ (Herb/Linting で herb-lint を実行。Node.js が必要) | ○ (文書全体) | ○ (文書全体。9 cop を除外し、31 cop を行単位で無効化。HTML を含むファイルで一部の cop が働かない) | ○ | ○ (テンプレートを壊す修正は捨てる。ただし 2 つの cop の修正が重なって壊れる例が 1 件) | × |
 

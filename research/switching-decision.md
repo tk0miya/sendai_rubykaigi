@@ -2,21 +2,22 @@
 
 調査日: 2026-10-31
 
-[existing-erb-linters.md](existing-erb-linters.md)（既存ツール）と [report.md](report.md)（rubocop-herb）の結果をもとに、利用者の立場から「既存ツールを使い続ける理由」「rubocop-herb に切り替える理由」「切り替えられない理由」を整理したメモです。
-【実測】は手元で実行して確かめたこと、【出典】はソースコードや公開情報で確かめたこと、【推測】は解釈です。ここで新たに確かめた事実には印を付け、既存の 2 文書で確かめた事実は、その文書へのリンクで示します。
+[existing-erb-linters.md](existing-erb-linters.md)（既存ツール）、[rubocop-erb-0.8.md](rubocop-erb-0.8.md)（rubocop-erb 0.8 系）と [report.md](report.md)（rubocop-herb）の結果をもとに、利用者の立場から「既存ツールを使い続ける理由」「rubocop-herb に切り替える理由」「切り替えられない理由」を整理したメモです。
+【実測】は手元で実行して確かめたこと、【出典】はソースコードや公開情報で確かめたこと、【推測】は解釈です。ここで新たに確かめた事実には印を付け、既存の文書で確かめた事実は、その文書へのリンクで示します。
 
 ## 比較の前提
 
 - 既存ツールは、Ruby 部分を RuboCop で検査する **erb_lint**（Rubocop linter）、**rubocop-erb**、**ruumba** と、HTML 構造を検査する **herb-lint** を対象にする。中心は利用者が最も多い erb_lint
+- rubocop-erb は、タグ単位の 0.7 系と、`Herb.extract_ruby` で文書全体を変換する 0.8 系（2026-10-29 公開）を分けて扱う
 - rubocop-herb は `96d31cf8dff39109dbe4506b808e19693a92b2e2`（2026-10-29 時点の main）
-- 利用状況（rubygems.org、2026-10-10 時点の累計 DL）【出典】
+- 利用状況（rubygems.org、2026-10-31 時点の累計 DL）【出典】
 
 | gem | 最新 | 累計 DL |
 |---|---|---|
-| erb_lint | 0.9.0 | 2,193 万 |
-| herb | 0.11.0 | 202 万 |
-| rubocop-erb | 0.7.2 | 85 万 |
-| ruumba | 0.1.17 | 49 万 |
+| erb_lint | 0.9.0 | 2,250 万 |
+| herb | 0.11.1 | 236 万 |
+| rubocop-erb | 0.8.2 | 91 万 |
+| ruumba | 0.1.17 | 50 万 |
 | rubocop-herb（tk0miya） | 未公開 | - |
 
 ## まとめ
@@ -26,13 +27,14 @@
 - **今すぐ切り替えられない理由は 2 種類ある**
   - rubocop-herb 側で解消できるもの: rubygems に未公開（gem 名も衝突）、2 つの cop の修正が重なると `-a` でテンプレートが壊れる問題、HTML を含むテンプレートで一部の cop が働かない問題
   - 利用者の環境や資産によるもの: HTML 検査に Node.js が必要、erb_lint の独自 linter・プラグインに移行先がない、Ruby 3.3 以上が必要
-- 既存ツールごとに見ると、ruumba と rubocop-erb の利用者は失うものがほぼなく、移行しやすい。erb_lint の利用者は Ruby 部分だけを rubocop-herb に移す併用が現実的。herb-lint の利用者にとっては、rubocop-herb は置き換えではなく追加になる【推測】
+- rubocop-erb 0.8 系は、rubocop-herb と同じく文書全体を検査し、テンプレートを壊す修正を捨てるようになった。rubocop-herb との差は、除外する cop の数（65 個と 9 個）、`<%# rubocop:disable %>` が効くか、修正の検査の細かさに縮まっている（[rubocop-erb-0.8.md](rubocop-erb-0.8.md)）
+- 既存ツールごとに見ると、ruumba と rubocop-erb 0.7 系の利用者は失うものがほぼなく、移行しやすい。rubocop-erb 0.8 系の利用者にとっては、移行の利点は検査できる cop の多さに限られる。erb_lint の利用者は Ruby 部分だけを rubocop-herb に移す併用が現実的。herb-lint の利用者にとっては、rubocop-herb は置き換えではなく追加になる【推測】
 
 ## 既存ツールを使い続ける理由
 
 ### 実績と情報の多さ
 
-- erb_lint の累計 DL は 2,193 万で、rubocop-erb の約 26 倍【出典】。設定例や CI への組み込み方の情報が多い
+- erb_lint の累計 DL は 2,250 万で、rubocop-erb の約 25 倍【出典】。設定例や CI への組み込み方の情報が多い
 - 周辺ツール（pronto-erb_lint, guard-erb_lint, erb_lint_daemon など）がある（[existing-erb-linters.md](existing-erb-linters.md#rubygemsorg-で見つかったその他の候補)）
 
 ### RuboCop 以外の機能（erb_lint）
@@ -64,17 +66,18 @@ erb_lint 0.9.0 には、Rubocop linter のほかに 22 個の linter と 5 個�
 
 - タグを跨いだ制御構造: `<% if foo == nil %>` の `Style/NilComparison`、`<% if !user.nil? %>` の `Style/NegatedIf`、`then` / `elsif` / `unless !x`、本当に空の `else`
 - タグを跨いだ変数: 本当に未使用の変数だけに `Lint/UselessAssignment` が出る
-- `Lint/Syntax`: `end` の抜けを検出する（rubocop-erb は `Lint/Syntax` を除外している）
+- `Lint/Syntax`: `end` の抜けを検出する（rubocop-erb 0.7 系は `Lint/Syntax` を除外している。0.8 系は検出する）
 - herb-lint では検出されないスタイル違反（`link_to( 'Home',root_path )` など）
 
 ### 誤検知が少ない【実測・出典】
 
 - erb_lint の `Lint/UselessAssignment` やタグごとの `Style/FrozenStringLiteralComment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は、いずれも出ない
-- ファイル全体で除外する cop は 9 個（rubocop-erb は約 55 個）。それ以外の誤検知になる cop（31 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- ファイル全体で除外する cop は 9 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（31 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- rubocop-erb 0.8 系が除外している `Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation` なども、誤検知にならない行では検出する。実際のビューでは、本当に空のブロックや `map { |k| k.to_s }` を検出した（[rubocop-erb-0.8.md](rubocop-erb-0.8.md#082-と-rubocop-herb-の違い)）
 
 ### autocorrect がテンプレートを壊さない【実測・出典】
 
-- rubocop-erb で意味・構文を壊していた `count -1`、`item *2`、`user && user.admin?` が正しく修正される
+- rubocop-erb 0.7 系が意味・構文を壊す `count -1`、`item *2`、`user && user.admin?` が正しく修正される
 - erb_lint で `<%=` や `<%` が消えていた例も、正しく修正されるか、変更されない
 - 文字位置を変えずに変換するので、ruumba のように黙って書き戻しを諦めることがない
 - 修正を元の ERB に当ててみて、HTML が変わる修正、出力タグの数が変わる修正、パースエラーが増える修正は適用しない（`CopCorrectionGuard`。[report.md](report.md#autocorrect-の検査copcorrectionguard)）。HTML を含む分岐の入れ替え（`Style/UnlessElse` など）は、offense だけが報告される
@@ -92,7 +95,7 @@ erb_lint 0.9.0 には、Rubocop linter のほかに 22 個の linter と 5 個�
 
 - erb_lint は 2025-05 以降は依存更新のみで、性能改善 PR や autocorrect のバグが open のまま
 - ruumba は 2021 年からメンテ停止
-- better_html は非推奨になり、Herb への移行を案内している。rubocop-erb も ERB パーサを Herb に移した
+- better_html は非推奨になり、Herb への移行を案内している。rubocop-erb も ERB パーサを Herb に移し、0.8 系では `Herb.extract_ruby` で文書全体を変換している
 - rubocop-herb は、開発が活発な Herb の上に作られている
 
 ## 切り替えられない理由
@@ -102,12 +105,12 @@ erb_lint 0.9.0 には、Rubocop linter のほかに 22 個の linter と 5 個�
 | 理由 | 影響 | 解消の見込み |
 |---|---|---|
 | rubygems に未公開。gem 名が Marco Roth 氏の `rubocop-herb` 0.0.1 と衝突している。README の Installation が雛形のまま | Gemfile に git で指定するしかない。業務のプロジェクトでは導入しにくい | gem 名を決めて公開すれば解消 |
-| `<% %>`⏎`<%= b %><% %>` が `-a` で `<%= b ` になる（`Layout/SpaceBeforeSemicolon` と `Herb/EmptyErbTag` の修正が重なる） | **`-a` でテンプレートが壊れる**（閉じていない ERB タグになる）。空の ERB タグが出力タグの直後にあるテンプレートに限られる | 2 つのタグをつなげる修正を切り詰めるか、RuboCop がまとめた修正をもう一度検査すれば防げる見込み（[report.md](report.md#-が消える原因出典推測)） |
-| HTML を含むテンプレートで、`Style/MethodCallWithoutArgsParentheses`・`Style/RedundantParentheses` が出ず、`Style/TernaryParentheses` が修正されない | 見逃し | パースし直す検査を変換後の Ruby で行えば解消する見込み（[report.md](report.md#指摘修正が消える原因出典)） |
+| `<% %>`⏎`<%= b %><% %>` が `-a` で `<%= b ` になる（`Layout/SpaceBeforeSemicolon` と `Herb/EmptyErbTag` の修正が重なる） | **`-a` でテンプレートが壊れる**（閉じていない ERB タグになる）。空の ERB タグが出力タグの直後にあるテンプレートに限られ、実際のビュー 333 ファイルでは起きなかった（[rubocop-erb-0.8.md](rubocop-erb-0.8.md#実際のビューでの結果実測)） | 2 つのタグをつなげる修正を切り詰めるか、RuboCop がまとめた修正をもう一度検査すれば防げる見込み（[report.md](report.md#-が消える原因出典推測)） |
+| HTML を含むテンプレートで、`Style/MethodCallWithoutArgsParentheses`・`Style/RedundantParentheses` が出ず、`Style/TernaryParentheses` が修正されない | 見逃し。rubocop-erb 0.8 系では検出・修正される | パースし直す検査を変換後の Ruby で行えば解消する見込み（[report.md](report.md#指摘修正が消える原因出典)） |
 | マルチバイト文字を含むテキストや HTML コメントが `hybrid_code` に戻らない（[#72](https://github.com/tk0miya/rubocop-herb/issues/72)、open） | エラー表示【推測】 | issue で対応中 |
 | herb-lint の autocorrect に対応していない【出典: README】 | HTML 側の修正には `herb-lint --fix` を別に実行する必要がある | 実装すれば解消 |
 
-最初の 3 件は、どれも「既存ツールより良い」と言える範囲を狭めます。autocorrect については、壊す修正を捨てる仕組みがあります。ただし、2 つの cop の修正が重なって `-a` で壊れる例があるので、「autocorrect は常に安全」とまでは言えません。
+最初の 3 件は、どれも「既存ツールより良い」と言える範囲を狭めます。autocorrect については、壊す修正を捨てる仕組みがあり、実際のビューでは `-a`・`-A` ともテンプレートを壊しませんでした。ただし、2 つの cop の修正が重なって `-a` で壊れる例があるので、「autocorrect は常に安全」とまでは言えません。
 
 ### 利用者の環境や資産によるもの
 
@@ -126,7 +129,8 @@ erb_lint 0.9.0 には、Rubocop linter のほかに 22 個の linter と 5 個�
 | いま使っているもの | 切り替えたときに得るもの | 失うもの | 判断 |
 |---|---|---|---|
 | ruumba | 誤検知の解消、正しく書き戻される autocorrect、メンテされている実装 | ほぼない | 公開されれば移行しやすい |
-| rubocop-erb | タグを跨いだ検査、`Lint/Syntax`、意味を壊さない autocorrect | ほぼない（どちらも RuboCop プラグイン） | 公開されれば移行しやすい |
+| rubocop-erb 0.7 系 | タグを跨いだ検査、`Lint/Syntax`、意味を壊さない autocorrect | ほぼない（どちらも RuboCop プラグイン） | 公開されれば移行しやすい。0.8 系に上げるだけでも前の 3 つは得られる |
+| rubocop-erb 0.8 系 | 除外されていた cop（`Lint/EmptyBlock`、`Style/SymbolProc`、`Layout/LineLength` など）の検査、`<%# rubocop:disable %>`、修正後の ERB の検査、herb-lint の統合 | HTML を含むテンプレートでの一部の cop の検査（rubocop-herb の未解決の問題）、利用実績 | 移行の利点は検査できる cop の多さ。急いで切り替える理由は小さい |
 | erb_lint（Rubocop linter のみ） | 同上と、`.rubocop.yml` への一本化 | 導入時の offense の増加 | Ruby 部分は移行する価値がある |
 | erb_lint（HTML 系 linter・プラグインも利用） | Ruby 部分の検査の正しさ | 独自 linter・プラグイン、Node.js 不要という性質 | Ruby 部分だけ rubocop-herb に移し、erb_lint の Rubocop linter を無効にして併用する |
 | herb-lint | Ruby のスタイル検査（herb-lint にはない）、RuboCop との統合 | herb-lint の autocorrect（`herb-lint --fix` は別に実行すれば残る） | 置き換えではなく追加。`Herb/Linting` cop で 1 コマンドにまとめられる |
@@ -134,5 +138,6 @@ erb_lint 0.9.0 には、Rubocop linter のほかに 22 個の linter と 5 個�
 ## 発表に向けて
 
 - 提案では「チェックできる範囲、auto correct できる範囲が広がっています」と書いている。範囲が広がったことは再現例で示せ、テンプレートを壊す修正を捨てる仕組みも説明できる。ただし `-a` で壊れる例があるうちは、「autocorrect は常に安全」とは言わないほうがよい
+- rubocop-erb 0.8 系が同じ方式（文書全体の変換と修正範囲の検査）に移ったので、比べる相手は 0.7 系だけでなく 0.8 系も含める。0.8 系との違いは、除外する cop の数と、`<%=` と HTML の意味を残す変換にある
 - 「切り替えられない理由」のうち、rubocop-herb 側で解消できるもの（公開、未解決の問題 2 件）は、発表までに片付けておきたい
 - 利用者の環境によるもの（Node.js、erb_lint の独自 linter）は、「erb_lint と併用できる」「herb-lint を Ruby から使える」という形で、移行の道筋として示せる

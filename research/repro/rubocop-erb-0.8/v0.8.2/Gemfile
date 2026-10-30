@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# herb はビルド済みの gem（arm64-darwin など）を使う。rubocop と herb は tk0miya/rubocop-herb 96d31cf の Gemfile.lock に揃える
+gem "herb", "0.11.0"
+gem "rubocop", "1.92.0"
+gem "rubocop-erb", "0.8.2"
