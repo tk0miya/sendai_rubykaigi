@@ -231,21 +231,21 @@ $ alias rubocop-herb-head='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec ru
 ### 再現例と境界ケースにかける
 
 ```console
-$ pr2260 --format offenses erb_lint rubocop-erb ruumba rubocop-herb herb/app
-$ rubocop-herb-head --format offenses erb_lint rubocop-erb ruumba rubocop-herb herb/app
+$ pr2260 --format offenses erb_lint rubocop-erb ruumba herb/app
+$ rubocop-herb-head --format offenses erb_lint rubocop-erb ruumba herb/app
 $ pr2260 --format emacs herb-pr2260/edge
 $ rubocop-herb-head --format emacs herb-pr2260/edge
 ```
 
-- 再現例 22 ファイルで、PR 版は 97 件（うち `Layout/ExtraSpacing` 62 件）、rubocop-herb は 32 件
-- PR 版だけに `Lint/Void`、`Style/SymbolProc`、`Lint/EmptyBlock` が、rubocop-herb だけに `Lint/UnusedBlockArgument`、`Style/EmptyElse`、`Lint/EmptyConditionalBody`、`Style/IdenticalConditionalBranches` が出る
+- 再現例 20 ファイルで、PR 版は 88 件（うち `Layout/ExtraSpacing` 55 件）、rubocop-herb は 28 件
+- PR 版だけに `Lint/Void`、`Style/SymbolProc`、`Lint/EmptyBlock` が、rubocop-herb だけに `Lint/UnusedBlockArgument`、`Style/EmptyElse`、`Lint/EmptyConditionalBody` が出る
 - `herb-pr2260/edge/case.html.erb` に、PR 版だけ `Lint/EmptyWhen` が出る。`herb-pr2260/edge/disable.html.erb` の `<%# rubocop:disable … %>` は PR 版では効かない
 
 ### autocorrect（コピーに対して実行すること）
 
 ```console
 $ W="$TMPDIR/pr2260-ac" && mkdir -p "$W/orig/herb"
-$ for d in erb_lint rubocop-erb ruumba rubocop-herb; do ditto "$d" "$W/orig/$d"; done
+$ for d in erb_lint rubocop-erb ruumba; do ditto "$d" "$W/orig/$d"; done
 $ ditto herb/app "$W/orig/herb/app" && ditto herb-pr2260/edge "$W/orig/edge"
 $ for t in pr-safe pr-all tk-safe tk-all; do ditto "$W/orig" "$W/$t"; done
 $ (cd "$W/pr-safe" && pr2260 -a .)
@@ -258,7 +258,7 @@ $ for t in pr-safe pr-all tk-safe tk-all; do BUNDLE_GEMFILE="$PR2260/Gemfile" bu
 
 - macOS のファイルシステムは大文字と小文字を区別しないので、`-a` と `-A` のコピーに `pr_a` / `pr_A` のような名前を付けない（同じディレクトリになる）
 - `html_changes.rb` は、書き換わったファイルのうち、HTML（空白の違いは無視）が変わったものと Herb のパースエラーが増えたものを数える
-- PR 版は `-a` でも 9 ファイルで HTML が変わる。`edge/two_tags_line.html.erb` が `<td><%= user.name%> user.email%></td>` に、`edge/inline_if.html.erb` が `<% if a%> else%> end%>` になる。rubocop-herb は `-a`、`-A` とも 0 ファイル
+- PR 版は `-a` でも 8 ファイルで HTML が変わる。`edge/two_tags_line.html.erb` が `<td><%= user.name%> user.email%></td>` に、`edge/inline_if.html.erb` が `<% if a%> else%> end%>` になる。rubocop-herb は `-a`、`-A` とも 0 ファイル
 
 ### 実際のビューにかける
 
