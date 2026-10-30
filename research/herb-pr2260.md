@@ -12,7 +12,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 - herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.91.0 / ruby 4.0.5
 - 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/herb-pr2260/](repro/herb-pr2260/)）
 - 入力
-  - [repro/](repro/) の既存ツールの再現例と rubocop-herb の再現例（22 ファイル）
+  - [repro/](repro/) の既存ツールの再現例（20 ファイル）
   - 境界ケース（[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/)、12 ファイル）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
@@ -95,12 +95,12 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 ## 既存の再現例での結果【実測】
 
-`erb_lint`、`rubocop-erb`、`ruumba`、`rubocop-herb`、`herb/app` の 22 ファイルにかけた結果です。
+`erb_lint`、`rubocop-erb`、`ruumba`、`herb/app` の 20 ファイルにかけた結果です。
 
 | | PR 版 | rubocop-herb |
 |---|---|---|
-| offense の数 | 97 | 32 |
-| `Layout/ExtraSpacing` | 62 | 0 |
+| offense の数 | 88 | 28 |
+| `Layout/ExtraSpacing` | 55 | 0 |
 
 `Layout/ExtraSpacing` を除くと、次の offense が片方にだけ出ます。
 
@@ -108,7 +108,7 @@ PR 版だけに出るもの（すべて誤検知）:
 
 | cop | 例 | 理由 |
 |---|---|---|
-| `Layout/ExtraSpacing`（62 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
+| `Layout/ExtraSpacing`（55 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
 | `Lint/Void`（4 件） | `<p><%= total %></p>`、`<%= name %>: <%= count -1 %>`、`<%= user.name.nil? ? "anon" : user.name %>` | 出力する式が、ただの式文になる |
 | `Style/SymbolProc`（3 件） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
 | `Lint/EmptyBlock`（1 件） | `<% items.each do \|i\| %><li>item</li><% end %>` | 本文の HTML が空白になる |
@@ -119,7 +119,6 @@ rubocop-herb だけに出るもの:
 |---|---|---|
 | `Lint/UnusedBlockArgument` | 上の `\|i\|` | PR 版は本文が空のブロックとみなすので出ない |
 | `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` | PR 版はファイル全体で除外している |
-| `Style/IdenticalConditionalBranches` | `rubocop-herb/identical_branches_output.html.erb` の 2 つの `<%= foo %>` | PR 版はファイル全体で除外している。rubocop-herb では autocorrect できない offense として報告され、`-A` でも修正されない |
 
 ## 境界ケースでの結果【実測】
 
@@ -183,14 +182,14 @@ PR 版は、`-a` でも次のようにテンプレートを壊します。ファ
 - 修正対象ではないタグでも、`%>` の前の空白が `Layout/ExtraSpacing` で削除される（`<% end %>` → `<% end%>`）
 - `-A` では、さらに `Style/SymbolProc` で、`cross_tag_variables.html.erb` の出力するブロックが `<% items.each(&:name)%>` になり、出力がなくなる
 
-再現例と境界ケース（34 ファイル）で、`-a` の前後を比べた結果です（[html_changes.rb](repro/herb-pr2260/html_changes.rb)。HTML は空白の違いを無視して比べる）。
+再現例と境界ケース（32 ファイル）で、`-a` の前後を比べた結果です（[html_changes.rb](repro/herb-pr2260/html_changes.rb)。HTML は空白の違いを無視して比べる）。
 
 | | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
 |---|---|---|---|
-| PR 版 `-a` | 33 | 9 | 9 |
-| PR 版 `-A` | 33 | 9 | 9 |
-| rubocop-herb `-a` | 19 | 0 | 0 |
-| rubocop-herb `-A` | 20 | 0 | 0 |
+| PR 版 `-a` | 31 | 8 | 8 |
+| PR 版 `-A` | 31 | 8 | 8 |
+| rubocop-herb `-a` | 18 | 0 | 0 |
+| rubocop-herb `-A` | 19 | 0 | 0 |
 
 `html_changes.rb` は HTML とパースエラーだけを見るので、`Style/SymbolProc` で出力がなくなるような変化は数えていません。
 
