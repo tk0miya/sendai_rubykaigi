@@ -218,9 +218,9 @@ PR 版の gem（`gems/rubocop-herb`）は Ruby だけでできているので、
 ```console
 $ cd research/repro
 $ (cd herb-pr2260 && BUNDLE_FROZEN=true bundle install)
-$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-2cf8414"
-$ (cd "$TMPDIR/rubocop-herb-2cf8414" && git checkout 2cf8414fb988dac08bc5d78cabf9c5bfe1328a8c && bundle install)
-$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb-2cf8414"
+$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-24ec034"
+$ (cd "$TMPDIR/rubocop-herb-24ec034" && git checkout 24ec03477642aa4c8162d2d7d075aa623c72d062 && bundle install)
+$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb-24ec034"
 $ alias pr2260='BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec rubocop --cache false -c "$PR2260/pr.yml"'
 $ alias rubocop-herb-head='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$PR2260/tk.yml"'
 ```
@@ -276,5 +276,5 @@ $ (cd "$V/pr" && pr2260 -a .) ; (cd "$V/tk" && rubocop-herb-head -a .)
 $ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
 ```
 
-- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 992 件
+- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 935 件
 - `-a` で HTML が変わるファイルは、PR 版が 63、rubocop-herb が 0
