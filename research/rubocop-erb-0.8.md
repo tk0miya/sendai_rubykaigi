@@ -15,6 +15,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 - 入力
   - [repro/](repro/) の既存ツールの再現例と、[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/) の境界ケース（32 ファイル）
   - 0.8 系向けの境界ケース（[repro/rubocop-erb-0.8/edge/](repro/rubocop-erb-0.8/edge/)、9 ファイル）
+  - 無効化コメントの書き方ごとの例（[repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/)、6 ファイル）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -23,7 +24,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 - herb#2260 との大きな違いは、**autocorrect の修正範囲を検査する仕組みがある**ことです。修正の範囲が 1 つの ERB タグの Ruby の中に収まらなければ、その offense の修正をまるごと捨てます。実際のビュー 333 ファイルで `-a`、`-A` とも HTML が変わったファイル、パースエラーが増えたファイルは 0 でした。0.7 系は `-A` で 2 ファイルを構文エラーにしました
 - 誤検知への対策は、cop をファイル全体で除外することです。除外は 65 個（0.7 系は 53 個、rubocop-herb は 9 個）で、`Lint/Void`、`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Layout/LineLength` なども除外しています。このため、ERB でも妥当な指摘（本当に空のブロック、`map { |k| k.to_s }` など）も出ません
 - 除外していない cop には、HTML が空白になることによる誤検知が残ります。実際のビューでは、`<%= cache "x" do %>…<% end %>` のように 1 行に書いたブロックに `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出て、`-a` で `do`⏎` %>…<% `⏎`end %>` のようにタグの中に改行が入ります（8 ファイル。出力は変わらない）
-- `<%# rubocop:disable … %>` は効きません。タグの中の行末の `# rubocop:disable …` は効きますが、`Lint/CopDirectiveSyntax` が出ます
+- 無効化コメントは、ERB でよく書く `<%# rubocop:disable … %>` が効きません。確実に効くのは、Ruby のコメントだけを書いた複数行のタグ（`<%`⏎`  # rubocop:disable …`⏎`%>`）です。タグの中の行末の `# rubocop:disable …` は効きますが、`Lint/CopDirectiveSyntax` が出ます（[無効化コメントのサポート](#無効化コメントのサポート実測)）
 - 実際のビューで、0.8.2 と rubocop-herb の offense は、rubocop-herb の `Layout/LineLength`（162 件）などを除けばほぼ同じです。一方、**rubocop-herb には、HTML を含むファイルで `Style/MethodCallWithoutArgsParentheses` などの指摘や修正が消える問題**が見つかりました（[rubocop-herb-issues/reparse-cops-skip-html-files.md](rubocop-herb-issues/reparse-cops-skip-html-files.md)）。0.8.2 では起きません
 
 ## 0.8 系の仕組み【出典】
@@ -75,7 +76,8 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `Lint/Syntax` | 除外 | 有効 | 有効 |
 | 誤検知への対策 | 53 個の cop をファイル全体で除外 | 65 個の cop をファイル全体で除外 | 9 個をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)） |
 | autocorrect の検査 | なし | 修正範囲が 1 つのタグの Ruby に収まるか | 修正後の ERB の HTML とパース結果を比べる（`CopCorrectionGuard`。[report.md](report.md#autocorrect-の検査copcorrectionguard)） |
-| `<%# rubocop:disable … %>` | 効かない | 効かない【実測】 | 効く【実測】 |
+| `<%# rubocop:disable … %>` | 効かない【実測】 | 効かない【実測】 | 効く【実測】 |
+| 無効化コメントの範囲 | 同じタグの中だけ【実測】 | ファイル全体。ただし Ruby のコメントだけを書いた複数行のタグか、タグの中の行末に書いたときだけ効く【実測】 | ファイル全体【実測】 |
 | `<%%= … %>`（エスケープしたタグ） | 中身を Ruby として検査し、`-a` で書き換える【実測】 | 検査しない | 検査しない |
 | 規模（`lib/`） | 466 行 | 386 行 | 約 3,200 行 |
 
@@ -116,6 +118,25 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `multibyte.html.erb`（HTML と Ruby に絵文字と日本語） | 位置は正しい | 位置は正しく、`-A` の結果も元の位置に書き戻される | 同左 |
 | `reparse_cops_in_html.html.erb`（`<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)`） | 3 つとも出る | 3 つとも出て、`-A` で正しく修正 | `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない。`Style/TernaryParentheses` は出るが修正されない（下記） |
 | `disable_inline.html.erb`（タグの中の行末の `# rubocop:disable`） | 出ない | `Lint/CopDirectiveSyntax`（誤検知） | 出ない |
+
+## 無効化コメントのサポート【実測】
+
+[repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/) の 6 ファイルで、`Style/StringLiterals` を無効にするコメントを書き方ごとに試した結果です。どのファイルも、コメントの後の行に `"a"` などの二重引用符の文字列があります。
+
+| ファイル | 書き方 | 0.7.2 | 0.8.2 | rubocop-herb |
+|---|---|---|---|---|
+| `erb_comment.html.erb` | `<%# rubocop:disable Style/StringLiterals %>` | 効かない | 効かない | 効く |
+| `ruby_comment_tag.html.erb` | `<% # rubocop:disable Style/StringLiterals %>` | 効かない（同じタグの中だけに効く） | 効かない | 効く |
+| `trailing.html.erb` | `<% x = "b" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効く |
+| `trailing_output_tag.html.erb` | `<%= "a" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効く |
+| `multiline_tag.html.erb` | `<%`⏎`  # rubocop:disable Style/StringLiterals`⏎`  x = "b"`⏎`%>` の後に `<%= "c" %>` | 同じタグの中の `x = "b"` だけに効く | 後の `<%= "c" %>` にも効く | 後の `<%= "c" %>` にも効く |
+| `multiline_range.html.erb` | `<%`⏎`  # rubocop:disable …`⏎`%>` と `<%`⏎`  # rubocop:enable …`⏎`%>` で範囲を区切る | 効かない | 範囲の中だけに効く | 範囲の中だけに効く |
+
+- 0.8.2 では、`Herb.extract_ruby` が `<%# … %>` と、`#` で始まる 1 行のタグ（`<% # … %>`）の中身を空白にするので、そこに書いた無効化コメントは RuboCop に届かない
+- タグの中の行末に書いたコメントは届くが、`extract_ruby` がタグの終わりに補う `  ;` がコメントの中に入り（`# rubocop:disable Style/StringLiterals  ;`）、`Lint/CopDirectiveSyntax`（Malformed directive comment）が出る。無効化そのものは効く
+- コメントの後で改行してから `%>` を書けば、補われる `;` が次の行に回るので、通常の Ruby のコメントとして扱われる。ファイル全体に効き、`# rubocop:enable` で範囲を区切れる
+- 0.7.2 はタグ 1 つを 1 つの Ruby として検査するので、無効化コメントは同じタグの中にしか効かない。`<% # rubocop:disable … %>` では、そのタグに `Lint/MissingCopEnableDirective` が出る
+- rubocop-herb は、右側に別のタグや HTML がない `<%# … %>` を Ruby のコメントに変換するので、どの書き方でも効く。右側にタグや HTML があって効かない書き方は、`Herb/IgnoredCopDirective` が報告する（[report.md](report.md#herbignoredcopdirective-cop)）
 
 ## autocorrect の結果【実測】
 
@@ -216,5 +237,5 @@ conference-app の `admin/talks/index.html.erb` の `<%= link_to "All events tal
 - ただし範囲しか見ないので、範囲がタグの中に収まる限り、ERB に合わない修正も通る。`Style/SingleLineDoEndBlock` の改行の挿入がその例。出力は変わらないが、ERB としては不自然な形になる。`<%= foo %>` の式を消すような修正（出力が変わる）も、範囲がタグの中なら止まらない。今回の入力では、`<% unused = 1 %>` → `<% 1 %>` のように `<%` のタグの中で起きた例だけだった
 - 誤検知への対策がファイル全体での除外なので、0.8 系では妥当な指摘も失われる。`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Style/EmptyElse` などは、rubocop-herb では ERB の構造を見て誤検知になる行だけで無効にしているので、本当に空のブロックや `map { |k| k.to_s }` を指摘できる。PR #70 の説明どおり、ERB の文脈を cop に教える改修が進めば差は縮まる
 - `Lint/Void` を除外しているので、`Lint/UselessAssignment` の修正の後に `<% 1 %>` が黙って残る。offense も出ないので、利用者は気付きにくい
-- `<%# rubocop:disable … %>` が効かないことは、既存のテンプレートに 0.8 系を入れるときの障害になりうる。タグの中の行末のコメントは効くが、`Lint/CopDirectiveSyntax` が出るので、こちらも実用上は使いにくい
+- `<%# rubocop:disable … %>` が効かないことは、既存のテンプレートに 0.8 系を入れるときの障害になりうる。このコメントで抑えていた指摘が、まとめて出る。タグの中の行末のコメントは効くが、`Lint/CopDirectiveSyntax` が出るので、実用上は使いにくい。0.8 系で無効化コメントを使うなら、Ruby のコメントだけを書いた複数行のタグにするのが確実
 - rubocop-herb にとっては、0.8 系が同じ土俵の比較対象になった。rubocop-herb の利点は、`<%=` と HTML の意味を残した変換と行単位の無効化により、除外する cop が少ないこと、修正後の ERB を検査すること、`<%# rubocop:disable %>` が効くこと。一方で、変換が複雑なぶん、`ReparsedEquivalence` のような RuboCop 側の仕組みと噛み合わない箇所がある。0.8 系は `Herb.extract_ruby` の結果をそのまま RuboCop に渡すので、この種の問題は起きにくい

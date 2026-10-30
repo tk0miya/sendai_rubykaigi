@@ -308,6 +308,16 @@ $ for t in erb072 erb082 tkherb; do $t --format emacs rubocop-erb-0.8/edge; done
 - `rubocop-erb-0.8/edge/reparse_cops_in_html.html.erb` に、rubocop-herb だけ `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない
 - `rubocop-erb-0.8/edge/disable_inline.html.erb` に、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
 
+無効化コメントの書き方ごとの例は、無効化がファイルをまたがないよう、1 ファイルずつ実行します。
+
+```console
+$ for f in rubocop-erb-0.8/disable/*.html.erb; do for t in erb072 erb082 tkherb; do echo "== $t $f"; $t --format emacs "$f"; done; done
+```
+
+- `erb_comment.html.erb`（`<%# rubocop:disable … %>`）は、0.7.2 と 0.8.2 では効かず、`Style/StringLiterals` が出る。rubocop-herb では効く
+- `trailing.html.erb`、`trailing_output_tag.html.erb`（タグの中の行末のコメント）は 3 つとも効くが、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
+- `multiline_range.html.erb`（複数行のタグで `rubocop:disable` と `rubocop:enable` を書く）は、0.8.2 と rubocop-herb では範囲の中だけに効く。0.7.2 では効かない
+
 ### autocorrect（コピーに対して実行すること）
 
 ```console
