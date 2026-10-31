@@ -1,0 +1,5 @@
+<% items.each do |item| %>
+  <% next if item.hidden? %>
+  <%# rubocop:enable Style/StringLiterals %>
+  <%= item.name %>
+<% end %>

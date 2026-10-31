@@ -1,0 +1,5 @@
+<% items.each do |item| %>
+  <% next if item.hidden? %>
+  <%# show the item %>
+  <%= item.name %>
+<% end %>

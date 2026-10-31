@@ -122,6 +122,8 @@ Two cases need extra care:
   - Keep the `ERBSource` object itself and change only its behavior (`comments` / `raw_source`) during the investigation. `RuboCop::Erb::Corrector` checks correction ranges only when `processed_source.is_a?(ERBSource)`. When I swapped in a `SimpleDelegator`, `-A` rewrote `<%# rubocop:pop %>` into a bare `<%`.
   - Reset `@comment_index` and `@ast_with_comments` before the investigation and restore them afterwards. rubocop-ast memoizes both from `comments`. Without this, a `comment_index` built by `Style/DirectiveScope` leaks the ERB comments to later cops, and `Lint/EmptyConditionalBody` stopped reporting an empty `if` that contained `<%# note %>`.
 
+Why not add the ERB comments to `processed_source.comments` instead? `CommentConfig` would then pick up the directives without overriding `each_directive`, but every cop would see the comments while the extracted Ruby still has a blank line at that position. 23 cops in RuboCop 1.92.0 decide whether a line is a comment from the source text (`RuboCop::Cop::Util#comment_line?`, `/^\s*#/`), so they disagree with `processed_source.comments`. For example, `Style/InlineComment` reports a standalone `<%# heading %>` as a trailing inline comment, and `Style/CommentAnnotation` checks each of two consecutive `<%# TODO … %>` lines as if each were an inline comment. The side effects of approach 1 on comment-inspecting cops also come back, and `Lint/RedundantCopEnableDirective` still stops at its `raw_source` check.
+
 ## Prototype results
 
 All inputs were run one file at a time. "Works" means the disabled cop is not reported.

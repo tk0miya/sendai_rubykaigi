@@ -10,6 +10,7 @@ dir = __dir__
 ARGV.each do |file|
   config = if File.basename(file).start_with?('empty_if') then 'config_empty_if.yml'
            elsif File.basename(file).start_with?('inline_comment') then 'config_inline_comment.yml'
+           elsif File.basename(file).start_with?('excluded_') then 'config_excluded_cops.yml'
            else 'config.yml'
            end
   MODES.each do |mode|

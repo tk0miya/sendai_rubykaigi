@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop-erb 0.8.2 に `<%# rubocop:disable … %>` のサポートを足す 3 つの方策の試作。
+# rubocop-erb 0.8.2 に `<%# rubocop:disable … %>` のサポートを足す方策の試作。
 # 環境変数 ERB_COMMENT_DIRECTIVE で方策を選ぶ。
 #
 # - render_all:     Herb.extract_ruby に comments: true を付け、ERB コメントをすべて Ruby のコメントにする
@@ -177,6 +177,7 @@ end
 
 # directive_only_cops: 無効化コメントを CommentConfig を通さずに探す cop に、ERB コメントを見せる。
 # その cop の on_new_investigation の間だけ、ERBSource の comments に ERB コメントを足し、raw_source を元の ERB にする。
+# comments_all では、comments は常に ERB コメントを足して返す（raw_source は変えない）。
 # processed_source を別のオブジェクト（SimpleDelegator など）に差し替えると、rubocop-erb の Corrector が
 # ERBSource と見なさず、修正範囲の検査を飛ばすので、ERBSource のまま振る舞いを変える
 module ErbCommentDirective

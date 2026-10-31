@@ -1,0 +1,8 @@
+# rubocop-erb が .erb で除外している cop のうち、ソースの行でコメントを見分けるものを有効にする設定
+inherit_from: config.yml
+Layout/EmptyLineAfterGuardClause:
+  Exclude: []
+Style/WhileUntilModifier:
+  Exclude: []
+Style/IfUnlessModifier:
+  Exclude: []

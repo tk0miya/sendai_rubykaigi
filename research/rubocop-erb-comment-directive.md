@@ -12,7 +12,7 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 - 入力
   - [repro/erb-comment/](repro/erb-comment/) の 9 ファイル（[erb-comment-directive.md](erb-comment-directive.md#対象)）
   - [repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/) の 6 ファイル（[rubocop-erb-0.8.md](rubocop-erb-0.8.md#無効化コメントのサポート実測)）
-  - 方策の違いを見るための例（[repro/rubocop-erb-comment-directive/input/](repro/rubocop-erb-comment-directive/input/)、25 ファイル。下の表）
+  - 方策の違いを見るための例（[repro/rubocop-erb-comment-directive/input/](repro/rubocop-erb-comment-directive/input/)、31 ファイル。下の表）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル。`<%#` を含むのは 17 ファイルで、`rubocop:` を書いたものはない）
 
 | ファイル | 内容 |
@@ -29,7 +29,8 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 | `directive_scope.html.erb` | `<%# rubocop:disable … %>`、`<%= "a" %>`、`<%# rubocop:enable … %>`（1 つの文だけを囲む） |
 | `suppressed_exception.html.erb` | `<% begin %>`、`<%= render "a" %>`、`<% rescue %>` の後に、本文がコメントだけの `<%# ignore errors from the partial %>` と `<% end %>`（各タグが別の行） |
 | `consecutive_annotations.html.erb` | `<%# TODO fix this %>` と `<%# TODO fix that %>` が続く 2 行 |
-| `inline_comment.html.erb` | 独立した行の `<%# note %>` の後に `<%= foo %>`（`Style/InlineComment` を有効にして実行） |
+| `inline_comment.html.erb` | 独立した行の `<%# heading %>` の後に `<%= foo %>`（`Style/InlineComment` を有効にして実行） |
+| `excluded_*.html.erb`（6 ファイル） | `while` の 1 行目・本文・`end` の行に `<%# … %>` があるもの、ガード節（`<% next if … %>`）の次の行に `<%# … %>` があるもの、`rescue` の本文が `<%# rubocop:disable Lint/SuppressedException %>` だけのもの。rubocop-erb が `.erb` で除外している cop を有効にして実行（[除外されている cop](#除外されている-cop実測)） |
 | `empty_if_with_directive.html.erb` | `directive_scope.html.erb` と同じ 3 行の後に、`<% if x %><%# note %>`⏎`<% end %>`（本文が空の `if`） |
 | `plain_comments.html.erb` | `<%# TODO fix this %>` と `<%#no space %>`（無効化ではないコメント） |
 | `empty_if_plain_comment.html.erb` | `<% if some_error %><%# note %>`⏎`<% end %>`（本文が空の `if` と、無効化ではないコメント） |
@@ -73,6 +74,7 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 - 方策 3 の弱点は、`CommentConfig` を通さずに無効化コメントを探す cop が働かないことです。`Lint/RedundantCopEnableDirective`（不要な `enable` と、対応する `push` のない `pop`）、`Lint/CopDirectiveSyntax`（書き方の誤り）、`Style/DirectiveScope`（`disable-next` で書ける範囲）が、ERB のコメントに対して何も報告しません。これらの cop は、`processed_source.raw_source`（取り出した Ruby）に `enable` などの文字列があるかや、`processed_source.comments` を見て動くためです
 - この 3 つの cop には、ERB のコメントを見せるパッチを個別に当てる必要があります（方策 3'）。パッチを当てると 3 つとも報告し、ほかの結果は変わりませんでした（実際のビュー 333 ファイルでも差なし）。ただし、パッチの当て方を誤ると、rubocop-erb の修正範囲の検査が外れて autocorrect が `<%# rubocop:pop %>` を `<%` に書き換えたり、rubocop-ast が覚えた値を通じて ERB のコメントがほかの cop に漏れたりしました
 - ERB のコメントを `processed_source.comments` に足して、すべての cop に見せる形（方策 3''）はうまくいきません。取り出した Ruby のその行は空白なので、ソースの行が `#` で始まるかでコメントの行を見分ける cop（23 個）と食い違います。`Style/InlineComment` が独立した行の `<%# note %>` を行末のコメントと見なすなどの誤検知が出ます。さらに、方策 1・2 と同じ副作用（`Style/CommentAnnotation` など）も出て、`Lint/RedundantCopEnableDirective` も働きません
+- 方策 3・3'・3'' は、ERB のコメントの行を取り出した Ruby では空白のままにするので、コメントの有無で判断を変える cop が Ruby と違う判断をします。rubocop-erb が `.erb` で除外している `Style/WhileUntilModifier`、`Layout/EmptyLineAfterGuardClause` を有効にすると、`<%#` を書いた `while` が修飾子の形を勧められるなど、Ruby では出ない offense が出ます。これは 0.8.2 と同じ結果で、方策 3' が新たに増やすものではありませんが、方策 3 では直りません（[除外されている cop](#除外されている-cop実測)）
 - 方策 3 は、RuboCop の private なメソッド（`CommentConfig#each_directive`）、内部の変数（`@no_directives`）、cop の実装（どこから無効化コメントを探すか）に依存します
 - autocorrect で不要な無効化コメントを消す（`Lint/RedundantCopDisableDirective`）のは、3 つの方策のどれでも働きません。rubocop-erb の修正範囲の検査が、`<%#` の `#` を含む範囲の修正を捨てるからです。方策 3 だけ autocorrect が効かないわけではありません
 - 【推測】提案するなら方策 3 に cop へのパッチを加えたもの（方策 3'）がよいと考えます。ERB の意味（コメントは `%>` で終わる）を保ったまま無効化だけを効かせられ、既存の結果を変えないからです。ただし、RuboCop の内部への依存は方策 1・2 より大きくなります
@@ -216,15 +218,34 @@ RuboCop 1.92.0 には、コメントの行かどうかを `processed_source.line
 
 | ファイル | 方策 1（Ruby のコメント） | 方策 3・3' | 方策 3'' |
 |---|---|---|---|
-| `inline_comment.html.erb`（`Style/InlineComment` を有効） | 出ない | 出ない | 独立した行の `<%# note %>` に `Style/InlineComment` が出る |
-| `consecutive_annotations.html.erb` | `Style/CommentAnnotation` が 1 行目だけ | 出ない | `Style/CommentAnnotation` が 2 行とも |
+| `inline_comment.html.erb`（`Style/InlineComment` を有効） | 出ない | 出ない | 独立した行の `<%# heading %>` に `Style/InlineComment` が出る |
+| `consecutive_annotations.html.erb` | `Style/CommentAnnotation` が 1 つ目のコメント（2 行目）だけ | 出ない | `Style/CommentAnnotation` が 2 つとも（2 行目と 3 行目） |
 | `suppressed_exception.html.erb` | 出ない（コメントを本文と見なす） | `Lint/SuppressedException` | `Lint/SuppressedException` |
 
 - `Style/InlineComment` と `Style/CommentAnnotation` は、コメントのある行が `#` で始まらないので、どの ERB のコメントも行末のコメントと見なします。`Style/CommentAnnotation` は、続いたコメントの 2 行目以降を本来は調べませんが、行末のコメントは 1 つずつ調べるので、2 行とも報告します
-- `Lint/SuppressedException` の `AllowComments` は、`rescue` から `end` までにコメントの行があるかを行の文字列で調べます。方策 3・3'・3'' と 0.8.2 では、ERB のコメントは空白の行なので、コメントだけの `rescue` を報告します。方策 3・3' でもこの点は 0.8.2 と同じです
+- `Lint/SuppressedException` の `AllowComments` は、`rescue` から `end` までにコメントの行があるかを行の文字列で調べます。方策 3・3'・3'' と 0.8.2 では、ERB のコメントは空白の行なので、コメントだけの `rescue` を報告します
 - そのほか、方策 3'' では、方策 1・2 と同じく `Style/CommentAnnotation`、`Layout/LeadingCommentSpace`、`Layout/EmptyComment`、`Layout/EmptyLineAfterMagicComment` が新たに出て、`Lint/EmptyConditionalBody` がコメントだけの `if` を報告しなくなります。実際のビューは 766 件（`Layout/EmptyLineAfterMagicComment` 3 件）です。`Layout/EmptyComment` は、複数行の `<%#` の `<%#` だけの 1 行目（`#` になる）に出ます
 - `Lint/RedundantCopEnableDirective` は、方策 3'' でも `raw_source` の確認で止まり、`redundant_enable.html.erb` と `orphan_pop.html.erb` に何も出ません。`Lint/CopDirectiveSyntax` と `Style/DirectiveScope` は働きます
 - 方策 3・3' は、ERB のコメントを `CommentConfig`（と、3' ではパッチを当てた 3 つの cop の調査中）にしか見せないので、この食い違いは起きません。パッチを当てた 3 つの cop は、ソースの行の文字列を使いません（`Style/DirectiveScope` は修正の範囲を行単位で作りますが、その修正は rubocop-erb が捨てます）【出典】
+
+### 除外されている cop【実測】
+
+rubocop-erb 0.8.2 は、`Layout/EmptyLineAfterGuardClause`、`Style/WhileUntilModifier`、`Style/IfUnlessModifier` を `.erb` で除外しています【出典】。これらもコメントの有無で判断を変える cop です。除外を外して（`config_excluded_cops.yml`）、`excluded_*.html.erb` にかけました。方策 1（ERB のコメントを Ruby のコメントにする）の結果が、Ruby として書いたときの結果です。
+
+| ファイル | 方策 1・2 | 0.8.2・方策 3・3' | 方策 3'' |
+|---|---|---|---|
+| `excluded_while_first_line.html.erb`（`<% while … %><%# … %>`） | 出ない | `Style/WhileUntilModifier` | 出ない |
+| `excluded_while_last_line.html.erb`（`<% end %><%# … %>`） | 出ない | `Style/WhileUntilModifier` | 出ない |
+| `excluded_while_body_line.html.erb`（本文に `<%# … %>` だけの行） | 出ない | `Style/WhileUntilModifier` | `Style/WhileUntilModifier` |
+| `excluded_guard_note.html.erb`（ガード節の次の行に `<%# … %>`） | `Layout/EmptyLineAfterGuardClause` | 出ない | 出ない |
+| `excluded_guard_enable.html.erb`（ガード節の次の行に `<%# rubocop:enable … %>`、その次にコード） | `Layout/EmptyLineAfterGuardClause` | 出ない | 出ない |
+| `excluded_suppressed_directive.html.erb`（`rescue` の本文が `<%# rubocop:disable Lint/SuppressedException %>` だけ） | 出ない | `Lint/SuppressedException` | `Lint/SuppressedException` |
+
+- 0.8.2 と方策 3・3' の結果は、どの入力でも同じです。ERB のコメントの行は、取り出した Ruby では空白の行なので、無効化コメントがあってもなくても、Ruby とは違う判断になります
+- `Style/WhileUntilModifier` は、1 行目と最後の行のコメントを `comment_at_line` などで調べます（`processed_source.comments` から探す）。本文の行数は、空白でない行を数えます（ソースの行）。方策 3'' は前者だけ Ruby と同じになり、本文の行は 0.8.2 と同じく数えません
+- `Layout/EmptyLineAfterGuardClause` は、ガード節の次の行が空白か（ソースの行）を先に調べます。ERB のコメントの行は空白なので、方策 3・3'・3'' のどれでも、空行があるものとして扱います
+- `excluded_suppressed_directive.html.erb` では、`Lint/SuppressedException` は `rescue` の行（3 行目）に出ますが、無効化コメントは 4 行目から効くので、この offense を抑えられません。Ruby では、コメントがあるので `AllowComments` によって出ません
+- 【推測】rubocop-erb が除外している cop を有効に戻すには、ERB のコメントの行が、ソースの行としても `processed_source.comments` としてもコメントに見える必要があります。そうできるのは、コメントを Ruby のコメントにする方策 1・2 だけです
 
 ## 方策 1 で位置がずれる【実測・出典】
 
