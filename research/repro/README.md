@@ -430,7 +430,7 @@ $ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 -
 - `rubocop-erb-comment-directive/config.yml` は、「rubocop-erb 0.8」の節の `erb.yml` を継承し、パッチを `require` する設定
 - `rubocop-erb-comment-directive/config_empty_if.yml` は、さらに `Lint/EmptyConditionalBody` を `.erb` でも有効にする設定（rubocop-erb の既定では除外）
 - `rubocop-erb-comment-directive/run_all.rb` は、入力を 1 ファイルずつ、4 つの方策で rubocop にかける。名前が `empty_if` で始まるファイルには `config_empty_if.yml` を使う
-- rubocop-erb の設定の `Exclude`（`**/*.erb`）が効くように、`research/repro` で実行する
+- rubocop-erb の設定の `Exclude`（`**/*.erb`）が効くように、入力のあるディレクトリ（`research/repro` か、コピーしたディレクトリ）で実行する
 
 ### 入力にかける
 
@@ -454,7 +454,7 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb 
 $ RCX="$(BUNDLE_GEMFILE="$G" bundle info rubocop --path)/exe/rubocop"
 $ for m in none render_all render_safe directive_only; do
     mkdir -p "$TMPDIR/ac-$m" && cp rubocop-erb-comment-directive/input/*.html.erb erb-comment/*.html.erb "$TMPDIR/ac-$m/"
-    for f in "$TMPDIR/ac-$m"/*.html.erb; do ERB_COMMENT_DIRECTIVE=$m BUNDLE_GEMFILE="$G" bundle exec ruby "$RCX" --cache false -c rubocop-erb-comment-directive/config.yml -A --format quiet "$f"; done
+    (cd "$TMPDIR/ac-$m" && for f in *.html.erb; do ERB_COMMENT_DIRECTIVE=$m BUNDLE_GEMFILE="$G" bundle exec ruby "$RCX" --cache false -c "$OLDPWD/rubocop-erb-comment-directive/config.yml" -A --format quiet "$f"; done)
   done
 $ diff rubocop-erb-comment-directive/input/multiline_comment_autocorrect.html.erb "$TMPDIR/ac-render_all/multiline_comment_autocorrect.html.erb"
 ```

@@ -56,7 +56,7 @@ module ErbCommentDirective
       ErbCommentDirective.comment_nodes(Herb.parse(template_source).value).each do |node|
         from = node.tag_opening.range.from
         to = node.tag_closing.range.to
-        rest = plain.byteslice(to, (plain.index("\n", to) || plain.bytesize) - to) # 行の残り（Ruby 以外は空白）
+        rest = plain.byteslice(to, (plain.byteindex("\n", to) || plain.bytesize) - to) # 行の残り（Ruby 以外は空白）
         next unless rest.strip.empty?
 
         result[from, to - from] = commented.b.byteslice(from, to - from)
