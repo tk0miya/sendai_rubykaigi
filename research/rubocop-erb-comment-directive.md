@@ -317,11 +317,11 @@ rubocop-erb 0.8.2 は、`Layout/EmptyLineAfterGuardClause`、`Style/WhileUntilMo
 
 ## 提案に含める点
 
-rubocop-erb への issue の下書きは [rubocop-erb-issues/erb-comment-directive.md](rubocop-erb-issues/erb-comment-directive.md) です。issue は実装を示すものではなく、対応の是非と実装方針をメンテナーに問うものにする。
+rubocop-erb への issue の下書きは [rubocop-erb-issues/erb-comment-directive.md](rubocop-erb-issues/erb-comment-directive.md)（日本語版は [erb-comment-directive.ja.md](rubocop-erb-issues/erb-comment-directive.ja.md)）です。issue は実装を示すものではなく、対応の是非と実装方針をメンテナーに問うものにする。
 
 - 問うこと: ERB のコメントに書いた無効化コメントのサポートを rubocop-erb で受け入れるか。受け入れるなら、方策 2 の方向でよいか
 - 方策 1（`comments: true`）を既定にできない理由として、ERB の意味が壊れること（`leading_plain_comment.html.erb`、`leading_syntax_error.html.erb`）、位置がずれて autocorrect がテンプレートを壊すこと（`multiline_comment_autocorrect.html.erb`、`multiline_column0.html.erb`）、普通の ERB のコメントに新しい offense が出て CI が通らなくなることを示す
 - 方策 2 は、条件を満たす無効化コメントだけを Ruby のコメントにする方向として示す。普通の ERB のコメントは変えないこと、無効化コメントを扱う cop が RuboCop を変えずに働くこと、実際のビュー 333 ファイルで 0.8.2 と同じ結果になることを添える
-- 判断を仰ぐ点として、複数行のコメントを対象にするか（1 行の `<%# rubocop:… %>` だけにするか、行ごとに見るか）、効かない無効化コメントをどう知らせるか（cop、警告、文書のみ）、HTML だけの行に書いた無効化コメントの範囲など細かい点を挙げる
+- 判断を仰ぐ点として、複数行のコメントを対象にするか（1 行の `<%# rubocop:… %>` だけにするか、行ごとに見るか）と、効かない無効化コメントをどう知らせるか（cop、警告、文書のみ）を挙げる。issue は短くまとめ、細かい点（HTML だけの行に書いた無効化コメントの範囲など）は議論の中で扱う
 - 方策 2a と方策 3 は issue では示さない
 - herb には別に、`Herb.extract_ruby(comments: true)` が、`%>` か本文が行頭にある複数行の `<%#` で位置を保たないことを報告できる
