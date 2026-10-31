@@ -1,0 +1,4 @@
+# rubocop-erb 0.8.2 + 方策の試作（ERB_COMMENT_DIRECTIVE で選ぶ）
+inherit_from: ../rubocop-erb-0.8/erb.yml
+require:
+  - ./lib/comment_directive.rb

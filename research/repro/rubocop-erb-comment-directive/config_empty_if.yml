@@ -1,0 +1,4 @@
+# Lint/EmptyConditionalBody を .erb でも有効にする（rubocop-erb の既定では除外）
+inherit_from: config.yml
+Lint/EmptyConditionalBody:
+  Exclude: []
