@@ -224,7 +224,6 @@ RuboCop 1.92.0 で、無効化コメントを扱う cop が無効化コメント
 
 rubocop-erb への issue の下書きは [rubocop-erb-issues/erb-comment-directive.md](rubocop-erb-issues/erb-comment-directive.md) です。
 
-
 - 方策 3（ERB のコメントを、取り出す Ruby には入れずに、無効化コメントとしてだけ RuboCop に渡す）を、cop へのパッチと合わせて提案する。理由は、ERB の意味を保つこと、既存の結果を変えないこと（実際のビュー 333 ファイルで差なし）、どこに書いても効くこと
 - 方策 1（`comments: true`）を採らない理由として、`leading_plain_comment.html.erb`、`leading_syntax_error.html.erb`、`multiline_comment_autocorrect.html.erb`、`multiline_code_after.html.erb`、`multiline_column0.html.erb`（autocorrect の無限ループ）の結果を示す。方策 2 を採らない理由として、複数行のコメントで無効化が黙って効かない書き方（`multiline_code_after.html.erb`、`multiline_column0.html.erb`）を示す
 - 対象にするコメントは `<%# … %>` と、`#` で始まる 1 行のタグ `<% # … %>`。どちらも `Herb.extract_ruby` が空白にする

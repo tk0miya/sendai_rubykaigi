@@ -4,7 +4,7 @@
 
 `Herb.extract_ruby` blanks ERB comments, so a directive such as `<%# rubocop:disable Style/StringLiterals %>` never reaches RuboCop. I'd like to propose supporting directives in ERB comments.
 
-ERB comments are the usual place for notes in templates, and herb-lint already uses the same syntax for its own directives (`<%# herb:disable rule-name %>`). Today, the only form that works across lines in rubocop-erb 0.8.2 is a Ruby comment inside a multi-line tag:
+ERB comments are the usual place for notes in templates, and herb-lint already uses the same syntax for its own directives (`<%# herb:disable rule-name %>`). Today, the only form that disables a cop for a range of lines in rubocop-erb 0.8.2 is a Ruby comment inside a multi-line tag:
 
 ```erb
 <%
@@ -31,8 +31,19 @@ I prototyped three approaches on top of rubocop-erb 0.8.2 and compared them. I p
 <%# rubocop:enable Style/StringLiterals %>
 ```
 
+`.rubocop.yml`:
+
+```yaml
+plugins:
+  - rubocop-erb
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.4
+```
+
 ```console
-$ bundle exec rubocop --stdin test.html.erb < test.html.erb
+$ bundle exec rubocop --format emacs --stdin test.html.erb < test.html.erb
 test.html.erb:2:8: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 ```
 
@@ -64,11 +75,18 @@ Herb.extract_ruby("<%# a\n  b\n%>\n<%= x %>\n", comments: true)
 
 `rubocop -A` turns the last line into `<%= link_to "'a' url, {r emote: true}  %>`. With `rubocop:disable` at column 0 inside a multi-line comment, `Layout/LeadingCommentSpace` keeps inserting spaces into the comment until RuboCop stops with "Infinite loop detected". This also happens in real views: in kaigionrails/conference-app, `app/views/admin/kaminari/_page.html.erb` starts with a multi-line comment, and its offenses on line 11 move one column to the right.
 
-Finally, every ERB comment becomes visible to cops that inspect comments. `Style/CommentAnnotation` (`<%# TODO fix this %>` is autocorrected to `<%# TODO: fix this %>`), `Layout/LeadingCommentSpace`, `Layout/EmptyComment` and `Layout/EmptyLineAfterMagicComment` (`<%# encoding: utf-8 -%>`) start reporting. `Lint/EmptyConditionalBody` (`AllowComments: true`) stops reporting `<% if x %><%# note %><% end %>`.
+Finally, every ERB comment becomes visible to cops that inspect comments. `Style/CommentAnnotation` (`<%# TODO fix this %>` is autocorrected to `<%# TODO: fix this %>`), `Layout/LeadingCommentSpace`, `Layout/EmptyComment` and `Layout/EmptyLineAfterMagicComment` (`<%# encoding: utf-8 -%>`) start reporting. `Lint/EmptyConditionalBody` (`AllowComments: true`) stops reporting an empty `if` that contains a comment:
+
+```erb
+<% if x %><%# note %>
+<% end %>
+```
+
+(rubocop-erb excludes `Lint/EmptyConditionalBody` for `*.erb` by default. It was enabled for this check and for the `@comment_index` case below.)
 
 ### 2. Render a comment only when it is safe
 
-Turn an ERB comment into a Ruby comment only when no Ruby code follows it on the same line. tk0miya/rubocop-herb does this. It avoids the syntax problems above. However, whether a directive works now depends on details that users cannot see, and when it doesn't work, nothing reports it:
+Turn an ERB comment into a Ruby comment only when no Ruby code follows it on the same line. tk0miya/rubocop-herb uses a stricter version of this (it also requires that no tag or HTML follows). It avoids the syntax problems above. However, whether a directive works now depends on details that users cannot see, and when it doesn't work, nothing reports it:
 
 - `<%# rubocop:disable … %><% if 'hello' %>` (code to the right)
 - `<%#` … `%><%= "a" %>` (code after the closing tag of a multi-line comment)
@@ -82,7 +100,7 @@ Keep the extracted Ruby as it is. Build `Parser::Source::Comment` objects from t
 
 - Both `<%# … %>` and single-line `<% # … %>` are covered (`extract_ruby` blanks both)
 - Each line of a multi-line ERB comment becomes its own comment. `DirectiveComment` only reads the first `# rubocop:` of a comment text, so passing the whole comment as one text would silently ignore a second directive and a directive written after a description line
-- The comment text is the template text (`# rubocop:disable …`), and the range points at the template, so `DirectiveComment#range` and offense locations match the ERB source
+- The comment text is the template text (`# rubocop:disable …`), and the range points at the template, so `DirectiveComment#range` and offense locations match the ERB source. The exception is a line of a multi-line comment that starts at column 0: there `#` is prepended, so the text is one character longer than its range
 - Whether a directive covers one line or a range is left to RuboCop (whether the line has Ruby tokens). `<%# rubocop:disable … %><% if 'hello' %>` therefore applies to that line only, the same way as `herb:disable` applies to the line it is written on
 
 The rest of RuboCop does not see these comments, so the other offenses and autocorrections stay exactly as in 0.8.2.
