@@ -65,8 +65,10 @@ module ErbCommentDirective
   # - text:     hash_pos から書く Ruby のコメント（`%>` は含まない）
   # - renderable / reason: 長さを変えずに Ruby のコメントにできるか。できない理由は
   #   :code_after（同じ行の後ろに Ruby のコードがあり、コメントにするとそのコードもコメントに入る）か
-  #   :no_room（2 行目以降で、行頭の空白が 2 文字より少なく、`# ` を置けない）
-  # 2 行目以降で、空白の後が `#` で始まる行（`  # rubocop:disable …`）は、そのままで Ruby のコメントなので書き換えない
+  #   :no_room（2 行目以降で、行頭の空白が 2 文字より少なく、`# ` を置けない）か
+  #   :no_space（`#rubocop:` のように `#` の後に空白がない。Layout/LeadingCommentSpace の autocorrect が ERB コメントを書き換える）
+  # 2 行目以降で、空白の後が `#` で始まる行（`  # rubocop:disable …`）は、そのままで Ruby のコメントなので、
+  # 字下げのタブを空白にする（Layout/IndentationStyle を出さないため）ほかは書き換えない
   DIRECTIVE_REGEXP = /\A#\s*rubocop\s*:/.freeze
 
   def self.directive_lines(template, plain, herb_root)
@@ -88,14 +90,18 @@ module ErbCommentDirective
         rest = plain.byteslice(rest_from, (plain.byteindex("\n", rest_from) || plain.bytesize) - rest_from)
         reason = if index == lines.size - 1 && !rest.strip.empty? then :code_after
                  elsif !ruby_comment && !stripped.match?(/\A[ \t]{2}/) then :no_room
+                 elsif !marker.match?(/\A#[ \t]+rubocop/) then :no_space
                  end
-        text = ruby_comment || reason ? stripped : "##{stripped.byteslice(1..)}"
+        text = if reason || index.zero? then stripped
+               elsif ruby_comment then stripped.sub(/\A[ \t]+/) { |indent| ' ' * indent.size }
+               else "##{stripped.byteslice(1..)}"
+               end
         { hash_pos: line_start, text: text.force_encoding(Encoding::UTF_8), renderable: reason.nil?, reason: reason }
       end
     end
   end
 
-  # 方策 1・2: Ruby の取り出しを変える
+  # 方策 1・2・2a: Ruby の取り出しを変える
   module ExtractorPatch
     private
 
@@ -287,7 +293,8 @@ module RuboCop
       class IgnoredCopDirective < Base
         MESSAGES = {
           code_after: 'This directive is ignored because Ruby code follows it on the same line.',
-          no_room: 'This directive is ignored because its line in the multi-line comment is indented by less than two characters.'
+          no_room: 'This directive is ignored because its line in the multi-line comment is indented by less than two characters.',
+          no_space: 'This directive is ignored because there is no space after `#`.'
         }.freeze
 
         def on_new_investigation

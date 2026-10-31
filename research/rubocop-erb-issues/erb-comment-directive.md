@@ -1,10 +1,17 @@
-# Support `rubocop:disable` directives written in ERB comments (`<%# … %>`)
+# Should `rubocop:disable` directives in ERB comments (`<%# … %>`) be supported?
 
 ## Summary
 
-`Herb.extract_ruby` blanks ERB comments, so a directive such as `<%# rubocop:disable Style/StringLiterals %>` never reaches RuboCop. I'd like to propose supporting directives in ERB comments.
+`Herb.extract_ruby` blanks ERB comments, so a directive such as `<%# rubocop:disable Style/StringLiterals %>` never reaches RuboCop. I'd like to ask:
 
-ERB comments are the usual place for notes in templates, and herb-lint already uses the same syntax for its own directives (`<%# herb:disable rule-name %>`). Today, the only form that disables a cop for a range of lines in rubocop-erb 0.8.2 is a Ruby comment inside a multi-line tag:
+1. whether supporting directives written in ERB comments is in scope for rubocop-erb, and
+2. if so, which implementation direction you would prefer.
+
+Below are the background, two directions I looked into, and the open points I'd like your opinion on. I have a prototype for the second direction and can open a PR once the direction is settled.
+
+## Background
+
+ERB comments are the usual place for notes in templates, and herb-lint already uses the same syntax for its own directives (`<%# herb:disable rule-name %>`). In rubocop-erb 0.8.2, the only form that disables a cop for a range of lines is a Ruby comment inside a multi-line tag:
 
 ```erb
 <%
@@ -12,18 +19,11 @@ ERB comments are the usual place for notes in templates, and herb-lint already u
 %>
 ```
 
-herb-format collapses this tag into `<% # rubocop:disable … %>`, which rubocop-erb 0.8.2 also blanks. The directive then stops working without any warning. A Ruby comment at the end of a tag (`<%= "a" # rubocop:disable … %>`) works but triggers `Lint/CopDirectiveSyntax`, because `extract_ruby` appends `  ;` to the comment.
+herb-format collapses this tag into `<% # rubocop:disable … %>`, which rubocop-erb 0.8.2 also blanks, so the directive stops working without any warning. A Ruby comment at the end of a tag (`<%= "a" # rubocop:disable … %>`) works but triggers `Lint/CopDirectiveSyntax`, because `extract_ruby` appends `  ;` to the comment.
 
-The proposal: in the extracted Ruby, turn **only directive lines that meet a few conditions** into Ruby comments, in place and without changing their length. All other ERB comments stay blank as today. Report directives that can't be turned into Ruby comments this way with a new cop.
+### Current behavior
 
-## Environment
-
-- rubocop-erb 0.8.2
-- rubocop 1.92.0
-- herb 0.11.0 (the `extract_ruby` output was also checked with 0.11.1)
-- ruby 3.3.6
-
-## Current behavior
+Environment: rubocop-erb 0.8.2, rubocop 1.92.0, herb 0.11.0, ruby 3.3.6.
 
 `.rubocop.yml`:
 
@@ -47,152 +47,63 @@ $ bundle exec rubocop --format emacs --stdin test.html.erb < test.html.erb
 test.html.erb:2:8: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 ```
 
-## Proposal
+## Possible directions
 
-### Render directive lines in place
+### A. Render all ERB comments (`Herb.extract_ruby(source, comments: true)`)
 
-On top of the output of `Herb.extract_ruby`:
+This is a one-line change, but I don't think it is acceptable as the default:
 
-- Look at `<%# … %>` and single-line `<% # … %>` tags (both are blanked by `extract_ruby`), one line at a time.
-- A line is a directive line if it starts with `# rubocop:`. On the first line, the `#` of `<%#` is used. On later lines of a multi-line comment, the text after the indentation is used, with `# ` assumed in front unless it already starts with `#`.
-- Write the directive line back into the extracted Ruby at the same position:
-  - On the first line, the `#` of `<%#` stays where it is.
-  - On later lines, the first indentation character becomes `#` (`  rubocop:disable …` → `# rubocop:disable …`). A line that already reads `  # rubocop:disable …` is a Ruby comment as it is and is copied unchanged.
-  - `%>` is not copied.
-- Leave every other line, and every ERB comment without a directive, blank as today.
-
-```erb
-<div>
-  <%#
-    Keep the legacy markup as is.
-    rubocop:disable Style/StringLiterals
-  %>
-  <%= "a" %>
-</div>
-```
-
-becomes (`·` is a space)
-
-```
-·····
-·····
-·································
-#···rubocop:disable·Style/StringLiterals
-····
-······"a"··;
-······
-```
-
-Because the length and the number of lines do not change, every position stays aligned with the template, and nothing else in RuboCop needs to know about ERB comments. Directive lines are ordinary Ruby comments, so `CommentConfig`, `Lint/RedundantCopDisableDirective`, `Lint/RedundantCopEnableDirective`, `Lint/MissingCopEnableDirective`, `Lint/CopDirectiveSyntax` and `Style/DirectiveScope` all work as they do for Ruby files. Whether a directive applies to one line or to a range is decided by RuboCop as usual: a directive on a line with Ruby code applies to that line, and a directive on its own line applies until `rubocop:enable`.
-
-### Report directives that cannot be rendered
-
-Two kinds of directive lines cannot become a Ruby comment without changing the meaning or the positions:
-
-- **Ruby code follows on the same line**, e.g. `<%# rubocop:disable Lint/LiteralAsCondition %><% if 'hello' %>`. An ERB comment ends at `%>`, but a Ruby comment runs to the end of the line, so the `if` would be commented out.
-- **A later line of a multi-line comment indented by fewer than two characters** (and not written with `#`), e.g.
-
-  ```erb
-  <%#
-   rubocop:disable Style/StringLiterals
-  %>
-  ```
-
-  There is no room for `# ` in front of the directive. Writing `#rubocop:disable` instead would trigger `Layout/LeadingCommentSpace`, whose autocorrection would then rewrite the ERB comment.
-
-These lines are left blank, so the directives don't take effect. A new cop (`Erb/IgnoredCopDirective` in my prototype) reports them, so a directive never stops working silently:
-
-```
-test.html.erb:1:3: C: Erb/IgnoredCopDirective: This directive is ignored because Ruby code follows it on the same line.
-test.html.erb:1:53: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
-```
-
-## Why not render all ERB comments (`Herb.extract_ruby(source, comments: true)`)
-
-This is a one-line change, but:
-
-- **ERB semantics.** Ruby code after a comment on the same line is commented out:
+- **It breaks ERB semantics.** An ERB comment ends at `%>`, but a Ruby comment runs to the end of the line, so Ruby code after the comment is commented out:
   - `<%# heading %><% if signed_in? %>` … `<% end %>` (a valid template without any directive) reports `Lint/Syntax: unexpected token end`.
   - `<%# rubocop:disable … %><%= link_to("a", path %>` (a real syntax error) no longer reports `Lint/Syntax`.
-  - In a multi-line comment, code after the closing `%>` (`%><%= "a" %>`) is commented out.
-- **Positions.** With herb 0.11.0 and 0.11.1, `comments: true` makes the output longer for multi-line comments whose `%>` or text lines start at column 0:
+- **It shifts positions.** With herb 0.11.0 and 0.11.1, `comments: true` makes the output longer for multi-line comments whose `%>` or text lines start at column 0:
 
   ```ruby
   Herb.extract_ruby("<%# a\n  b\n%>\n<%= x %>\n", comments: true)
   # => "#   a\n# b\n#  \n    x  ;\n"   (22 bytes in, 23 bytes out)
   ```
 
-  `RubyExtractor#extracted_ruby` treats any length difference as coming from multi-byte characters, so later positions shift. With
+  `RubyExtractor#extracted_ruby` treats any length difference as coming from multi-byte characters, so later positions shift. In my tests, `rubocop -A` turned `<%= link_to "a", url, {remote: true} %>` after such a comment into `<%= link_to "'a' url, {r emote: true}  %>`, and a column-0 `rubocop:disable` line made RuboCop stop with "Infinite loop detected".
+- **It adds offenses to ordinary comments**, so CI that passes today would start failing:
+  - `Style/CommentAnnotation` (`<%# TODO fix this %>`)
+  - `Layout/LeadingCommentSpace` (`<%#no space %>`)
+  - `Layout/EmptyComment` (the `<%#` line of a multi-line comment)
+  - `Layout/EmptyLineAfterMagicComment` (`<%# encoding: utf-8 -%>`)
 
-  ```erb
-  <%# multi-line comment
-    second line
-  %>
-  <%= link_to "a", url, {remote: true} %>
-  ```
+### B. Render only directives that meet certain conditions (proposed)
 
-  `rubocop -A` turns the last line into `<%= link_to "'a' url, {r emote: true}  %>`. With a `rubocop:disable` line at column 0, `Layout/LeadingCommentSpace` keeps inserting spaces into the comment until RuboCop stops with "Infinite loop detected". In kaigionrails/conference-app, `app/views/admin/kaminari/_page.html.erb` starts with such a comment, and its offenses on line 11 move one column to the right.
-- **New offenses on ordinary comments.** Every ERB comment becomes visible to comment cops, so CI that passes today would start failing:
-  - `Style/CommentAnnotation`: `<%# TODO fix this %>` is autocorrected to `<%# TODO: fix this %>`.
-  - `Layout/LeadingCommentSpace`.
-  - `Layout/EmptyComment`, for the `<%#` line of a multi-line comment.
-  - `Layout/EmptyLineAfterMagicComment`, for `<%# encoding: utf-8 -%>`.
+Keep ERB comments blank as today, except directive lines (`# rubocop:…`) that can be written into the extracted Ruby in place, without changing the length or the meaning:
 
-  Rendering only directive lines avoids them.
+- On the first line of an ERB comment, the `#` of `<%#` is already where a Ruby comment would start.
+- Nothing but HTML may follow the directive on the same line. Otherwise the Ruby code after it would be commented out, as in A.
 
-## Prototype results
+Ordinary comments are untouched, so the existing results do not change. Directive lines become ordinary Ruby comments, so the directive-related cops (`Lint/RedundantCopDisableDirective`, `Lint/RedundantCopEnableDirective`, `Lint/MissingCopEnableDirective`, `Lint/CopDirectiveSyntax`, `Style/DirectiveScope`) work as they do for Ruby files, with no changes to RuboCop.
 
-I prototyped the proposal on top of rubocop-erb 0.8.2. Each input was run on its own. "Works" means the disabled cop is not reported.
+Some directives cannot be supported this way, for example `<%# rubocop:disable Lint/LiteralAsCondition %><% if 'hello' %>`, where Ruby code follows on the same line. These would not take effect.
 
-| Input | 0.8.2 | Proposal |
-|---|---|---|
-| `<% if 'hello' %>world<% end %><%# rubocop:disable … %>` | no | works |
-| standalone `<%# rubocop:disable … %>` / `<%# rubocop:enable … %>` | no | works |
-| `<% # rubocop:disable … %>` | no | works |
-| `<%# rubocop:disable-next … %>` | no | works |
-| `<p>日本語</p><%# rubocop:disable … %>` (multi-byte characters before the comment) | no | works |
-| `<%#`⏎`  rubocop:disable …`⏎` %>` | no | works |
-| `<%#`⏎`  description`⏎`  rubocop:disable …`⏎`%>` | no | works |
-| two directives in one multi-line comment | no | both work |
-| `<%= "a" %><%#`⏎`  rubocop:disable …`⏎`%>` | no | works from line 2 |
-| `<%#`⏎`  rubocop:disable …`⏎`%><%= "a" %>` | no | works |
-| `<%# rubocop:disable … %><% if 'hello' %>…` | no | not applied, `Erb/IgnoredCopDirective` |
-| `<%#`⏎`  # rubocop:disable …`⏎`%>` | no | works |
-| `<%#`⏎`rubocop:disable …`⏎`%>` (column 0), or indented by one space or one tab | no | not applied, `Erb/IgnoredCopDirective` |
-| `<%# rubocop:disable %>` (no cop name) | — | `Lint/CopDirectiveSyntax` |
-| `<%# rubocop:enable X %>` without a matching disable | — | `Lint/RedundantCopEnableDirective` |
-| `<%# rubocop:pop %>` without a matching push | — | `Lint/RedundantCopEnableDirective` |
-| disable/enable pair around a single statement | — | `Style/DirectiveScope` |
-| ordinary comments (`<%# TODO fix this %>`, `<%#no space %>`, `<% if x %><%# note %>`, …) | — | same as 0.8.2 |
+In my prototype on 333 real views (rails/rails `0f591639b8` and kaigionrails/conference-app `25a02cc`, none of which contain `rubocop:` in ERB comments), B reports the same 763 offenses as 0.8.2, and `rubocop -A` never rewrites an ERB comment.
 
-- On 333 real views (rails/rails `0f591639b8` and kaigionrails/conference-app `25a02cc`, none of which contain `rubocop:` in ERB comments), the proposal reports the same 763 offenses as 0.8.2.
-- With `rubocop -A`, the proposal changes the same code as 0.8.2, except where a directive now suppresses the offense. ERB comments are never rewritten.
-- Lines with directives behave as they would in Ruby. With rubocop-erb's ERB exclusion of `Layout/EmptyLineAfterGuardClause` lifted, a guard clause followed by `<%# rubocop:enable … %>` and then code reports that cop. A `rescue` whose body is only a directive comment is not reported by `Lint/SuppressedException` (`AllowComments`). Ordinary ERB comments stay blank, so they behave as in 0.8.2.
+## Questions
 
-## Open questions
+1. **Is this in scope?** Would you accept support for directives written in ERB comments in rubocop-erb?
+2. **Direction.** Is B acceptable, or would you prefer another approach?
+3. **Multi-line comments.** Should B handle directives inside multi-line ERB comments, and if so, how?
+   - **Only single-line `<%# rubocop:… %>` comments.** The only condition is that no Ruby code follows on the same line. Directives inside multi-line comments are not supported.
+   - **Each line of a multi-line comment.** This allows a description before the directive and several directives in one comment, for example:
 
-- **How far to support multi-line comments.** The prototype looks at each line of a multi-line comment, which allows a description before the directive and several directives in one comment, at the cost of the extra conditions above (indentation, a leading `#`, code after the closing `%>`). A simpler rule would support only single-line `<%# rubocop:… %>` comments and report directives inside multi-line comments with the new cop. Then the only condition is that no Ruby code follows on the same line.
-- **A new cop.** rubocop-erb has no cops of its own yet. Reporting ignored directives needs one (a department name such as `Erb`, a default configuration, documentation). Alternatively, the extractor could print a warning, but an offense works better with CI.
-- **Comment-only bodies.** `<% if some_error %><%# rubocop:disable Lint/EmptyConditionalBody %>`⏎`<% end %>` reports nothing, but not because of the directive: `Lint/EmptyConditionalBody` (`AllowComments: true`, enabled for `.erb` for this check) treats the directive as the body. `Lint/RedundantCopDisableDirective` is not reported either. Ruby behaves the same way with a `# rubocop:disable` comment as the only body, so this is not specific to ERB.
-- **Lines with only HTML.** `<%# rubocop:disable … %><p>a</p>` has no Ruby tokens on its line, so RuboCop treats the directive as being on its own line, and it applies until `rubocop:enable` or the end of the file. This follows the Ruby rule, but it may be surprising in a template.
-- **Removing redundant directives.** `Lint/RedundantCopDisableDirective` and `Lint/RedundantCopEnableDirective` report redundant directives, but `RuboCop::Erb::Corrector` discards their corrections, because the range starts at the `#` of `<%#`. Even if the correction were allowed, removing only the directive text would likely leave parts of the tag behind. A proper correction should probably remove the whole tag (or the whole line of a multi-line comment).
+     ```erb
+     <%#
+       Keep the legacy markup as is.
+       rubocop:disable Style/StringLiterals
+     %>
+     ```
 
-## Prototype
-
-The core of the extractor change:
-
-```ruby
-# For each directive line of each ERB comment:
-#   hash_pos   - byte offset of the `#` (the `#` of `<%#` on the first line, the line start on later lines)
-#   text       - the Ruby comment to write there, without `%>`
-#   renderable - false when Ruby code follows on the same line, or a later line is indented by fewer than two characters
-def extracted_ruby
-  ruby = Herb.extract_ruby(template_source).b
-  directive_lines.each do |line|
-    ruby[line[:hash_pos], line[:text].bytesize] = line[:text].b if line[:renderable]
-  end
-  # ... then the existing realignment for multi-byte characters
-end
-```
-
-I have a working prototype of the extractor change and the cop, and can open a PR if this direction looks acceptable.
+     It needs more conditions: the line must be indented by at least two characters (so `# ` fits in front), Ruby code must not follow the closing `%>`, and `#rubocop:` without a space has to be excluded. Otherwise `Layout/LeadingCommentSpace` would autocorrect the ERB comment.
+4. **Directives that cannot be supported.** How should users learn that a directive is ignored?
+   - a new cop such as `Erb/IgnoredCopDirective`, which would be rubocop-erb's first cop
+   - a warning from the extractor
+   - documentation only
+5. **Edge cases.** Are these acceptable as they are?
+   - **Lines with only HTML.** `<%# rubocop:disable … %><p>a</p>` has no Ruby tokens on its line, so the directive applies until `rubocop:enable` or the end of the file, as a directive on its own line does in Ruby.
+   - **Comment-only bodies.** A directive that is the only content of an `if` body counts as a comment for `Lint/EmptyConditionalBody` (`AllowComments: true`). Ruby behaves the same.
+   - **Removing redundant directives.** `Lint/RedundantCopDisableDirective` reports a redundant ERB directive, but `RuboCop::Erb::Corrector` discards the correction, because the range starts at the `#` of `<%#`. Removing such a directive would probably mean removing the whole tag.
