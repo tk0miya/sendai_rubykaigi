@@ -178,7 +178,7 @@ RuboCop 1.92.0 で、無効化コメントを扱う cop が無効化コメント
 
 試作では、3 つの cop の `on_new_investigation` の間だけ、`ERBSource#comments` が ERB のコメントを足して返し、`ERBSource#raw_source` が元の ERB を返すようにしました。
 
-- `redundant_enable.html.erb`、`orphan_pop.html.erb`、`malformed.html.erb`、`directive_scope.html.erb` に、方策 1 と同じ offense（[方策ごとの副作用](#方策ごとの副作用実測)の表の cop）が出ます【実測】
+- `redundant_enable.html.erb`、`orphan_pop.html.erb`、`malformed.html.erb`、`directive_scope.html.erb` に、方策 1 と同じ offense（[方策ごとの副作用](#方策ごとの副作用実測)の表の cop）が出ます。`empty_if_with_directive.html.erb` にも `Style/DirectiveScope` が出ます【実測】
 - そのほかの入力の offense と、`-A` の結果は、方策 3 と同じです。実際のビュー 333 ファイルでも 0.8.2 と同じ 763 件です【実測】
 - 3 つの cop の autocorrect は、どれも `<%#` の `#` を含む範囲を書き換えるので、rubocop-erb の修正範囲の検査で捨てられ、`[Correctable]` も付きません【実測】
 - `processed_source` を別のオブジェクト（`SimpleDelegator` で `comments` と `raw_source` だけを変えたもの）に差し替える形にすると、autocorrect がテンプレートを壊しました。`orphan_pop.html.erb` の `<%# rubocop:pop %>` と、`redundant_enable.html.erb` の `<%# rubocop:enable … %>` が、`-A` でどちらも `<%` になります。rubocop-erb の `Corrector` は、`processed_source.is_a?(ERBSource)` のときだけ修正範囲を検査するので、差し替えたオブジェクトでは検査が外れるためです【実測・出典: `lib/rubocop/erb/corrector.rb`】
