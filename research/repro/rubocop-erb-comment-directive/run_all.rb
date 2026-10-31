@@ -4,7 +4,7 @@
 #   BUNDLE_GEMFILE=../rubocop-erb-0.8/v0.8.2/Gemfile bundle exec ruby run_all.rb FILE...
 require 'rubocop'
 
-MODES = %w[none render_all render_safe directive_only directive_only_cops comments_all].freeze
+MODES = %w[none render_all render_safe render_directives directive_only directive_only_cops comments_all].freeze
 dir = __dir__
 
 ARGV.each do |file|

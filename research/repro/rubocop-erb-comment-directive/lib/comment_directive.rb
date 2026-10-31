@@ -4,7 +4,9 @@
 # 環境変数 ERB_COMMENT_DIRECTIVE で方策を選ぶ。
 #
 # - render_all:     Herb.extract_ruby に comments: true を付け、ERB コメントをすべて Ruby のコメントにする
-# - render_safe:    右側（同じ行の後ろ）に Ruby のコードがない ERB コメントだけを Ruby のコメントにする
+# - render_safe:    右側（同じ行の残り）に Ruby のコードがない ERB コメントだけを Ruby のコメントにする
+# - render_directives: ERB コメントのうち無効化コメントの行だけを、その場で Ruby のコメントにする。Ruby のコメントに
+#                    できない行（右側に Ruby のコードがある、行頭に空白がない）は Erb/IgnoredCopDirective が報告する
 # - directive_only: Ruby のコードは変えず、ERB コメントを無効化コメントとして CommentConfig だけに渡す
 # - directive_only_cops: directive_only に加え、processed_source.comments や raw_source から無効化コメントを探す cop に
 #                        ERB コメントを見せる
@@ -58,6 +60,37 @@ module ErbCommentDirective
     head + [first, *rest].join("\n")
   end
 
+  # ERB コメントの中の、無効化コメントの行。1 行ごとに次を返す
+  # - hash_pos: Ruby のコメントの `#` を置くバイト位置（1 行目は `<%#` の `#`、2 行目以降は行頭）
+  # - text:     hash_pos から書く Ruby のコメント（`%>` は含まない）
+  # - renderable / reason: 長さを変えずに Ruby のコメントにできるか。できない理由は
+  #   :code_after（同じ行の後ろに Ruby のコードがあり、コメントにするとそのコードもコメントに入る）か
+  #   :column_zero（2 行目以降で行頭に空白がなく、`#` を置く場所がない）
+  def self.directive_lines(template, plain, herb_root)
+    source = template.b
+    plain = plain.b
+    comment_nodes(herb_root).flat_map do |node|
+      start = node.tag_opening.value == '<%#' ? node.tag_opening.range.to - 1 : node.content.range.from + node.content.value.index('#')
+      lines = source.byteslice(start, node.content.range.to - start).split("\n", -1)
+      offset = start
+      lines.each_with_index.filter_map do |line, index|
+        line_start = offset
+        offset += line.bytesize + 1
+        stripped = line.rstrip
+        marker = index.zero? ? stripped : "# #{stripped.lstrip}"
+        next unless RuboCop::DirectiveComment::DIRECTIVE_MARKER_REGEXP.match?(marker.sub(/\A#\s*/, '# '))
+
+        rest_from = node.tag_closing.range.to
+        rest = plain.byteslice(rest_from, (plain.byteindex("\n", rest_from) || plain.bytesize) - rest_from)
+        reason = if index == lines.size - 1 && !rest.strip.empty? then :code_after
+                 elsif !index.zero? && !line.start_with?(' ', "\t") then :column_zero
+                 end
+        text = index.zero? || reason ? stripped : "##{stripped.byteslice(1..)}"
+        { hash_pos: line_start, text: text.force_encoding(Encoding::UTF_8), renderable: reason.nil?, reason: reason }
+      end
+    end
+  end
+
   # 方策 1・2: Ruby の取り出しを変える
   module ExtractorPatch
     private
@@ -68,9 +101,23 @@ module ErbCommentDirective
         Herb.extract_ruby(template_source, comments: true)
       when 'render_safe'
         render_safe
+      when 'render_directives'
+        render_directives
       else
         Herb.extract_ruby(template_source)
       end
+    end
+
+    # 無効化コメントの行だけを Ruby のコメントにする。ほかの ERB コメントは空白のまま
+    def render_directives
+      plain = Herb.extract_ruby(template_source)
+      result = plain.b
+      ErbCommentDirective.directive_lines(template_source, plain, Herb.parse(template_source).value).each do |line|
+        next unless line[:renderable]
+
+        result[line[:hash_pos], line[:text].bytesize] = line[:text].b
+      end
+      result.force_encoding(Encoding::UTF_8)
     end
 
     # 右側（同じ行の残り）に Ruby のコードがないコメントだけを、render_comment で Ruby のコメントにする
@@ -227,6 +274,32 @@ module ErbCommentDirective
     RuboCop::Cop::Lint::CopDirectiveSyntax,          # processed_source.comments を調べる
     RuboCop::Cop::Style::DirectiveScope              # processed_source.comments を調べる
   ].each { |cop| cop.prepend(CopPatch) }
+end
+
+# render_directives: Ruby のコメントにできなかった無効化コメントを報告する cop
+module RuboCop
+  module Cop
+    module Erb
+      class IgnoredCopDirective < Base
+        MESSAGES = {
+          code_after: 'This directive is ignored because Ruby code follows it on the same line.',
+          column_zero: 'This directive is ignored because its line in the multi-line comment starts at column 0.'
+        }.freeze
+
+        def on_new_investigation
+          return unless ErbCommentDirective.mode == 'render_directives' && processed_source.is_a?(RuboCop::Erb::ERBSource)
+
+          template = processed_source.template_source
+          lines = ErbCommentDirective.directive_lines(template, Herb.extract_ruby(template), processed_source.erb_root)
+          lines.reject { |line| line[:renderable] }.each do |line|
+            from = processed_source.byte_to_char_offset(line[:hash_pos])
+            range = Parser::Source::Range.new(processed_source.buffer, from, from + line[:text].length)
+            add_offense(range, message: MESSAGES.fetch(line[:reason]))
+          end
+        end
+      end
+    end
+  end
 end
 
 RuboCop::Erb::ERBSource.prepend(ErbCommentDirective::DirectiveViewPatch)
