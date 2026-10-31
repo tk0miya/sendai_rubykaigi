@@ -425,11 +425,12 @@ $ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 -
 
 ## rubocop-erb で ERB コメントの無効化コメントを効かせる方策
 
-[../rubocop-erb-comment-directive.md](../rubocop-erb-comment-directive.md) の再現手順です。rubocop-erb 0.8.2 に、`<%# rubocop:disable … %>` を効かせる 3 つの方策を試作したパッチ（`rubocop-erb-comment-directive/lib/comment_directive.rb`）を読み込んで比べます。方策は環境変数 `ERB_COMMENT_DIRECTIVE` で選びます（`none`、`render_all`、`render_safe`、`directive_only`、`directive_only_cops`）。`directive_only_cops` は、`directive_only` に加えて `Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` にパッチを当てます。
+[../rubocop-erb-comment-directive.md](../rubocop-erb-comment-directive.md) の再現手順です。rubocop-erb 0.8.2 に、`<%# rubocop:disable … %>` を効かせる 3 つの方策を試作したパッチ（`rubocop-erb-comment-directive/lib/comment_directive.rb`）を読み込んで比べます。方策は環境変数 `ERB_COMMENT_DIRECTIVE` で選びます（`none`、`render_all`、`render_safe`、`directive_only`、`directive_only_cops`、`comments_all`）。`directive_only_cops` は、`directive_only` に加えて `Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` にパッチを当てます。`comments_all` は、`directive_only` と同じコメントを `processed_source.comments` に足して、すべての cop に見せます。
 
 - `rubocop-erb-comment-directive/config.yml` は、「rubocop-erb 0.8」の節の `erb.yml` を継承し、パッチを `require` する設定
 - `rubocop-erb-comment-directive/config_empty_if.yml` は、さらに `Lint/EmptyConditionalBody` を `.erb` でも有効にする設定（rubocop-erb の既定では除外）
-- `rubocop-erb-comment-directive/run_all.rb` は、入力を 1 ファイルずつ、5 つの方策で rubocop にかける。名前が `empty_if` で始まるファイルには `config_empty_if.yml` を使う
+- `rubocop-erb-comment-directive/config_inline_comment.yml` は、`Style/InlineComment`（既定で無効）を有効にする設定
+- `rubocop-erb-comment-directive/run_all.rb` は、入力を 1 ファイルずつ、6 つの方策で rubocop にかける。名前が `empty_if` で始まるファイルには `config_empty_if.yml`、`inline_comment` で始まるファイルには `config_inline_comment.yml` を使う
 - rubocop-erb の設定の `Exclude`（`**/*.erb`）が効くように、入力のあるディレクトリ（`research/repro` か、コピーしたディレクトリ）で実行する
 
 ### 入力にかける
@@ -449,6 +450,9 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb 
 - `rubocop-erb-comment-directive/input/malformed.html.erb`: `none` と `directive_only` で `Lint/CopDirectiveSyntax` が出ない
 - `rubocop-erb-comment-directive/input/redundant_enable.html.erb`、`orphan_pop.html.erb`: `none` と `directive_only` で `Lint/RedundantCopEnableDirective` が出ない
 - `rubocop-erb-comment-directive/input/directive_scope.html.erb`: `none` と `directive_only` で `Style/DirectiveScope` が出ない
+- `rubocop-erb-comment-directive/input/inline_comment.html.erb`: `comments_all` だけ `Style/InlineComment` が出る
+- `rubocop-erb-comment-directive/input/consecutive_annotations.html.erb`: `Style/CommentAnnotation` が、`render_all` と `render_safe` では 1 つ目のコメント（2 行目）だけ、`comments_all` では 2 つとも（2 行目と 3 行目）出る
+- `rubocop-erb-comment-directive/input/suppressed_exception.html.erb`: `Lint/SuppressedException` が、`render_all` と `render_safe` 以外で出る
 - `rubocop-erb-comment-directive/input/empty_if_with_directive.html.erb`: `directive_only` と `directive_only_cops` の両方で `Lint/EmptyConditionalBody` が出る。`Style/DirectiveScope` は `directive_only_cops` だけで出る
 - `rubocop-erb-comment-directive/input/multiline_code_after.html.erb`、`multiline_column0.html.erb`: `none` と `render_safe` で `Style/StringLiterals` が出る（`render_safe` では無効化が効かない）
 - `rubocop-erb-comment-directive/input/multiline_code_before.html.erb`: どの方策でも 1 行目の `Style/StringLiterals` は出る。4 行目は、`render_all`・`render_safe`・`directive_only` では出ない。`render_all` に `Layout/SpaceAfterSemicolon`、`Layout/SpaceBeforeComment`、`Layout/EmptyComment` が出る
@@ -478,11 +482,12 @@ $ diff rubocop-erb-comment-directive/input/multiline_comment_autocorrect.html.er
 ビューの取得は「herb PR #2260」の節と同じです（`$V/orig` に 333 ファイル）。
 
 ```console
-$ (cd "$V/orig" && for m in none render_all render_safe directive_only directive_only_cops; do ERB_COMMENT_DIRECTIVE=$m BUNDLE_GEMFILE="$G" bundle exec ruby "$RCX" --cache false -c "$OLDPWD/rubocop-erb-comment-directive/config.yml" --format emacs . | sort > "$V/$m.txt"; done)
-$ for m in render_all render_safe directive_only directive_only_cops; do diff "$V/none.txt" "$V/$m.txt"; done
+$ (cd "$V/orig" && for m in none render_all render_safe directive_only directive_only_cops comments_all; do ERB_COMMENT_DIRECTIVE=$m BUNDLE_GEMFILE="$G" bundle exec ruby "$RCX" --cache false -c "$OLDPWD/rubocop-erb-comment-directive/config.yml" --format emacs . | sort > "$V/$m.txt"; done)
+$ for m in render_all render_safe directive_only directive_only_cops comments_all; do diff "$V/none.txt" "$V/$m.txt"; done
 ```
 
 - `none`、`directive_only`、`directive_only_cops` は 763 件で、差はない
+- `comments_all` は 766 件。`render_safe` と同じく、`<%# encoding: utf-8 -%>` で始まる 3 ファイルに `Layout/EmptyLineAfterMagicComment` が出る
 - `render_all` と `render_safe` は 766 件。rails の `<%# encoding: utf-8 -%>` で始まる 3 ファイルに `Layout/EmptyLineAfterMagicComment` が出る
 - `render_all` では、conference-app の `admin/kaminari/_page.html.erb`（複数行の `<%#`）の 11 行目の `Layout/SpaceInsideHashLiteralBraces` の列が 1 つ右にずれる
 

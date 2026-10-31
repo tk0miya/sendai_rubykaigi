@@ -1,0 +1,4 @@
+# Style/InlineComment（既定で無効）を有効にする設定
+inherit_from: config.yml
+Style/InlineComment:
+  Enabled: true

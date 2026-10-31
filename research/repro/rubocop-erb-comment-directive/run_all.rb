@@ -4,11 +4,14 @@
 #   BUNDLE_GEMFILE=../rubocop-erb-0.8/v0.8.2/Gemfile bundle exec ruby run_all.rb FILE...
 require 'rubocop'
 
-MODES = %w[none render_all render_safe directive_only directive_only_cops].freeze
+MODES = %w[none render_all render_safe directive_only directive_only_cops comments_all].freeze
 dir = __dir__
 
 ARGV.each do |file|
-  config = File.basename(file).start_with?('empty_if') ? 'config_empty_if.yml' : 'config.yml'
+  config = if File.basename(file).start_with?('empty_if') then 'config_empty_if.yml'
+           elsif File.basename(file).start_with?('inline_comment') then 'config_inline_comment.yml'
+           else 'config.yml'
+           end
   MODES.each do |mode|
     ENV['ERB_COMMENT_DIRECTIVE'] = mode
     puts "== #{mode} #{file}"

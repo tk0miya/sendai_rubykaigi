@@ -8,6 +8,7 @@
 # - directive_only: Ruby のコードは変えず、ERB コメントを無効化コメントとして CommentConfig だけに渡す
 # - directive_only_cops: directive_only に加え、processed_source.comments や raw_source から無効化コメントを探す cop に
 #                        ERB コメントを見せる
+# - comments_all:        Ruby のコードは変えず、ERB コメントを processed_source.comments に足して、すべての cop に見せる
 #
 # 未設定か none なら何もしない（0.8.2 のまま）。
 require 'herb'
@@ -118,12 +119,15 @@ module ErbCommentDirective
     end
   end
 
-  class ErbCommentConfig < RuboCop::CommentConfig
+  # raw_source（取り出した Ruby）ではなく元の ERB に `rubocop` があるかで、無効化コメントの解析を飛ばすか決める
+  class TemplateCommentConfig < RuboCop::CommentConfig
     def initialize(processed_source)
       super
       @no_directives = !processed_source.template_source.include?('rubocop')
     end
+  end
 
+  class ErbCommentConfig < TemplateCommentConfig
     private
 
     def each_directive(&block)
@@ -139,6 +143,7 @@ module ErbCommentDirective
 
   module ERBSourcePatch
     def comment_config
+      return @comment_config ||= TemplateCommentConfig.new(self) if ErbCommentDirective.mode == 'comments_all'
       return super unless ErbCommentDirective.directive_only?
 
       @comment_config ||= ErbCommentConfig.new(self)
@@ -177,7 +182,7 @@ end
 module ErbCommentDirective
   module DirectiveViewPatch
     def comments
-      return super unless Thread.current[:erb_comment_directive_view]
+      return super unless Thread.current[:erb_comment_directive_view] || ErbCommentDirective.mode == 'comments_all'
 
       (super + erb_comments).sort_by { |comment| comment.source_range.begin_pos }
     end
