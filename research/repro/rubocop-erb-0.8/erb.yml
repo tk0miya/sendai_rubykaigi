@@ -1,0 +1,7 @@
+# rubocop-erb（v0.7.2/ と v0.8.2/ の両方）用
+plugins:
+  - rubocop-erb
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.4

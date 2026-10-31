@@ -46,7 +46,7 @@
 
 ### 4. ERB のツールはたくさんある
 
-- erb_lint（累計 2,193 万 DL）、rubocop-erb、ruumba、Herb（herb-lint / herb-format）、erb-formatter、Rufo …
+- erb_lint（累計 2,250 万 DL）、rubocop-erb、ruumba、Herb（herb-lint / herb-format）、erb-formatter、Rufo …
 - 図: ツール名を並べたロゴ風のスライド。比較表はパート 4 で出すので、ここでは数を見せるだけ
 
 ### 5. でも、このコードに何も言われない
@@ -65,8 +65,8 @@
 
 ### 6. Ruby の取り出し方は 2 系統
 
-- **タグ単位に分割する**: erb_lint、rubocop-erb、better_html、erb-formatter、Rufo
-- **HTML を空白で埋めて、文書全体を 1 本の Ruby にする**: ruumba、Herb（構文チェック）、Steep の提案
+- **タグ単位に分割する**: erb_lint、rubocop-erb（0.7 系）、better_html、erb-formatter、Rufo
+- **HTML を空白で埋めて、文書全体を 1 本の Ruby にする**: ruumba、rubocop-erb（0.8 系）、Herb（構文チェック）、Steep の提案
 - 図: 同じ ERB が、左は断片の列、右は空白入りの 1 本の Ruby になる様子
 
 ### 7. タグ単位: 3 つの文脈が失われる
@@ -84,13 +84,13 @@
 | `<% name = "Alice" %>` + `<%= name %>` | `Lint/UselessAssignment`（誤検知） |
 | `<%= "hello" %>` | `Style/FrozenStringLiteralComment` がタグごとに出る |
 
-- ノート: README は誤検知になる cop の無効化を推奨。rubocop-erb は約 55 cop を除外している
+- ノート: README は誤検知になる cop の無効化を推奨。rubocop-erb 0.7 系は 53 cop を除外している
 
 ### 9. autocorrect がテンプレートを壊す
 
 - erb_lint: `<%= link_to "x", …%>` → `<%=` が消え、`# frozen_string_literal: true` が HTML に入る
-- rubocop-erb: `<%= count -1 %>` → `<%= count(-1) %>`（前のタグのローカル変数が見えない）
-- rubocop-erb: `<% if user && user.admin? %>` → `user&&.admin?`（構文エラー）
+- rubocop-erb 0.7 系: `<%= count -1 %>` → `<%= count(-1) %>`（前のタグのローカル変数が見えない）
+- rubocop-erb 0.7 系: `<% if user && user.admin? %>` → `user&&.admin?`（構文エラー）
 - ノート: 一番インパクトがあるスライド。Before / After を大きく見せる
 
 ### 10. なぜ直せないのか
@@ -98,6 +98,7 @@
 - RuboCop の ruby_extractors API は「1 fragment = 元ファイル上の連続した 1 区間」
 - `if a` / `c` / `end` をまとめて渡しても、offense を元の ERB の位置に戻せない（r7kamura 氏、rubocop-erb#6）
 - → タグ単位の方式は API の制約で構造的に解消できない
+- ノート: rubocop-erb 自身も 0.8 系（2026-10-29）で、`Herb.extract_ruby` による文書全体の変換に移った（[rubocop-erb-0.8.md](../research/rubocop-erb-0.8.md)）
 
 ### 11. 文書全体方式（ruumba）: 別の文脈が失われる
 
@@ -169,7 +170,7 @@ div;
 
 ### 17. 残る誤検知は ERB の構造を見て抑える
 
-- ファイル全体で除外する cop は 9 個だけ（rubocop-erb は約 55 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
+- ファイル全体で除外する cop は 9 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
 - それ以外は、誤検知になる**その行だけ**で cop を無効化（31 個）
   - 本文に HTML を含む分岐・ブロック: `Lint/EmptyConditionalBody` など → 本当に空の `else` は検出できる
   - ERB タグに跨がる `<% end %>` や本文: `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中に書いた Ruby は検査される
@@ -222,7 +223,8 @@ div;
 | ツール | HTML 構造 | Ruby の構文 | Ruby のスタイル | タグを跨いだ解析 | autocorrect |
 |---|---|---|---|---|---|
 | erb_lint | ○ | △ | △ | × | △ |
-| rubocop-erb | × | △ | △ | × | △ |
+| rubocop-erb 0.7 系 | × | △ | △ | × | △ |
+| rubocop-erb 0.8 系 | × | ○ | △ | ○ | ○ |
 | ruumba | × | ○ | △ | ○ | △ |
 | herb-lint | ◎ | ◎ | × | ○ | ○ |
 | **rubocop-herb** | ◎ | ○ | ○ | ○ | △ → ○ にしたい |
@@ -236,6 +238,7 @@ div;
   - 捨てた offense は「autocorrect できない」として報告する
   - cop を個別に除外しなくても、未知の cop の壊れ方も止められる
 - 残っている課題（正直に）: ガードは cop ごとの修正しか見ていない。`<% %>`⏎`<%= b %><% %>` は、`Layout/SpaceBeforeSemicolon` と `Herb/EmptyErbTag` の修正が重なって `-a` で `<%= b ` になる（[report.md](../research/report.md#未解決の問題実測)）
+- ノート: rubocop-erb 0.8 系も、修正範囲が 1 つのタグの Ruby に収まらない修正を捨てる仕組みを入れた。比べられたら、こちらは HTML・出力タグ・パースエラーで結果を検査する点が違う、と答える
 - ノート: 発表までに直せていれば、残っている課題の項目を削る
 
 ## 5. この基盤の先・まとめ（1:15）
@@ -251,7 +254,7 @@ div;
 - 既存ツールは Ruby だけを取り出すため、分割しても連結しても文脈が失われる
 - rubocop-herb は Herb の AST で HTML と Ruby の両方を理解し、文字位置を保ったまま RuboCop にかける
 - HTML は herb-lint に任せ、`rubocop` 1 つで 2 種類の lint を実行する
-- いま使っているツールからの移行: ruumba / rubocop-erb → 置き換え、erb_lint → Ruby 部分だけ移して併用、herb-lint → 追加
+- いま使っているツールからの移行: ruumba / rubocop-erb 0.7 系 → 置き換え、erb_lint → Ruby 部分だけ移して併用、herb-lint → 追加
 - 今こそ、ERB でもモダンな開発を
 - リポジトリの URL
 
@@ -259,6 +262,7 @@ div;
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、15 分では lint で手一杯。パート 5 で構想として触れる形でよいか。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
 - **autocorrect の課題**: 2 つの cop の修正が重なって `-a` で壊れる問題を直してから発表するか、課題として見せるか（スライド 22 の最後の項目の扱いが変わる）。HTML を含むテンプレートで `Style/MethodCallWithoutArgsParentheses` などが働かない問題（[report.md](../research/report.md#未解決の問題実測)）も、発表前に直しておきたい
+- **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 9 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
 - **Marco Roth 氏との調整**: 氏は Rust 製 linter を RuboCop に公開する RuboCop プラグインのプロトタイプも作っていて、herb#475 で「調整が必要」と述べている。rubygems の `rubocop-herb` / `herb-linter` 0.0.1 もこの計画のためと思われる（[herb-rust.md](../research/herb-rust.md)）。スライド 20 で氏の計画に触れる前に、役割分担（Ruby パートはこちら、HTML パートは Rust 製 linter）と gem 名について話しておきたい
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく
 - **デモ**: ライブか録画か。15 分ならスライド 18 の Before / After を録画で見せるのが安全

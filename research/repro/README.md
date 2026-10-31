@@ -272,3 +272,105 @@ $ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr22
 
 - 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 935 件
 - `-a` で HTML が変わるファイルは、PR 版が 63、rubocop-herb が 0
+
+## rubocop-erb 0.8
+
+[../rubocop-erb-0.8.md](../rubocop-erb-0.8.md) の再現手順です。rubocop-erb 0.7.2（タグ単位）、0.8.2（`Herb.extract_ruby`）、tk0miya/rubocop-herb を同じ入力にかけて比べます。
+
+### セットアップ
+
+`rubocop-erb-0.8/v0.7.2/` と `rubocop-erb-0.8/v0.8.2/` に、それぞれの版の `Gemfile` があります。herb はビルド済みの gem を使うので、「herb PR #2260」の節と同じく `BUNDLE_FROZEN=true` を付けて `bundle install` します。rubocop と herb のバージョンは、比べる rubocop-herb の `Gemfile.lock`（rubocop 1.92.0、herb 0.11.0）に揃えてあります。
+
+```console
+$ cd research/repro
+$ (cd rubocop-erb-0.8/v0.7.2 && BUNDLE_FROZEN=true bundle install)
+$ (cd rubocop-erb-0.8/v0.8.2 && BUNDLE_FROZEN=true bundle install)
+$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-96d31cf"
+$ (cd "$TMPDIR/rubocop-herb-96d31cf" && git checkout 96d31cf8dff39109dbe4506b808e19693a92b2e2 && bundle install)
+$ export R="$PWD/rubocop-erb-0.8" RUBOCOP_HERB="$TMPDIR/rubocop-herb-96d31cf"
+$ erb072() { BUNDLE_GEMFILE="$R/v0.7.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
+$ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
+$ tkherb() { BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$R/tk.yml" "$@"; }
+```
+
+- `erb.yml` は rubocop-erb を読み込む設定（0.7.2 と 0.8.2 で共通）、`tk.yml` は `$RUBOCOP_HERB/config/develop/rubocop.yml` を継承する設定。どちらも `NewCops: enable` と `TargetRubyVersion: 3.4` に揃えてある
+- zsh では、入力のディレクトリを変数にまとめるときは配列（`IN=(erb_lint rubocop-erb …)` と `$IN`）にする。文字列にすると 1 つの引数として渡る
+
+### 再現例と境界ケースにかける
+
+```console
+$ for t in erb072 erb082 tkherb; do $t --format offenses erb_lint rubocop-erb ruumba herb/app herb-pr2260/edge; done
+$ for t in erb072 erb082 tkherb; do $t --format emacs rubocop-erb-0.8/edge; done
+```
+
+- 32 ファイルで、0.7.2 は 24 件、0.8.2 は 33 件、rubocop-herb は 37 件
+- `rubocop-erb-0.8/edge/single_line_block.html.erb` に、0.8.2 だけ `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出る
+- `rubocop-erb-0.8/edge/reparse_cops_in_html.html.erb` に、rubocop-herb だけ `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない
+- `rubocop-erb-0.8/edge/disable_inline.html.erb` に、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
+
+無効化コメントの書き方ごとの例は、無効化がファイルをまたがないよう、1 ファイルずつ実行します。
+
+```console
+$ for f in rubocop-erb-0.8/disable/*.html.erb; do for t in erb072 erb082 tkherb; do echo "== $t $f"; $t --format emacs "$f"; done; done
+```
+
+- `erb_comment.html.erb`（`<%# rubocop:disable … %>`）は、0.7.2 と 0.8.2 では効かず、`Style/StringLiterals` が出る。rubocop-herb では効く
+- `trailing.html.erb`、`trailing_output_tag.html.erb`（タグの中の行末のコメント）は 3 つとも効くが、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
+- `multiline_range.html.erb`（複数行のタグで `rubocop:disable` と `rubocop:enable` を書く）は、0.8.2 と rubocop-herb では範囲の中だけに効く。0.7.2 では効かない
+
+指摘の表示は `--format clang` で比べます。
+
+```console
+$ for t in erb072 erb082 tkherb; do echo "== $t"; $t --format clang rubocop-erb-0.8/display; done
+```
+
+- `show.html.erb`: 3 つとも、指摘の行は元の ERB（HTML と日本語を含む行）のまま表示され、キャレットの位置も同じ
+- `unclosed_paren.html.erb`: 0.8.2 と rubocop-herb の両方で、`Lint/Syntax` のメッセージに ERB にない `;` が出る
+- `identical_branches.html.erb`: rubocop-herb だけ、`Style/IdenticalConditionalBranches` のメッセージに `_ = foo` が出る
+
+### autocorrect（コピーに対して実行すること）
+
+```console
+$ W="$TMPDIR/rerb-ac" && mkdir -p "$W/orig/herb"
+$ for d in erb_lint rubocop-erb ruumba; do ditto "$d" "$W/orig/$d"; done
+$ ditto herb/app "$W/orig/herb/app" && ditto herb-pr2260/edge "$W/orig/edge"
+$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do ditto "$W/orig" "$W/$t"; done
+$ (cd "$W/o-safe" && erb072 -a .) ; (cd "$W/o-all" && erb072 -A .)
+$ (cd "$W/n-safe" && erb082 -a .) ; (cd "$W/n-all" && erb082 -A .)
+$ (cd "$W/tk-safe" && tkherb -a .) ; (cd "$W/tk-all" && tkherb -A .)
+$ diff -r "$W/orig" "$W/n-all"
+$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$W/orig" "$W/$t"; done
+```
+
+- 0.7.2 の `-A` で `rubocop-erb/autocorrect_safe_navigation.html.erb` が `user&&.admin?` になる。0.8.2 と rubocop-herb は HTML を変えない
+
+`rubocop-erb-0.8/edge/` の autocorrect も同じようにコピーに対して実行します。
+
+```console
+$ E="$TMPDIR/edge08-ac" && for t in o n tk; do ditto rubocop-erb-0.8/edge "$E/$t"; done
+$ (cd "$E/o" && erb072 -A .) ; (cd "$E/n" && erb082 -A .) ; (cd "$E/tk" && tkherb -A .)
+$ for t in o n tk; do diff -r rubocop-erb-0.8/edge "$E/$t"; done
+```
+
+- 0.8.2 で、`single_line_block.html.erb` の 1 行のブロックが 3 行に分かれる
+- rubocop-herb で、`reparse_cops_in_html.html.erb` の `root_path()`、`(a == b)`、`(foo)` の括弧が残る
+
+### 実際のビューにかける
+
+ビューの取得は「herb PR #2260」の節と同じです（`$V/orig` に 333 ファイル）。
+
+```console
+$ (cd "$V/orig" && for t in erb072 erb082 tkherb; do $t --format offenses .; done)
+$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do ditto "$V/orig" "$V/$t"; done
+$ (cd "$V/o-safe" && erb072 -a .) ; (cd "$V/o-all" && erb072 -A .)
+$ (cd "$V/n-safe" && erb082 -a .) ; (cd "$V/n-all" && erb082 -A .)
+$ (cd "$V/tk-safe" && tkherb -a .) ; (cd "$V/tk-all" && tkherb -A .)
+$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
+$ (cd "$V/n-all" && erb082 --format offenses .) ; (cd "$V/tk-all" && tkherb --format offenses .)
+$ diff -r "$V/orig/rails/railties/lib/rails/generators" "$V/o-safe/rails/railties/lib/rails/generators"
+```
+
+- 333 ファイルで、0.7.2 は 762 件、0.8.2 は 763 件、rubocop-herb は 933 件
+- `-a`・`-A` で HTML が変わるファイルは、3 つとも 0。`-A` でパースエラーが増えるファイルは、0.7.2 が 2、ほかの 2 つは 0
+- `-A` の後に残る offense は、0.8.2 が 9 件、rubocop-herb が 126 件
+- 0.7.2 の `-a` は、rails の認証ジェネレーターのテンプレートの `<%%= … %>` の中身を書き換える（`html_changes.rb` では数えられない）

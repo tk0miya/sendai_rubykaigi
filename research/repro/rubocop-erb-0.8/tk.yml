@@ -1,0 +1,5 @@
+# tk0miya/rubocop-herb 用。RUBOCOP_HERB に clone したディレクトリを指定する
+inherit_from: <%= ENV.fetch("RUBOCOP_HERB") %>/config/develop/rubocop.yml
+AllCops:
+  SuggestExtensions: false
+  TargetRubyVersion: 3.4
