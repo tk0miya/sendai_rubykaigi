@@ -6,6 +6,8 @@
 # - render_all:     Herb.extract_ruby に comments: true を付け、ERB コメントをすべて Ruby のコメントにする
 # - render_safe:    右側（同じ行の後ろ）に Ruby のコードがない ERB コメントだけを Ruby のコメントにする
 # - directive_only: Ruby のコードは変えず、ERB コメントを無効化コメントとして CommentConfig だけに渡す
+# - directive_only_cops: directive_only に加え、processed_source.comments や raw_source から無効化コメントを探す cop に
+#                        ERB コメントを見せる
 #
 # 未設定か none なら何もしない（0.8.2 のまま）。
 require 'herb'
@@ -15,6 +17,10 @@ require 'rubocop/erb'
 module ErbCommentDirective
   def self.mode
     ENV.fetch('ERB_COMMENT_DIRECTIVE', nil)
+  end
+
+  def self.directive_only?
+    %w[directive_only directive_only_cops].include?(mode)
   end
 
   # `<%# … %>` と、`#` で始まる 1 行のタグ `<% # … %>`。どちらも extract_ruby が空白にする
@@ -131,7 +137,7 @@ module ErbCommentDirective
 
   module ERBSourcePatch
     def comment_config
-      return super unless ErbCommentDirective.mode == 'directive_only'
+      return super unless ErbCommentDirective.directive_only?
 
       @comment_config ||= ErbCommentConfig.new(self)
     end
@@ -162,5 +168,41 @@ module ErbCommentDirective
   end
 end
 
+# directive_only_cops: 無効化コメントを CommentConfig を通さずに探す cop に、ERB コメントを見せる。
+# その cop の on_new_investigation の間だけ、ERBSource の comments に ERB コメントを足し、raw_source を元の ERB にする。
+# processed_source を別のオブジェクト（SimpleDelegator など）に差し替えると、rubocop-erb の Corrector が
+# ERBSource と見なさず、修正範囲の検査を飛ばすので、ERBSource のまま振る舞いを変える
+module ErbCommentDirective
+  module DirectiveViewPatch
+    def comments
+      return super unless Thread.current[:erb_comment_directive_view]
+
+      (super + erb_comments).sort_by { |comment| comment.source_range.begin_pos }
+    end
+
+    def raw_source
+      Thread.current[:erb_comment_directive_view] ? template_source : super
+    end
+  end
+
+  module CopPatch
+    def on_new_investigation
+      return super unless ErbCommentDirective.mode == 'directive_only_cops' && processed_source.is_a?(RuboCop::Erb::ERBSource)
+
+      Thread.current[:erb_comment_directive_view] = true
+      super
+    ensure
+      Thread.current[:erb_comment_directive_view] = false
+    end
+  end
+
+  [
+    RuboCop::Cop::Lint::RedundantCopEnableDirective, # raw_source に 'enable' / 'pop' がなければ調べない
+    RuboCop::Cop::Lint::CopDirectiveSyntax,          # processed_source.comments を調べる
+    RuboCop::Cop::Style::DirectiveScope              # processed_source.comments を調べる
+  ].each { |cop| cop.prepend(CopPatch) }
+end
+
+RuboCop::Erb::ERBSource.prepend(ErbCommentDirective::DirectiveViewPatch)
 RuboCop::Erb::RubyExtractor.prepend(ErbCommentDirective::ExtractorPatch)
 RuboCop::Erb::ERBSource.prepend(ErbCommentDirective::ERBSourcePatch)
