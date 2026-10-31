@@ -127,7 +127,9 @@ module ErbCommentDirective
     private
 
     def each_directive(&block)
-      super
+      # directive_only_cops の cop の調査中は processed_source.comments が ERB コメントを含むので、
+      # super では ERB コメントを見せず、同じ無効化コメントを 2 回渡さないようにする
+      ErbCommentDirective.without_view { super }
       processed_source.erb_comments.each do |comment|
         directive = RuboCop::DirectiveComment.new(comment, registry)
         yield directive if directive.cop_names
@@ -185,14 +187,32 @@ module ErbCommentDirective
     end
   end
 
+  def self.without_view
+    view = Thread.current[:erb_comment_directive_view]
+    Thread.current[:erb_comment_directive_view] = false
+    yield
+  ensure
+    Thread.current[:erb_comment_directive_view] = view
+  end
+
+  # rubocop-ast の ProcessedSource が comments から作って覚える値。調査の前に消して ERB コメントを含めて作り直させ、
+  # 調査の後に元に戻す。戻さないと、後の cop（Lint/EmptyConditionalBody など）に ERB コメントが見える
+  MEMOIZED_FROM_COMMENTS = %i[@comment_index @ast_with_comments].freeze
+
   module CopPatch
     def on_new_investigation
-      return super unless ErbCommentDirective.mode == 'directive_only_cops' && processed_source.is_a?(RuboCop::Erb::ERBSource)
+      source = processed_source
+      return super unless ErbCommentDirective.mode == 'directive_only_cops' && source.is_a?(RuboCop::Erb::ERBSource)
 
-      Thread.current[:erb_comment_directive_view] = true
-      super
-    ensure
-      Thread.current[:erb_comment_directive_view] = false
+      saved = MEMOIZED_FROM_COMMENTS.to_h { |name| [name, source.instance_variable_get(name)] }
+      begin
+        MEMOIZED_FROM_COMMENTS.each { |name| source.instance_variable_set(name, nil) }
+        Thread.current[:erb_comment_directive_view] = true
+        super
+      ensure
+        Thread.current[:erb_comment_directive_view] = false
+        saved.each { |name, value| source.instance_variable_set(name, value) }
+      end
     end
   end
 

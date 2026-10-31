@@ -449,6 +449,7 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb 
 - `rubocop-erb-comment-directive/input/malformed.html.erb`: `none` と `directive_only` で `Lint/CopDirectiveSyntax` が出ない
 - `rubocop-erb-comment-directive/input/redundant_enable.html.erb`、`orphan_pop.html.erb`: `none` と `directive_only` で `Lint/RedundantCopEnableDirective` が出ない
 - `rubocop-erb-comment-directive/input/directive_scope.html.erb`: `none` と `directive_only` で `Style/DirectiveScope` が出ない
+- `rubocop-erb-comment-directive/input/empty_if_with_directive.html.erb`: `directive_only` と `directive_only_cops` の両方で `Lint/EmptyConditionalBody` が出る。`Style/DirectiveScope` は `directive_only_cops` だけで出る
 - `rubocop-erb-comment-directive/input/multiline_code_after.html.erb`、`multiline_column0.html.erb`: `none` と `render_safe` で `Style/StringLiterals` が出る（`render_safe` では無効化が効かない）
 - `rubocop-erb-comment-directive/input/multiline_code_before.html.erb`: どの方策でも 1 行目の `Style/StringLiterals` は出る。4 行目は、`render_all`・`render_safe`・`directive_only` では出ない。`render_all` に `Layout/SpaceAfterSemicolon`、`Layout/SpaceBeforeComment`、`Layout/EmptyComment` が出る
 

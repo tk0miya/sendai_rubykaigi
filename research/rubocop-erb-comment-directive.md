@@ -12,7 +12,7 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 - 入力
   - [repro/erb-comment/](repro/erb-comment/) の 9 ファイル（[erb-comment-directive.md](erb-comment-directive.md#対象)）
   - [repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/) の 6 ファイル（[rubocop-erb-0.8.md](rubocop-erb-0.8.md#無効化コメントのサポート実測)）
-  - 方策の違いを見るための例（[repro/rubocop-erb-comment-directive/input/](repro/rubocop-erb-comment-directive/input/)、21 ファイル。下の表）
+  - 方策の違いを見るための例（[repro/rubocop-erb-comment-directive/input/](repro/rubocop-erb-comment-directive/input/)、22 ファイル。下の表）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル。`<%#` を含むのは 17 ファイルで、`rubocop:` を書いたものはない）
 
 | ファイル | 内容 |
@@ -27,6 +27,7 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 | `redundant_enable.html.erb` | `<%= 'a' %>` の後に、無効にしていない cop の `<%# rubocop:enable Style/StringLiterals %>` |
 | `orphan_pop.html.erb` | `<%= 'a' %>` の後に、対応する `push` のない `<%# rubocop:pop %>` |
 | `directive_scope.html.erb` | `<%# rubocop:disable … %>`、`<%= "a" %>`、`<%# rubocop:enable … %>`（1 つの文だけを囲む） |
+| `empty_if_with_directive.html.erb` | `directive_scope.html.erb` と同じ 3 行の後に、`<% if x %><%# note %>`⏎`<% end %>`（本文が空の `if`） |
 | `plain_comments.html.erb` | `<%# TODO fix this %>` と `<%#no space %>`（無効化ではないコメント） |
 | `empty_if_plain_comment.html.erb` | `<% if some_error %><%# note %>`⏎`<% end %>`（本文が空の `if` と、無効化ではないコメント） |
 | `multiline_comment_autocorrect.html.erb` | 複数行の `<%# multi-line comment`⏎`  second line`⏎`%>` の後に `<%= link_to "a", url, {remote: true} %>` |
@@ -66,7 +67,7 @@ rubocop-erb 0.8 系は、`Herb.extract_ruby` が ERB のコメント（`<%# … 
 - 方策 1 と 2 は、ERB のコメントがすべて Ruby のコメントとして cop に見えます。`Style/CommentAnnotation`、`Layout/LeadingCommentSpace`、`Layout/EmptyComment`、`Layout/EmptyLineAfterMagicComment` が新たに出て、`Lint/EmptyConditionalBody` はコメントを本文と見なして出なくなります
 - 方策 3 は、取り出す Ruby を変えないので、無効化コメント以外の結果は 0.8.2 と同じです。実際のビュー 333 ファイルで offense に差はありませんでした。`<%#` の右側にコードがあっても、その行に効きます
 - 方策 3 の弱点は、`CommentConfig` を通さずに無効化コメントを探す cop が働かないことです。`Lint/RedundantCopEnableDirective`（不要な `enable` と、対応する `push` のない `pop`）、`Lint/CopDirectiveSyntax`（書き方の誤り）、`Style/DirectiveScope`（`disable-next` で書ける範囲）が、ERB のコメントに対して何も報告しません。これらの cop は、`processed_source.raw_source`（取り出した Ruby）に `enable` などの文字列があるかや、`processed_source.comments` を見て動くためです
-- この 3 つの cop には、ERB のコメントを見せるパッチを個別に当てる必要があります（方策 3'）。パッチを当てると 3 つとも報告し、ほかの結果は変わりませんでした（実際のビュー 333 ファイルでも差なし）。ただし、パッチの当て方を誤ると rubocop-erb の修正範囲の検査が外れ、autocorrect が `<%# rubocop:pop %>` を `<%` に書き換えてテンプレートを壊しました
+- この 3 つの cop には、ERB のコメントを見せるパッチを個別に当てる必要があります（方策 3'）。パッチを当てると 3 つとも報告し、ほかの結果は変わりませんでした（実際のビュー 333 ファイルでも差なし）。ただし、パッチの当て方を誤ると、rubocop-erb の修正範囲の検査が外れて autocorrect が `<%# rubocop:pop %>` を `<%` に書き換えたり、rubocop-ast が覚えた値を通じて ERB のコメントがほかの cop に漏れたりしました
 - 方策 3 は、RuboCop の private なメソッド（`CommentConfig#each_directive`）、内部の変数（`@no_directives`）、cop の実装（どこから無効化コメントを探すか）に依存します
 - autocorrect で不要な無効化コメントを消す（`Lint/RedundantCopDisableDirective`）のは、3 つの方策のどれでも働きません。rubocop-erb の修正範囲の検査が、`<%#` の `#` を含む範囲の修正を捨てるからです。方策 3 だけ autocorrect が効かないわけではありません
 - 【推測】提案するなら方策 3 に cop へのパッチを加えたもの（方策 3'）がよいと考えます。ERB の意味（コメントは `%>` で終わる）を保ったまま無効化だけを効かせられ、既存の結果を変えないからです。ただし、RuboCop の内部への依存は方策 1・2 より大きくなります
@@ -177,10 +178,12 @@ RuboCop 1.92.0 で、無効化コメントを扱う cop が無効化コメント
 
 試作では、3 つの cop の `on_new_investigation` の間だけ、`ERBSource#comments` が ERB のコメントを足して返し、`ERBSource#raw_source` が元の ERB を返すようにしました。
 
-- 3 つの cop とも、`redundant_enable.html.erb`、`orphan_pop.html.erb`、`malformed.html.erb`、`directive_scope.html.erb` に、方策 1 と同じ offense を出します【実測】
+- `redundant_enable.html.erb`、`orphan_pop.html.erb`、`malformed.html.erb`、`directive_scope.html.erb` に、方策 1 と同じ offense（[方策ごとの副作用](#方策ごとの副作用実測)の表の cop）が出ます【実測】
 - そのほかの入力の offense と、`-A` の結果は、方策 3 と同じです。実際のビュー 333 ファイルでも 0.8.2 と同じ 763 件です【実測】
 - 3 つの cop の autocorrect は、どれも `<%#` の `#` を含む範囲を書き換えるので、rubocop-erb の修正範囲の検査で捨てられ、`[Correctable]` も付きません【実測】
 - `processed_source` を別のオブジェクト（`SimpleDelegator` で `comments` と `raw_source` だけを変えたもの）に差し替える形にすると、autocorrect がテンプレートを壊しました。`orphan_pop.html.erb` の `<%# rubocop:pop %>` と、`redundant_enable.html.erb` の `<%# rubocop:enable … %>` が、`-A` でどちらも `<%` になります。rubocop-erb の `Corrector` は、`processed_source.is_a?(ERBSource)` のときだけ修正範囲を検査するので、差し替えたオブジェクトでは検査が外れるためです【実測・出典: `lib/rubocop/erb/corrector.rb`】
+- rubocop-ast の `ProcessedSource` は、`comments` から作った値（`comment_index` と `ast_with_comments`）を最初に使われたときに覚えます。パッチの cop の調査中に作られた値をそのまま残すと、後の cop にも ERB のコメントが見えます。`empty_if_with_directive.html.erb` では、`Style/DirectiveScope` の調査中に `comment_index` が作られ、後の `Lint/EmptyConditionalBody` がコメントを本文と見なして `if` を報告しなくなりました。試作では、調査の前にこの 2 つを消して作り直させ、調査の後に元の値に戻しています。戻すと `Lint/EmptyConditionalBody` は方策 3 と同じく出ます【実測・出典】
+- パッチの cop の調査中は `processed_source.comments` が ERB のコメントを含むので、そのとき `CommentConfig` が呼ばれると、同じ ERB のコメントを 2 回数えます。試作の `CommentConfig` は、`processed_source.comments` を読む間だけ ERB のコメントを外しています【出典】
 - 【推測】パッチは cop ごとに、その cop が無効化コメントを探す場所に合わせて当てる必要があり、RuboCop の cop の実装が変わると効かなくなります。無効化コメントを扱う cop が増えたときも、個別に追う必要があります
 
 ## 方策 1 で位置がずれる【実測・出典】
@@ -213,7 +216,7 @@ RuboCop 1.92.0 で、無効化コメントを扱う cop が無効化コメント
 - 方策 2 は、方策 1 の構文の問題を避けますが、効く書き方と効かない書き方の境目（右側に Ruby のコードがあるか、複数行のコメントの行頭に空白があるか）がユーザーから見えません。tk0miya/rubocop-herb の `Herb/IgnoredCopDirective` のように、効かない無効化コメントを報告する cop が要ります。また、ERB のコメントがすべて Ruby のコメントとして cop に見える副作用は、方策 1 と同じく残ります。無効化コメント（`rubocop:` を含むもの）だけを Ruby にすれば、`Style/CommentAnnotation` などは避けられますが、`Lint/EmptyConditionalBody` がコメントを本文と見なす問題は残ります
 - 方策 3 は、ERB の意味を変えずに、無効化の情報だけを RuboCop に渡します。`<%#` の右側にコードがあっても、その行に効くので、効く書き方と効かない書き方の境目がありません。herb-lint の `herb:disable` が書かれた行に効くのとも揃います
 - 複数行のコメントは、方策 3 でも扱いを決める必要があります。コメント全体を 1 つの無効化コメントとして渡すと、2 つ目以降の無効化や、説明の後に書いた無効化が黙って無視されます。行ごとに分けて渡せば、方策 1 と同じく無効化を書いた行から効き、Ruby のコードも変えずに済みます。行頭に空白のない行でも効きます
-- 方策 3 の最大の課題は、無効化コメントを検査する cop の一部（`Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope`）が働かないことです。rubocop-erb で cop ごとにパッチを当てれば働きますが、`CommentConfig` の private なメソッドへの依存に加えて、cop の実装への依存が増えます。パッチの当て方によっては、rubocop-erb の修正範囲の検査が外れてテンプレートを壊すことも確かめました
+- 方策 3 の最大の課題は、無効化コメントを検査する cop の一部（`Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope`）が働かないことです。rubocop-erb で cop ごとにパッチを当てれば働きますが、`CommentConfig` の private なメソッドへの依存に加えて、cop の実装への依存が増えます。パッチの当て方によっては、rubocop-erb の修正範囲の検査が外れてテンプレートを壊すことや、ERB のコメントがほかの cop に漏れることも確かめました
 - 根本的には、RuboCop 側に「`processed_source.comments` 以外から無効化コメントを足す」口があり、`CommentConfig` と無効化コメントを扱う cop がそろってそこを見るのが望ましいと考えます。rubocop-erb への提案では、当面は cop へのパッチで補い、RuboCop への提案は別に検討する、という形になります
 - autocorrect については、どの方策でも不要な無効化コメントは消えないので、方策 3 の弱点ではありません。むしろ方策 3 は、コメントの範囲を rubocop-erb が決められるので、タグ全体を消す扱いを足しやすいと考えます
 
@@ -223,6 +226,6 @@ RuboCop 1.92.0 で、無効化コメントを扱う cop が無効化コメント
 - 方策 1（`comments: true`）を採らない理由として、`leading_plain_comment.html.erb`、`leading_syntax_error.html.erb`、`multiline_comment_autocorrect.html.erb`、`multiline_code_after.html.erb`、`multiline_column0.html.erb`（autocorrect の無限ループ）の結果を示す。方策 2 を採らない理由として、複数行のコメントで無効化が黙って効かない書き方（`multiline_code_after.html.erb`、`multiline_column0.html.erb`）を示す
 - 対象にするコメントは `<%# … %>` と、`#` で始まる 1 行のタグ `<% # … %>`。どちらも `Herb.extract_ruby` が空白にする
 - 複数行の `<%#` は行ごとに無効化コメントとして扱い、無効化を書いた行から効かせる。1 つのコメントに複数の無効化を書けること、説明の後に無効化を書けること、行頭に空白がなくても効くことを示す（`multiline_second_line.html.erb`、`multiline_two_directives.html.erb`、`multiline_column0.html.erb`）
-- 方策 3 だけでは `Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` が働かないので、これらの cop へのパッチ（方策 3'）を含める。パッチは `ERBSource` のまま振る舞いを変え、rubocop-erb の修正範囲の検査を外さないようにする
+- 方策 3 だけでは `Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` が働かないので、これらの cop へのパッチ（方策 3'）を含める。パッチは `ERBSource` のまま振る舞いを変え、rubocop-erb の修正範囲の検査を外さないようにする。rubocop-ast が `comments` から作って覚える値は、パッチの cop の調査の後に元に戻す
 - 未解決の点として、RuboCop の private なメソッドと cop の実装への依存、不要な無効化コメントの autocorrect を挙げる。依存を減らすには、RuboCop 側に無効化コメントを足す口が要る
 - herb には別に、`Herb.extract_ruby(comments: true)` が、`%>` か本文が行頭にある複数行の `<%#` で位置を保たないことを報告できる
