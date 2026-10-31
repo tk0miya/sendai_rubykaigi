@@ -4,11 +4,11 @@
 
 このリポジトリの文書は日本語で書く。
 
-- 例外: upstream に報告する再現レポート（`research/rubocop-herb-issues/`）は英語で書く
+- 例外: upstream に報告する再現レポートや提案（`research/rubocop-herb-issues/`、`research/rubocop-erb-issues/`）は英語で書く
 
 ## 調査メモ・再現レポートの書き方
 
-`research/`（再現レポート `research/rubocop-herb-issues/` を含む）と `slides/` の文書には、調査対象の最新の状態だけを書く。
+`research/`（再現レポート `research/rubocop-herb-issues/`、`research/rubocop-erb-issues/` を含む）と `slides/` の文書には、調査対象の最新の状態だけを書く。
 
 - 以前の挙動への言及を残さない（「以前は〜だった」「〜で修正された」「解消した」など）
 - 過去の調査との差分を残さない（「前回からの変更」の節、調査日に並べた再確認の履歴、「前回報告した〜」など）
