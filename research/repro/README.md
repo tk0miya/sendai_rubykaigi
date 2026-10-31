@@ -374,3 +374,51 @@ $ diff -r "$V/orig/rails/railties/lib/rails/generators" "$V/o-safe/rails/railtie
 - `-a`・`-A` で HTML が変わるファイルは、3 つとも 0。`-A` でパースエラーが増えるファイルは、0.7.2 が 2、ほかの 2 つは 0
 - `-A` の後に残る offense は、0.8.2 が 9 件、rubocop-herb が 126 件
 - 0.7.2 の `-a` は、rails の認証ジェネレーターのテンプレートの `<%%= … %>` の中身を書き換える（`html_changes.rb` では数えられない）
+
+## ERB コメントの無効化コメント
+
+[../erb-comment-directive.md](../erb-comment-directive.md) の再現手順です。「rubocop-erb 0.8」の節の `erb072`、`erb082`、`tkherb` と、「herb PR #2260」の節の `pr2260` を使います。`tkherb` が使う `RUBOCOP_HERB` は、「rubocop-erb 0.8」の節の `$TMPDIR/rubocop-herb-96d31cf` にしておきます（「herb PR #2260」の節は別のコミットを指す）。
+
+### 各 linter で無効化が効くか
+
+無効化がファイルをまたがないよう、1 ファイルずつ実行します。
+
+```console
+$ cd research/repro
+$ for f in erb-comment/*.html.erb; do
+    echo "== $f"
+    bundle exec erb_lint --config erb_lint/recommended/.erb_lint.yml "$f"
+    for t in erb072 erb082 tkherb; do $t --format emacs "$f"; done
+    pr2260 --format emacs "$f"
+    bundle exec ruumba -D -e -c ruumba/.ruumba.yml --format emacs "$f"
+  done
+```
+
+- `trailing.html.erb`、`after_if.html.erb`: 0.8.2 と PR 版に `Lint/LiteralAsCondition` が出る。ruumba と rubocop-herb には出ない
+- `leading.html.erb`: rubocop-herb に `Herb/IgnoredCopDirective` と `Lint/LiteralAsCondition` が出る。ruumba には `Lint/CopDirectiveSyntax` が出て、`Lint/LiteralAsCondition` は出ない（`if` がコメントに入る）
+- `multiline_comment.html.erb`: rubocop-herb に `Layout/EmptyComment` が出る
+- `trailing_in_tag.html.erb`: 0.8.2 と PR 版に `Lint/CopDirectiveSyntax` が出る
+- `empty_if.html.erb`: どれにも `Lint/EmptyConditionalBody` は出ない
+- erb_lint は `multiline_tag.html.erb` 以外で、0.7.2 は `multiline_tag.html.erb` と `trailing_in_tag.html.erb` 以外で offense 0 件
+
+### herb-lint と herb-format
+
+`herb/` の `node_modules` を使います。コピーしたディレクトリに移ってから実行します（`$W` の外から rubocop-erb を実行すると、0.8.2 が除外している cop も出る）。
+
+```console
+$ (cd herb && npm install)
+$ W="$TMPDIR/erb-comment" && mkdir -p "$W" && cp -R erb-comment "$W/orig" && cp -R erb-comment "$W/fmt"
+$ cp herb/package.json "$W/" && ln -s "$PWD/herb/node_modules" "$W/node_modules"
+$ cd "$W"
+$ npx herb-lint --force orig
+$ npx herb-format --force fmt
+$ diff -ru orig fmt
+$ cp -R fmt fmtfix && npx herb-lint --force --fix fmtfix ; diff -r fmt fmtfix
+$ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 --format emacs "$f"; tkherb --format emacs "$f"; done; done
+```
+
+- `erb-comment/` の直下のファイルへの herb-lint の offense は、`not_erb_tag.html.erb` の `STRAY_ERB_CLOSING_TAG_ERROR` だけ。`indent.html.erb` のインデントのずれにも、`empty_if.html.erb` の空の `if` にも何も出ない
+- herb-format は、`indent.html.erb` の `<%#` を入れ子の深さに合わせてインデントし、同じ行に並んだタグを別々の行に分ける。`multiline_tag.html.erb` は `<% # rubocop:disable … %>` の 1 行になり、herb-lint の `--fix` で `<%#` に直る。`empty_if.html.erb` のコメントは `if` の本文に移る。`trailing_in_tag.html.erb` は変わらない。`not_erb_tag.html.erb` はパースエラーで飛ばす
+- 整形の後、rubocop-herb で `fmt/trailing.html.erb` と `fmt/after_if.html.erb` に `Lint/LiteralAsCondition` が出る。`fmt/empty_if.html.erb` には `Lint/MissingCopEnableDirective` と `Lint/RedundantCopDisableDirective` が出る。0.8.2 では `fmt/multiline_tag.html.erb` と `fmtfix/multiline_tag.html.erb` に `Lint/LiteralAsCondition` が出る
+- `herb-disable/`（`herb:disable` の例）: 整形の前は、`empty_if.html.erb` と `if_sibling.html.erb` に `herb-disable-comment-unnecessary` が出る。`same_anchor.html.erb` には、無効化していない 1 行目の `<img>` に `html-img-require-alt` が出る
+- 整形の後、`herb:disable` は行末に残るが、`same_anchor.html.erb` では 1 行目の `<img>` に、`empty_if.html.erb` では `<% end %>` の行に、`if_sibling.html.erb` では `</div>` の行に付く。この 3 ファイルでは、無効化したかった行に offense が出る
