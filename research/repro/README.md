@@ -447,6 +447,8 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb 
 - `rubocop-erb-comment-directive/input/leading_syntax_error.html.erb`: `render_all` だけ `Lint/Syntax` が出ない
 - `rubocop-erb-comment-directive/input/plain_comments.html.erb`: `render_all` と `render_safe` に `Style/CommentAnnotation` と `Layout/LeadingCommentSpace` が出る
 - `rubocop-erb-comment-directive/input/malformed.html.erb`: `directive_only` だけ `Lint/CopDirectiveSyntax` が出ない
+- `rubocop-erb-comment-directive/input/multiline_code_after.html.erb`、`multiline_column0.html.erb`: `none` と `render_safe` で `Style/StringLiterals` が出る（`render_safe` では無効化が効かない）
+- `rubocop-erb-comment-directive/input/multiline_code_before.html.erb`: どの方策でも 1 行目の `Style/StringLiterals` は出る。4 行目は、`render_all`・`render_safe`・`directive_only` では出ない。`render_all` に `Layout/SpaceAfterSemicolon`、`Layout/SpaceBeforeComment`、`Layout/EmptyComment` が出る
 
 ### autocorrect（コピーに対して実行すること）
 
@@ -461,6 +463,8 @@ $ diff rubocop-erb-comment-directive/input/multiline_comment_autocorrect.html.er
 
 - `multiline_comment_autocorrect.html.erb`: `render_all` で `<%= link_to "'a' url, {r emote: true}  %>` になる。ほかの方策では `<%= link_to 'a', url, { remote: true } %>`
 - `redundant.html.erb`（不要な `<%# rubocop:disable … %>`）は、どの方策でも書き換わらない
+- `multiline_column0_text.html.erb`: `render_all` で、コメントの `- item` が `-  item` に、コードが `<%= link_to "a'a'url, {re mote: true} %>` になる
+- `multiline_column0.html.erb`: `render_all` で、RuboCop が `Infinite loop detected`（`Layout/LeadingCommentSpace` と `Style/StringLiterals`）を出して止まる。コメントの `r` の後ろに空白が入る
 - `plain_comments.html.erb`: `render_all` と `render_safe` で `<%# TODO fix this %>` が `<%# TODO: fix this %>` になる
 
 `bundle exec rubocop` が `command not found` になる環境では、上のように `bundle info rubocop --path` の `exe/rubocop` を `bundle exec ruby` で動かします。
@@ -485,4 +489,4 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby -rherb -e 's = "<%# a\n  b\n%>\n<%= x %>\
 [22, 23, "#   a\n# b\n#  \n    x  ;\n"]
 ```
 
-- 複数行の `<%#` の `%>` の行（2 バイト）が `#  `（3 バイト）になり、出力が入力より長くなる。herb 0.11.1 でも同じ
+- 複数行の `<%#` の、行頭にある `%>`（2 バイト）が `#  `（3 バイト）になり、出力が入力より長くなる。行頭に空白のない本文の行も、`#` の分だけ長くなる。herb 0.11.1 でも同じ

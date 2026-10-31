@@ -34,6 +34,23 @@ module ErbCommentDirective
     nodes
   end
 
+  # ERB のコメントのタグ（バイト列）を、同じ長さの Ruby のコメントにする。
+  # 2 行目以降は、行頭の空白 1 文字を `#` に置き換える。空白だけの行はそのまま。
+  # 行頭に空白のない行があると、長さを変えずに `#` を置けないので nil を返す
+  def self.render_comment(source, node)
+    opening = node.tag_opening.value
+    head = opening == '<%#' ? '  #' : ' ' * opening.bytesize
+    content = source.byteslice(node.content.range.from, node.content.range.to - node.content.range.from)
+    first, *rest = (content + (' ' * node.tag_closing.value.bytesize)).split("\n", -1)
+    rest = rest.map do |line|
+      next line if line.strip.empty?
+      return nil unless line.start_with?(' ', "\t")
+
+      "##{line.byteslice(1..)}"
+    end
+    head + [first, *rest].join("\n")
+  end
+
   # 方策 1・2: Ruby の取り出しを変える
   module ExtractorPatch
     private
@@ -49,17 +66,19 @@ module ErbCommentDirective
       end
     end
 
+    # 右側（同じ行の残り）に Ruby のコードがないコメントだけを、render_comment で Ruby のコメントにする
     def render_safe
       plain = Herb.extract_ruby(template_source)
-      commented = Herb.extract_ruby(template_source, comments: true)
+      source = template_source.b
       result = plain.b
       ErbCommentDirective.comment_nodes(Herb.parse(template_source).value).each do |node|
         from = node.tag_opening.range.from
         to = node.tag_closing.range.to
-        rest = plain.byteslice(to, (plain.byteindex("\n", to) || plain.bytesize) - to) # 行の残り（Ruby 以外は空白）
+        rest = result.byteslice(to, (result.byteindex("\n", to) || result.bytesize) - to) # 行の残り（Ruby 以外は空白）
         next unless rest.strip.empty?
 
-        result[from, to - from] = commented.b.byteslice(from, to - from)
+        rendered = ErbCommentDirective.render_comment(source, node)
+        result[from, to - from] = rendered if rendered
       end
       result.force_encoding(Encoding::UTF_8)
     end
@@ -117,13 +136,27 @@ module ErbCommentDirective
       @comment_config ||= ErbCommentConfig.new(self)
     end
 
-    # `#` から `%>` の手前までを範囲とするコメント。text は ERB に書かれた文字列
+    # コメントの行ごとに、無効化コメントの候補を作る。1 行目は `#` から、2 行目以降は行頭から始まる。
+    # text は ERB に書かれた文字列で、2 行目以降は行頭の空白 1 文字を `#` に置き換える（空白がなければ `#` を足す）
     def erb_comments
-      @erb_comments ||= ErbCommentDirective.comment_nodes(erb_root).map do |node|
-        hash_pos = node.tag_opening.value == '<%#' ? node.tag_opening.range.to - 1 : node.content.range.from + node.content.value.index('#')
-        range = herb_range_to_parser_range(Herb::Range.new(hash_pos, node.content.range.to))
-        text = template_source.byteslice(hash_pos, node.content.range.to - hash_pos).rstrip
-        ErbComment.new(range.resize(text.length), text)
+      source = template_source.b
+      @erb_comments ||= ErbCommentDirective.comment_nodes(erb_root).flat_map do |node|
+        start = node.tag_opening.value == '<%#' ? node.tag_opening.range.to - 1 : node.content.range.from + node.content.value.index('#')
+        body = source.byteslice(start, node.content.range.to - start)
+        offset = start
+        body.split("\n", -1).each_with_index.filter_map do |line, index|
+          line_start = offset
+          offset += line.bytesize + 1
+          stripped = line.rstrip
+          next if stripped.empty?
+
+          text = if index.zero? then stripped
+                 elsif stripped.start_with?(' ', "\t") then "#" + stripped.byteslice(1..)
+                 else "#" + stripped
+                 end
+          range = herb_range_to_parser_range(Herb::Range.new(line_start, line_start + stripped.bytesize))
+          ErbComment.new(range, text.force_encoding(Encoding::UTF_8))
+        end
       end
     end
   end
