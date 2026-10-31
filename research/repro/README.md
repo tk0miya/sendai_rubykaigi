@@ -444,7 +444,7 @@ $ export G="$PWD/rubocop-erb-0.8/v0.8.2/Gemfile"
 $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb rubocop-erb-comment-directive/input/*.html.erb erb-comment/*.html.erb rubocop-erb-0.8/disable/*.html.erb
 ```
 
-- `erb-comment/leading.html.erb`: `render_all` では `Lint/LiteralAsCondition` の代わりに `Lint/CopDirectiveSyntax`、`Lint/MissingCopEnableDirective`、`Lint/RedundantCopDisableDirective` が出る（`if` がコメントに入る）。`render_safe` では `Lint/LiteralAsCondition` が出る。`directive_only`、`directive_only_cops`、`comments_all` では出ない
+- `erb-comment/leading.html.erb`: `render_all` では `Lint/LiteralAsCondition` の代わりに `Lint/CopDirectiveSyntax`、`Lint/MissingCopEnableDirective`、`Lint/RedundantCopDisableDirective` が出る（`if` がコメントに入る）。`render_safe` では `Lint/LiteralAsCondition` が出る。`render_directives` では `Lint/LiteralAsCondition` と `Erb/IgnoredCopDirective` が出る。`directive_only`、`directive_only_cops`、`comments_all` では出ない
 - `rubocop-erb-comment-directive/input/leading_plain_comment.html.erb`: `render_all` だけ `Lint/Syntax`（unexpected token end）が出る
 - `rubocop-erb-comment-directive/input/leading_syntax_error.html.erb`: `render_all` だけ `Lint/Syntax` が出ない
 - `rubocop-erb-comment-directive/input/plain_comments.html.erb`: `render_all`、`render_safe`、`comments_all` に `Style/CommentAnnotation` と `Layout/LeadingCommentSpace` が出る
@@ -454,10 +454,12 @@ $ BUNDLE_GEMFILE="$G" bundle exec ruby rubocop-erb-comment-directive/run_all.rb 
 - `rubocop-erb-comment-directive/input/inline_comment.html.erb`: `comments_all` だけ `Style/InlineComment` が出る
 - `rubocop-erb-comment-directive/input/consecutive_annotations.html.erb`: `Style/CommentAnnotation` が、`render_all` と `render_safe` では 1 つ目のコメント（2 行目）だけ、`comments_all` では 2 つとも（2 行目と 3 行目）出る
 - `rubocop-erb-comment-directive/input/suppressed_exception.html.erb`: `Lint/SuppressedException` が、`render_all` と `render_safe` 以外で出る
-- `rubocop-erb-comment-directive/input/empty_if_with_directive.html.erb`: `Lint/EmptyConditionalBody` は `none`、`directive_only`、`directive_only_cops` で出る。`Style/DirectiveScope` は `none` と `directive_only` 以外で出る
-- `rubocop-erb-comment-directive/input/multiline_code_after.html.erb`、`multiline_column0.html.erb`: `none` と `render_safe` で `Style/StringLiterals` が出る（`render_safe` では無効化が効かない）
+- `rubocop-erb-comment-directive/input/empty_if_with_directive.html.erb`: `Lint/EmptyConditionalBody` は `none`、`render_directives`、`directive_only`、`directive_only_cops` で出る。`Style/DirectiveScope` は `none` と `directive_only` 以外で出る
+- `rubocop-erb-comment-directive/input/multiline_code_after.html.erb`: `none` と `render_safe` で `Style/StringLiterals` が出る（`render_safe` では無効化が効かない）
+- `rubocop-erb-comment-directive/input/multiline_column0.html.erb`、`multiline_one_space.html.erb`、`multiline_tab.html.erb`: `render_directives` では無効化が効かず、`Style/StringLiterals`（`none` と同じ）と `Erb/IgnoredCopDirective` が出る
+- `rubocop-erb-comment-directive/input/multiline_hash.html.erb`、`multiline_column0_hash.html.erb`: `render_directives` で無効化が効く
 - `rubocop-erb-comment-directive/input/multiline_code_before.html.erb`: どの方策でも 1 行目の `Style/StringLiterals` は出る。4 行目は `none` だけで出る。`render_all` に `Layout/SpaceAfterSemicolon`、`Layout/SpaceBeforeComment`、`Layout/EmptyComment` が出る
-- `render_directives` は、普通の ERB のコメント（`plain_comments.html.erb`、`consecutive_annotations.html.erb`、`inline_comment.html.erb`、`empty_if_plain_comment.html.erb`、`suppressed_exception.html.erb`、`leading_plain_comment.html.erb`）で `none` と同じ結果になる。無効化コメントのある入力では、無効化が効き、`Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` も出る。`erb-comment/leading.html.erb` と `multiline_column0.html.erb` には `Erb/IgnoredCopDirective` が出る
+- `render_directives` は、普通の ERB のコメント（`plain_comments.html.erb`、`consecutive_annotations.html.erb`、`inline_comment.html.erb`、`empty_if_plain_comment.html.erb`、`suppressed_exception.html.erb`、`leading_plain_comment.html.erb`）で `none` と同じ結果になる。無効化コメントのある入力では、無効化が効き、`Lint/RedundantCopEnableDirective`、`Lint/CopDirectiveSyntax`、`Style/DirectiveScope` も出る。`erb-comment/leading.html.erb`、`multiline_column0.html.erb`、`multiline_one_space.html.erb`、`multiline_tab.html.erb` には `Erb/IgnoredCopDirective` が出る
 - `rubocop-erb-comment-directive/input/excluded_*.html.erb`（`config_excluded_cops.yml` で、rubocop-erb が除外している `Layout/EmptyLineAfterGuardClause`、`Style/WhileUntilModifier`、`Style/IfUnlessModifier` を有効にする）
   - `excluded_while_first_line.html.erb`、`excluded_while_last_line.html.erb`: `Style/WhileUntilModifier` が `none`、`render_directives`、`directive_only`、`directive_only_cops` で出る
   - `excluded_while_body_line.html.erb`: `Style/WhileUntilModifier` が `render_all` と `render_safe` 以外で出る

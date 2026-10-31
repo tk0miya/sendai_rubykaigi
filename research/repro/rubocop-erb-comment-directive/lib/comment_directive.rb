@@ -6,7 +6,7 @@
 # - render_all:     Herb.extract_ruby に comments: true を付け、ERB コメントをすべて Ruby のコメントにする
 # - render_safe:    右側（同じ行の残り）に Ruby のコードがない ERB コメントだけを Ruby のコメントにする
 # - render_directives: ERB コメントのうち無効化コメントの行だけを、その場で Ruby のコメントにする。Ruby のコメントに
-#                    できない行（右側に Ruby のコードがある、行頭に空白がない）は Erb/IgnoredCopDirective が報告する
+#                    できない行（右側に Ruby のコードがある、行頭の空白が 2 文字より少ない）は Erb/IgnoredCopDirective が報告する
 # - directive_only: Ruby のコードは変えず、ERB コメントを無効化コメントとして CommentConfig だけに渡す
 # - directive_only_cops: directive_only に加え、processed_source.comments や raw_source から無効化コメントを探す cop に
 #                        ERB コメントを見せる
@@ -61,11 +61,14 @@ module ErbCommentDirective
   end
 
   # ERB コメントの中の、無効化コメントの行。1 行ごとに次を返す
-  # - hash_pos: Ruby のコメントの `#` を置くバイト位置（1 行目は `<%#` の `#`、2 行目以降は行頭）
+  # - hash_pos: Ruby のコメントを書き始めるバイト位置（1 行目は `<%#` の `#`、2 行目以降は行頭）
   # - text:     hash_pos から書く Ruby のコメント（`%>` は含まない）
   # - renderable / reason: 長さを変えずに Ruby のコメントにできるか。できない理由は
   #   :code_after（同じ行の後ろに Ruby のコードがあり、コメントにするとそのコードもコメントに入る）か
-  #   :column_zero（2 行目以降で行頭に空白がなく、`#` を置く場所がない）
+  #   :no_room（2 行目以降で、行頭の空白が 2 文字より少なく、`# ` を置けない）
+  # 2 行目以降で、空白の後が `#` で始まる行（`  # rubocop:disable …`）は、そのままで Ruby のコメントなので書き換えない
+  DIRECTIVE_REGEXP = /\A#\s*rubocop\s*:/.freeze
+
   def self.directive_lines(template, plain, herb_root)
     source = template.b
     plain = plain.b
@@ -77,15 +80,16 @@ module ErbCommentDirective
         line_start = offset
         offset += line.bytesize + 1
         stripped = line.rstrip
-        marker = index.zero? ? stripped : "# #{stripped.lstrip}"
-        next unless RuboCop::DirectiveComment::DIRECTIVE_MARKER_REGEXP.match?(marker.sub(/\A#\s*/, '# '))
+        ruby_comment = index.zero? || stripped.lstrip.start_with?('#')
+        marker = ruby_comment ? stripped.lstrip : "# #{stripped.lstrip}"
+        next unless DIRECTIVE_REGEXP.match?(marker)
 
         rest_from = node.tag_closing.range.to
         rest = plain.byteslice(rest_from, (plain.byteindex("\n", rest_from) || plain.bytesize) - rest_from)
         reason = if index == lines.size - 1 && !rest.strip.empty? then :code_after
-                 elsif !index.zero? && !line.start_with?(' ', "\t") then :column_zero
+                 elsif !ruby_comment && !stripped.match?(/\A[ \t]{2}/) then :no_room
                  end
-        text = index.zero? || reason ? stripped : "##{stripped.byteslice(1..)}"
+        text = ruby_comment || reason ? stripped : "##{stripped.byteslice(1..)}"
         { hash_pos: line_start, text: text.force_encoding(Encoding::UTF_8), renderable: reason.nil?, reason: reason }
       end
     end
@@ -283,7 +287,7 @@ module RuboCop
       class IgnoredCopDirective < Base
         MESSAGES = {
           code_after: 'This directive is ignored because Ruby code follows it on the same line.',
-          column_zero: 'This directive is ignored because its line in the multi-line comment starts at column 0.'
+          no_room: 'This directive is ignored because its line in the multi-line comment is indented by less than two characters.'
         }.freeze
 
         def on_new_investigation
