@@ -8,10 +8,10 @@ Keep the extracted Ruby as it is, and add only the directives in ERB comments to
   - RuboCop decides which cops are disabled where by reading `processed_source.comments`, so every directive works wherever it is written, with the same rule as in Ruby. So no cop is needed.
   - The extracted Ruby is not changed, so this does not depend further on the output of `Herb.extract_ruby`.
 - Cons
-  - Cops that look for comments in the source text instead of `processed_source.comments` don't see the directives, because the source text is blank where the ERB comments are.
+  - It does not work together with existing cops that look for comments in the source text instead of `processed_source.comments`, because the source text is blank where the ERB comments are.
     - `Lint/RedundantCopEnableDirective` does nothing unless `processed_source.raw_source` contains `enable`, so a redundant `<%# rubocop:enable … %>` is never reported.
     - About 20 cops decide whether a line is a comment line from the source text (`RuboCop::Cop::Util#comment_line?`), so they see a directive line as an empty line. For example, `Lint/SuppressedException` (`AllowComments`) reports a `rescue` whose body is only a directive, which it doesn't in Ruby. The directive itself cannot suppress this offense, because it applies only from the next line.
-    - Fixing this would need a patch for each of these cops.
+    - Patching each of these cops is not realistic.
 
 **Example**
 
@@ -49,4 +49,4 @@ app/views/posts/show.html.erb:4:5: C: Style/DirectiveScope: Use disable-next ins
 1 file inspected, 3 offenses detected
 ```
 
-I did not propose this because these cops would need patches one by one. To avoid this, RuboCop itself would need a way to tell these cops about comments that are not in the source text.
+I did not propose this because it does not work together with these existing cops.
