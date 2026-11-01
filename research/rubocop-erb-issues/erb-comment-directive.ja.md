@@ -1,6 +1,6 @@
 # ERB のコメント（`<%# … %>`）に書いた `rubocop:disable` をサポートしてほしい
 
-[erb-comment-directive.md](erb-comment-directive.md)（英語で出す issue の下書き）の日本語版です。
+[erb-comment-directive.md](erb-comment-directive.md)（[r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84) の本文）の日本語版です。
 
 素晴らしい gem をありがとうございます。0.8 で `Herb.extract_ruby` を使うようになったことによる改善をうれしく思っています。
 

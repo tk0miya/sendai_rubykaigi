@@ -317,7 +317,7 @@ rubocop-erb 0.8.2 は、`Layout/EmptyLineAfterGuardClause`、`Style/WhileUntilMo
 
 ## 提案に含める点
 
-rubocop-erb への issue の下書きは [rubocop-erb-issues/erb-comment-directive.md](rubocop-erb-issues/erb-comment-directive.md)（日本語版は [erb-comment-directive.ja.md](rubocop-erb-issues/erb-comment-directive.ja.md)）です。issue は短くまとめ、次の 3 点を伝える。
+rubocop-erb には [r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84) として提案しました。本文は [rubocop-erb-issues/erb-comment-directive.md](rubocop-erb-issues/erb-comment-directive.md)（日本語版は [erb-comment-directive.ja.md](rubocop-erb-issues/erb-comment-directive.ja.md)）です。issue は短くまとめ、次の 3 点を伝える。
 
 - ERB のコメントに書いた無効化コメントをサポートしてほしいこと
 - 実装の方針は 2 つあること。方針 1 は ERB のコメントをすべて出力する（この調査の方策 1）。方針 2 は、安全なときだけ無効化コメントを出力する（この調査の方策 2）
