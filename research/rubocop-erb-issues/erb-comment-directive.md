@@ -18,7 +18,6 @@ Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment i
     <p>menu</p>
   <% end %>
   ```
-- **Ordinary comments are treated as Ruby comments.** `<%# TODO fix this %>` gets `Style/CommentAnnotation`, `<%# encoding: utf-8 -%>` is read as a magic comment (`Layout/EmptyLineAfterMagicComment`), and so on. CI that passes today would fail.
 
 ## Option 2: Render only directives, when it is safe (recommended)
 

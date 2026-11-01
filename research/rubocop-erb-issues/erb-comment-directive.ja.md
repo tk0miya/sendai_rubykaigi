@@ -20,7 +20,6 @@
     <p>menu</p>
   <% end %>
   ```
-- **普通のコメントが Ruby のコメントとして扱われる**: `<%# TODO fix this %>` に `Style/CommentAnnotation` が出たり、`<%# encoding: utf-8 -%>` がマジックコメントと見なされたり（`Layout/EmptyLineAfterMagicComment`）します。今通っている CI が通らなくなります
 
 ## 方針 2: 安全なときだけ無効化コメントを出力する（推奨）
 
