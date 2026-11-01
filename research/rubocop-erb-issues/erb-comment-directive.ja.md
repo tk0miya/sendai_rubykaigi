@@ -6,17 +6,6 @@
 
 実装の方針は 2 つ考えられ、2 つ目を勧めます。
 
-例として、次のテンプレートに対する両方の方針の結果を示します。
-
-```erb
-<%# TODO fix this %>
-<%# rubocop:disable Style/StringLiterals %>
-<p><%= "a" %></p>
-<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
-  <p>b</p>
-<% end %>
-```
-
 ## 方針 1: ERB のコメントをすべて出力する
 
 `Herb.extract_ruby(source, comments: true)` を使い、すべての ERB のコメントを Ruby のコメントにします。
@@ -27,7 +16,18 @@
   - 本来 ERB ではレンダリングされないコメントノードがレンダリングされるため、意図せぬ挙動を引き起こす。具体的には、コメントの後ろにあるコードがコメント扱いされる
     - たとえば `<%# note %><% if x %>` … `<% end %>` のような正しいテンプレートに `Lint/Syntax` が出て、逆にコメントの後ろにある本当の構文エラーは報告されなくなる
 
-サンプルを取り出した Ruby（4 行目の `if` がコメントに入るので、6 行目に `Lint/Syntax` が出る）：
+たとえば、次のテンプレートは
+
+```erb
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
+<% end %>
+```
+
+次の Ruby になります。4 行目の `if` がコメントに入るので、6 行目に `Lint/Syntax` が出ます。
 
 ```
 1:   # TODO fix this
@@ -51,7 +51,18 @@
   - 通常のコメントは書き戻されないので、lint の対象にならない（0.8.2 と同じ）。たとえば `<%# TODO fix this %>` に `Style/CommentAnnotation` が出ない
   - 方針 1 より実装が大きい
 
-サンプルを取り出した Ruby（1 行目の通常のコメントと、後ろにコードが続く 4 行目の無効化コメントは空白のまま）：
+たとえば、次のテンプレートは
+
+```erb
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
+<% end %>
+```
+
+次の Ruby になります。1 行目の通常のコメントと、後ろにコードが続く 4 行目の無効化コメントは空白のままです。
 
 ```
 1:

@@ -4,17 +4,6 @@
 
 I see two ways to implement this, and I recommend the second.
 
-As an example, I'll show the results of both options for this template:
-
-```erb
-<%# TODO fix this %>
-<%# rubocop:disable Style/StringLiterals %>
-<p><%= "a" %></p>
-<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
-  <p>b</p>
-<% end %>
-```
-
 ## Option 1: Render all ERB comments
 
 Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment into a Ruby comment.
@@ -25,7 +14,18 @@ Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment i
   - Comment nodes, which ERB never renders, are rendered, and this causes unintended behavior. Specifically, code after a comment is treated as part of the comment.
     - For example, a valid template such as `<%# note %><% if x %>` … `<% end %>` reports `Lint/Syntax`, and a real syntax error after a comment goes unreported.
 
-Extracted Ruby for the sample (line 4's `if` becomes part of the comment, so line 6 reports `Lint/Syntax`):
+For example, this template:
+
+```erb
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
+<% end %>
+```
+
+is extracted as follows. Line 4's `if` becomes part of the comment, so line 6 reports `Lint/Syntax`:
 
 ```
 1:   # TODO fix this
@@ -49,7 +49,18 @@ Write only `rubocop:` directives back into the extracted Ruby, in place. For exa
   - Ordinary comments are not written back, so they are not linted (same as 0.8.2). For example, `<%# TODO fix this %>` gets no `Style/CommentAnnotation`.
   - More code than option 1.
 
-Extracted Ruby for the sample (the ordinary comment on line 1 and the directive followed by code on line 4 stay blank):
+For example, this template:
+
+```erb
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
+<% end %>
+```
+
+is extracted as follows. The ordinary comment on line 1 and the directive followed by code on line 4 stay blank:
 
 ```
 1:
