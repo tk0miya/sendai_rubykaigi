@@ -1,6 +1,8 @@
 # Support `rubocop:disable` in ERB comments (`<%# … %>`)
 
-`Herb.extract_ruby` blanks ERB comments, so `<%# rubocop:disable Style/StringLiterals %>` has no effect. I'd like rubocop-erb to support directives written in ERB comments. ERB comments are the natural place for them in templates, and herb-lint uses the same form for its own directives (`<%# herb:disable … %>`).
+Thank you for the great gem. I'm happy to see the improvements that came with `Herb.extract_ruby` in 0.8.
+
+Now I'd like to propose supporting `rubocop:disable` directives in ERB comments (`<%# … %>`). Currently, `Herb.extract_ruby` blanks ERB comments, so `<%# rubocop:disable Style/StringLiterals %>` has no effect. ERB comments are the natural place for directives in templates, and herb-lint uses the same form for its own directives (`<%# herb:disable … %>`).
 
 I see two ways to implement this, and I recommend the second.
 

@@ -2,7 +2,9 @@
 
 [erb-comment-directive.md](erb-comment-directive.md)（英語で出す issue の下書き）の日本語版です。
 
-`Herb.extract_ruby` は ERB のコメントを空白にするので、`<%# rubocop:disable Style/StringLiterals %>` は効きません。ERB のコメントに書いた無効化コメントを、rubocop-erb でサポートしてほしいと考えています。テンプレートで無効化コメントを書く場所としては ERB のコメントが自然で、herb-lint も自分の無効化コメントに同じ形（`<%# herb:disable … %>`）を使っています。
+素晴らしい gem をありがとうございます。0.8 で `Herb.extract_ruby` を使うようになったことによる改善をうれしく思っています。
+
+今回は、ERB のコメント（`<%# … %>`）に書いた `rubocop:disable` のサポートを提案したいと考えています。今は `Herb.extract_ruby` が ERB のコメントを空白にするので、`<%# rubocop:disable Style/StringLiterals %>` は効きません。テンプレートで無効化コメントを書く場所としては ERB のコメントが自然で、herb-lint も自分の無効化コメントに同じ形（`<%# herb:disable … %>`）を使っています。
 
 実装の方針は 2 つ考えられ、2 つ目を勧めます。
 
