@@ -8,11 +8,19 @@
 
 ## 方針 1: ERB のコメントをすべて出力する
 
-`Herb.extract_ruby(source, comments: true)` を使い、すべての ERB のコメントを Ruby のコメントにします。変更は 1 行で済みますが、次の問題があります。
+`Herb.extract_ruby(source, comments: true)` を使い、すべての ERB のコメントを Ruby のコメントにします。変更は 1 行で済みますが、本来 ERB では処理されないコメントが Ruby のコードになるので、RuboCop が意図しない解釈をします。
 
-- **コードがコメントに入る**: Ruby のコメントは行末まで続くので、同じ行で ERB のコメントの後ろにあるコードがコメントに入ります。たとえば `<%# note %><% if x %>` … `<% end %>` に `Lint/Syntax` が出ます
-- **普通のコメントに offense が出る**: `Style/CommentAnnotation`、`Layout/EmptyComment` などが新たに出て、今通っている CI が通らなくなります
-- **位置がずれる**: 一部の複数行のコメントの後ろで位置がずれ、autocorrect がテンプレートを壊すことがあります
+- **後ろのコードがコメントに入る**: ERB のコメントは `%>` で終わりますが、Ruby のコメントは行末まで続きます。`<%# note %><% if x %>` … `<% end %>` のような正しいテンプレートに `Lint/Syntax` が出て、逆に同じ行でコメントの後ろにある本当の構文エラーは報告されなくなります
+- **複数行のコメントでも壊れる**: 次のような正しいテンプレートでも、`%>` の後ろの `if` がコメントに入り、`Lint/Syntax: unexpected token end` が出ます
+
+  ```erb
+  <%#
+    Show the menu only to signed-in users.
+  %><% if signed_in? %>
+    <p>menu</p>
+  <% end %>
+  ```
+- **普通のコメントが Ruby のコメントとして扱われる**: `<%# TODO fix this %>` に `Style/CommentAnnotation` が出たり、`<%# encoding: utf-8 -%>` がマジックコメントと見なされたり（`Layout/EmptyLineAfterMagicComment`）します。今通っている CI が通らなくなります
 
 ## 方針 2: 安全なときだけ無効化コメントを出力する（推奨）
 
