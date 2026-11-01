@@ -5,6 +5,7 @@
 I see two ways to implement this, and I recommend the second.
 
 Below, both options are applied to this template:
+
 ```erb
 <%# TODO fix this %>
 <%# rubocop:disable Style/StringLiterals %>
@@ -14,12 +15,12 @@ Below, both options are applied to this template:
 <% end %>
 ```
 
-
 ## Option 1: Render all ERB comments
 
 Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment into a Ruby comment.
 
 Extracted Ruby for the sample (line 4's `if` becomes part of the comment, so line 6 reports `Lint/Syntax`):
+
 ```
 1:   # TODO fix this
 2:   # rubocop:disable Style/StringLiterals
@@ -28,7 +29,6 @@ Extracted Ruby for the sample (line 4's `if` becomes part of the comment, so lin
 5:
 6:    end  ;
 ```
-
 
 - Pros
   - A one-line change.
@@ -41,6 +41,7 @@ Extracted Ruby for the sample (line 4's `if` becomes part of the comment, so lin
 Write only `rubocop:` directives back into the extracted Ruby, in place. For example, `<%# rubocop:disable … %>` becomes `  # rubocop:disable …`. A directive is written back only when no Ruby code follows it on the same line.
 
 Extracted Ruby for the sample (the ordinary comment on line 1 and the directive followed by code on line 4 stay blank):
+
 ```
 1:
 2:   # rubocop:disable Style/StringLiterals
@@ -49,7 +50,6 @@ Extracted Ruby for the sample (the ordinary comment on line 1 and the directive 
 5:
 6:    end  ;
 ```
-
 
 - Pros
   - Comments that would break code are not written back, so code is never treated as part of a comment.
