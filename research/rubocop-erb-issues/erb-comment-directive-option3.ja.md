@@ -10,6 +10,7 @@
   - RuboCop は `processed_source.comments` を見て、どこでどの cop を無効にするかを決めるので、どこに書いた directive も Ruby と同じ規則で効く。そのため cop は要らない
   - 取り出した Ruby を変えないので、`Herb.extract_ruby` の出力にさらに依存することはない
 - Cons
+  - RuboCop の内部の作りに依存する。`processed_source.comments` は RuboCop が parser の結果から作るもので、plugin がコメントを足すための仕組みは用意されていない
   - コメントを `processed_source.comments` ではなく、ソースの文字列から探す既存の cop と併用できない。ERB のコメントの位置のソースは空白なので、これらの cop には directive が見えないから
     - `Lint/RedundantCopEnableDirective` は、`processed_source.raw_source` に `enable` が含まれないと何もしないので、不要な `<%# rubocop:enable … %>` を報告しない
     - 20 個ほどの cop は、コメントの行かどうかをソースの文字列で判断する（`RuboCop::Cop::Util#comment_line?`）ので、directive の行を空行と見なす。たとえば `Lint/SuppressedException`（`AllowComments`）は、本文が directive だけの `rescue` を報告する。Ruby では報告しない。directive は次の行から効くので、その directive でこの指摘を抑えることもできない
