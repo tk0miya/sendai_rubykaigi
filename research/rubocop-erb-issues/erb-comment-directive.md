@@ -19,10 +19,12 @@ Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment i
 Write only `rubocop:` directives back into the extracted Ruby, in place. For example, `<%# rubocop:disable … %>` becomes `  # rubocop:disable …`. A directive is written back only when no Ruby code follows it on the same line.
 
 - Pros
-  - Code is never commented out.
+  - Comments that would break code are not written back, so code is never treated as part of a comment.
   - Other ERB comments stay blank, so existing results don't change. In my prototype, 333 real views from rails/rails and kaigionrails/conference-app give the same 763 offenses as 0.8.2.
 - Cons
-  - A directive followed by Ruby code on the same line (`<%# rubocop:disable … %><% if x %>`) cannot be supported. Users need to be told about it, for example by a cop.
+  - Some directives are not written back and have no effect: those followed by Ruby code on the same line, such as `<%# rubocop:disable … %><% if x %>`. This happens implicitly and may confuse users.
+    - A cop that detects such directives would avoid this.
+  - Ordinary comments are not written back, so they are not linted (same as 0.8.2). For example, `<%# TODO fix this %>` gets no `Style/CommentAnnotation`.
   - More code than option 1.
 
 I have a prototype of option 2 and can open a PR if this direction sounds good.
