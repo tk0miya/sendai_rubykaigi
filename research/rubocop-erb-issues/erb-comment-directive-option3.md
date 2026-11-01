@@ -1,15 +1,17 @@
 While you consider this, let me share one more approach. I looked into it before opening the issue but did not propose it because of its technical problems. It has drawbacks, but it does not need a new cop.
 
-## Option 3: Pass directives to RuboCop without rendering them
+## Option 3: Pass ERB comments to RuboCop without rendering them
 
-Keep the extracted Ruby as it is. Build comment objects from the ERB comments, and pass them only to RuboCop's `CommentConfig`, which decides which cops are disabled on which lines.
+Keep the extracted Ruby as it is, and add the ERB comments to `processed_source.comments` as comment objects.
 
 - Pros
-  - Every directive works wherever it is written, with the same rule as in Ruby. On a line with code, it applies to that line. On its own line, it applies until `rubocop:enable`. So no cop is needed.
+  - RuboCop decides which cops are disabled where by reading `processed_source.comments`, so every directive works wherever it is written, with the same rule as in Ruby. So no cop is needed.
   - The extracted Ruby is not changed, so this does not depend further on the output of `Herb.extract_ruby`.
 - Cons
-  - It relies on RuboCop internals: it overrides the private `CommentConfig#each_directive` and recomputes `CommentConfig`'s internal `@no_directives`.
-  - Some cops find directives without going through `CommentConfig`, so they don't see these: `Lint/RedundantCopEnableDirective` (it checks `processed_source.raw_source`), `Lint/CopDirectiveSyntax` and `Style/DirectiveScope` (they read `processed_source.comments`). Each needs a patch. Adding the ERB comments to `processed_source.comments` instead doesn't work either: about 20 cops tell comment lines apart by the source text, which is blank there, so they disagree with `processed_source.comments`. For example, `Style/InlineComment` then reports a standalone `<%# heading %>` as a trailing comment.
+  - Cops that check comments themselves don't work correctly, because they read the source text instead of `processed_source.comments`, and the source text is blank where the ERB comments are.
+    - `Lint/RedundantCopEnableDirective` does nothing unless `processed_source.raw_source` contains `enable`, so a redundant `<%# rubocop:enable … %>` is never reported.
+    - About 20 cops (those using `RuboCop::Cop::Util#comment_line?`) decide whether a line is a comment line from the source text, so they disagree with `processed_source.comments`. For example, `Style/CommentAnnotation` treats each ERB comment as a trailing comment and checks every line of consecutive comments, while in Ruby only the first line of a comment block is checked.
+    - Fixing this would need a patch for each of these cops.
 
 **Example**
 
@@ -19,16 +21,30 @@ Template:
 <%# rubocop:disable Lint/LiteralAsCondition %><% if 'b' %>
   <p>b</p>
 <% end %>
+<%# rubocop:enable Style/StringLiterals %>
+<div>
+  <%# TODO fix this %>
+  <%# TODO fix that %>
+</div>
 ```
 
-`rubocop` reports no offenses. With 0.8.2, `Lint/LiteralAsCondition` is reported on line 1.
+The directive on line 1 works, so `Lint/LiteralAsCondition` is not reported. However, the redundant `rubocop:enable` on line 4 is not reported, and `Style/CommentAnnotation` is reported on both lines 6 and 7. The same comments in a Ruby file get `Lint/RedundantCopEnableDirective`, and `Style/CommentAnnotation` only on the first `TODO` line.
 
 ```console
 $ rubocop app/views/posts/show.html.erb
 Inspecting 1 file
-.
+C
 
-1 file inspected, no offenses detected
+Offenses:
+
+app/views/posts/show.html.erb:6:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
+  <%# TODO fix this %>
+      ^^^^^
+app/views/posts/show.html.erb:7:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
+  <%# TODO fix that %>
+      ^^^^^
+
+1 file inspected, 2 offenses detected, 2 offenses autocorrectable
 ```
 
-I did not propose this because of the dependency on RuboCop internals and the patches for each cop. To avoid them, RuboCop itself would need a way to add directive comments that are not in `processed_source.comments`.
+I did not propose this because the cops that check comments would need patches one by one. To avoid this, RuboCop itself would need a way to tell these cops about comments that are not in the source text.

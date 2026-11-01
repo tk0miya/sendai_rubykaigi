@@ -2,16 +2,18 @@
 
 ご検討の材料として、もう 1 つの方針を共有させてください。issue を出す前に検討しましたが、技術上の問題があって提案しなかったものです。欠点はありますが、新しい cop は要りません。
 
-## 方針 3: 無効化コメントを出力せずに RuboCop に渡す
+## 方針 3: ERB のコメントを出力せずに RuboCop に渡す
 
-取り出した Ruby はそのままにします。ERB のコメントからコメントのオブジェクトを作り、RuboCop の `CommentConfig`（どの行でどの cop を無効にするかを決める部分）にだけ渡します。
+取り出した Ruby はそのままにして、ERB のコメントをコメントのオブジェクトとして `processed_source.comments` に足します。
 
 - Pros
-  - どこに書いた directive も、Ruby と同じ規則で効く。コードのある行に書けばその行に、独立した行に書けば `rubocop:enable` までの範囲に効く。そのため cop は要らない
+  - RuboCop は `processed_source.comments` を見て、どこでどの cop を無効にするかを決めるので、どこに書いた directive も Ruby と同じ規則で効く。そのため cop は要らない
   - 取り出した Ruby を変えないので、`Herb.extract_ruby` の出力にさらに依存することはない
 - Cons
-  - RuboCop の内部に依存する。private な `CommentConfig#each_directive` を上書きし、`CommentConfig` の内部の変数 `@no_directives` を判定し直す
-  - `CommentConfig` を通さずに directive を探す cop には届かない。`Lint/RedundantCopEnableDirective`（`processed_source.raw_source` を調べる）、`Lint/CopDirectiveSyntax` と `Style/DirectiveScope`（`processed_source.comments` を読む）で、cop ごとにパッチが要る。代わりに ERB のコメントを `processed_source.comments` に足す形もうまくいかない。ソースの行の文字列でコメントの行を見分ける cop が 20 個ほどあり、その位置のソースは空白なので、`processed_source.comments` と食い違う。たとえば `Style/InlineComment` が、独立した行の `<%# heading %>` を行末のコメントとして報告する
+  - コメントそのものを検査する cop が正しく動かない。これらの cop は `processed_source.comments` ではなくソースの文字列を見るが、ERB のコメントの位置のソースは空白だから
+    - `Lint/RedundantCopEnableDirective` は、`processed_source.raw_source` に `enable` が含まれないと何もしないので、不要な `<%# rubocop:enable … %>` を報告しない
+    - 20 個ほどの cop（`RuboCop::Cop::Util#comment_line?` を使うもの）は、コメントの行かどうかをソースの文字列で判断するので、`processed_source.comments` と食い違う。たとえば `Style/CommentAnnotation` は、ERB のコメントをすべて行末のコメントと見なして、続いたコメントの各行を調べる。Ruby では、続いたコメントは 1 行目だけを調べる
+    - 直すには、これらの cop に 1 つずつパッチを当てる必要がある
 
 **例**
 
@@ -21,16 +23,30 @@
 <%# rubocop:disable Lint/LiteralAsCondition %><% if 'b' %>
   <p>b</p>
 <% end %>
+<%# rubocop:enable Style/StringLiterals %>
+<div>
+  <%# TODO fix this %>
+  <%# TODO fix that %>
+</div>
 ```
 
-`rubocop` の offense は 0 件です。0.8.2 では 1 行目に `Lint/LiteralAsCondition` が出ます。
+1 行目の directive は効くので、`Lint/LiteralAsCondition` は出ません。一方で、4 行目の不要な `rubocop:enable` は報告されず、`Style/CommentAnnotation` は 6 行目と 7 行目の両方に出ます。同じコメントを Ruby のファイルに書くと、`Lint/RedundantCopEnableDirective` が出て、`Style/CommentAnnotation` は 1 つ目の `TODO` の行にだけ出ます。
 
 ```console
 $ rubocop app/views/posts/show.html.erb
 Inspecting 1 file
-.
+C
 
-1 file inspected, no offenses detected
+Offenses:
+
+app/views/posts/show.html.erb:6:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
+  <%# TODO fix this %>
+      ^^^^^
+app/views/posts/show.html.erb:7:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
+  <%# TODO fix that %>
+      ^^^^^
+
+1 file inspected, 2 offenses detected, 2 offenses autocorrectable
 ```
 
-RuboCop の内部への依存と、cop ごとのパッチが必要なことから、提案しませんでした。これらを避けるには、`processed_source.comments` 以外から directive を足す口が RuboCop 本体に要ります。
+コメントを検査する cop に 1 つずつパッチが要ることから、提案しませんでした。これを避けるには、ソースの文字列にないコメントをこれらの cop に伝える仕組みが、RuboCop 本体に要ります。
