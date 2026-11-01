@@ -10,9 +10,9 @@
   - RuboCop は `processed_source.comments` を見て、どこでどの cop を無効にするかを決めるので、どこに書いた directive も Ruby と同じ規則で効く。そのため cop は要らない
   - 取り出した Ruby を変えないので、`Herb.extract_ruby` の出力にさらに依存することはない
 - Cons
-  - コメントそのものを検査する cop が正しく動かない。これらの cop は `processed_source.comments` ではなくソースの文字列を見るが、ERB のコメントの位置のソースは空白だから
+  - コメントを `processed_source.comments` ではなく、ソースの文字列から探す cop が正しく動かない。ERB のコメントの位置のソースは空白だから
     - `Lint/RedundantCopEnableDirective` は、`processed_source.raw_source` に `enable` が含まれないと何もしないので、不要な `<%# rubocop:enable … %>` を報告しない
-    - 20 個ほどの cop（`RuboCop::Cop::Util#comment_line?` を使うもの）は、コメントの行かどうかをソースの文字列で判断するので、`processed_source.comments` と食い違う。たとえば `Style/CommentAnnotation` は、ERB のコメントをすべて行末のコメントと見なして、続いたコメントの各行を調べる。Ruby では、続いたコメントは 1 行目だけを調べる
+    - 20 個ほどの cop は、コメントの行かどうかをソースの文字列で判断する（`RuboCop::Cop::Util#comment_line?`）ので、`processed_source.comments` と食い違う。`Metrics/MethodLength` や `Lint/SuppressedException`（`AllowComments`）のように、コードを検査する cop も含まれる。たとえば `Style/CommentAnnotation` は、ERB のコメントをすべて行末のコメントと見なして、続いたコメントの各行を調べる。Ruby では、続いたコメントは 1 行目だけを調べる
     - 直すには、これらの cop に 1 つずつパッチを当てる必要がある
 
 **例**
@@ -49,4 +49,4 @@ app/views/posts/show.html.erb:7:7: C: [Correctable] Style/CommentAnnotation: Ann
 1 file inspected, 2 offenses detected, 2 offenses autocorrectable
 ```
 
-コメントを検査する cop に 1 つずつパッチが要ることから、提案しませんでした。これを避けるには、ソースの文字列にないコメントをこれらの cop に伝える仕組みが、RuboCop 本体に要ります。
+これらの cop に 1 つずつパッチが要ることから、提案しませんでした。これを避けるには、ソースの文字列にないコメントをこれらの cop に伝える仕組みが、RuboCop 本体に要ります。
