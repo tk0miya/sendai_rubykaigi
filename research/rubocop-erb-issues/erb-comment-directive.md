@@ -11,7 +11,8 @@ Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment i
 - Pros
   - A one-line change.
 - Cons
-  - Code after a comment on the same line is commented out, because an ERB comment ends at `%>` but a Ruby comment runs to the end of the line. A valid template such as `<%# note %><% if x %>` … `<% end %>` reports `Lint/Syntax`, and a real syntax error after a comment goes unreported.
+  - Comment nodes, which ERB never renders, are rendered, and this causes unintended behavior. Specifically, code after a comment is treated as part of the comment.
+    - For example, a valid template such as `<%# note %><% if x %>` … `<% end %>` reports `Lint/Syntax`, and a real syntax error after a comment goes unreported.
 
 ## Option 2: Render only directives, when it is safe (recommended)
 
