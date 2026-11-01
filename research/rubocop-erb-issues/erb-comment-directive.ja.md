@@ -6,9 +6,31 @@
 
 実装の方針は 2 つ考えられ、2 つ目を勧めます。
 
+以下では、次のテンプレートに両方の方針を当てた結果を示します。
+```erb
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
+<% end %>
+```
+
+
 ## 方針 1: ERB のコメントをすべて出力する
 
 `Herb.extract_ruby(source, comments: true)` を使い、すべての ERB のコメントを Ruby のコメントにします。
+
+サンプルを取り出した Ruby（4 行目の `if` がコメントに入るので、6 行目に `Lint/Syntax` が出る）：
+```
+1:   # TODO fix this
+2:   # rubocop:disable Style/StringLiterals
+3:        "a"  ;
+4:   # rubocop:disable Lint/LiteralAsCondition      if x  ;
+5:
+6:    end  ;
+```
+
 
 - Pros
   - 変更は 1 行で済む
@@ -19,6 +41,17 @@
 ## 方針 2: 安全なときだけ無効化コメントを出力する（推奨）
 
 `rubocop:` の無効化コメントだけを、取り出した Ruby にその場で書き戻します。たとえば `<%# rubocop:disable … %>` は `  # rubocop:disable …` になります。同じ行の後ろに Ruby のコードが続くときは書き戻しません。
+
+サンプルを取り出した Ruby（1 行目の通常のコメントと、後ろにコードが続く 4 行目の無効化コメントは空白のまま）：
+```
+1:
+2:   # rubocop:disable Style/StringLiterals
+3:        "a"  ;
+4:                                                  if x  ;
+5:
+6:    end  ;
+```
+
 
 - Pros
   - コードを破損するコメントは書き戻さないので、コードがコメント扱いされることはない
