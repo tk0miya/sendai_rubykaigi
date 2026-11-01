@@ -20,35 +20,32 @@
 テンプレート：
 
 ```erb
-<% begin %>
-  <%= render 'a' %>
-<% rescue StandardError %>
-  <%# rubocop:disable Lint/SuppressedException %>
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
 <% end %>
-<%# rubocop:enable Lint/SuppressedException %>
-<%# rubocop:enable Style/StringLiterals %>
 ```
 
-同じコメントを Ruby のファイルに書いた場合と比べると、3 行目に `Lint/SuppressedException` が出て、7 行目の `Lint/RedundantCopEnableDirective` が出ません。4 行目の 2 つの offense は Ruby でも出ます。
+取り出した Ruby（0.8.2 と同じ）：
 
-```console
-$ rubocop app/views/posts/show.html.erb
-Inspecting 1 file
-W
-
-Offenses:
-
-app/views/posts/show.html.erb:3:4: W: Lint/SuppressedException: Do not suppress exceptions.
-<% rescue StandardError %>
-   ^^^^^^^^^^^^^^^^^^^^^^^
-app/views/posts/show.html.erb:4:5: W: Lint/RedundantCopDisableDirective: Unnecessary disabling of Lint/SuppressedException.
-  <%# rubocop:disable Lint/SuppressedException %>
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-app/views/posts/show.html.erb:4:5: C: Style/DirectiveScope: Use disable-next instead of a disable/enable pair around a single statement.
-  <%# rubocop:disable Lint/SuppressedException %>
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1 file inspected, 3 offenses detected
 ```
+1:
+2:
+3:        "a"  ;
+4:                                                  if x  ;
+5:
+6:    end  ;
+```
+
+`processed_source.comments`：
+
+```
+line 2: "# rubocop:disable Style/StringLiterals"
+line 4: "# rubocop:disable Lint/LiteralAsCondition"
+```
+
+後ろにコードが続く 4 行目も含めて、2 つの directive はどちらも効きます。一方で、取り出した Ruby の 2 行目と 4 行目にはコメントがないので、ソースの文字列からコメントを探す cop には、これらの directive が見えません。
 
 これらの既存の cop と併用できないことから、提案しませんでした。

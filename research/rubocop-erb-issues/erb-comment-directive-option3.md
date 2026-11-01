@@ -18,35 +18,32 @@ Keep the extracted Ruby as it is, and add only the directives in ERB comments to
 Template:
 
 ```erb
-<% begin %>
-  <%= render 'a' %>
-<% rescue StandardError %>
-  <%# rubocop:disable Lint/SuppressedException %>
+<%# TODO fix this %>
+<%# rubocop:disable Style/StringLiterals %>
+<p><%= "a" %></p>
+<%# rubocop:disable Lint/LiteralAsCondition %><% if x %>
+  <p>b</p>
 <% end %>
-<%# rubocop:enable Lint/SuppressedException %>
-<%# rubocop:enable Style/StringLiterals %>
 ```
 
-Compared with the same comments in a Ruby file, `Lint/SuppressedException` is reported on line 3, and `Lint/RedundantCopEnableDirective` is not reported on line 7. The two offenses on line 4 are reported in Ruby too.
+Extracted Ruby (unchanged from 0.8.2):
 
-```console
-$ rubocop app/views/posts/show.html.erb
-Inspecting 1 file
-W
-
-Offenses:
-
-app/views/posts/show.html.erb:3:4: W: Lint/SuppressedException: Do not suppress exceptions.
-<% rescue StandardError %>
-   ^^^^^^^^^^^^^^^^^^^^^^^
-app/views/posts/show.html.erb:4:5: W: Lint/RedundantCopDisableDirective: Unnecessary disabling of Lint/SuppressedException.
-  <%# rubocop:disable Lint/SuppressedException %>
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-app/views/posts/show.html.erb:4:5: C: Style/DirectiveScope: Use disable-next instead of a disable/enable pair around a single statement.
-  <%# rubocop:disable Lint/SuppressedException %>
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1 file inspected, 3 offenses detected
 ```
+1:
+2:
+3:        "a"  ;
+4:                                                  if x  ;
+5:
+6:    end  ;
+```
+
+`processed_source.comments`:
+
+```
+line 2: "# rubocop:disable Style/StringLiterals"
+line 4: "# rubocop:disable Lint/LiteralAsCondition"
+```
+
+Both directives take effect, including the one on line 4 that is followed by code. In the extracted Ruby, however, lines 2 and 4 have no comment, so cops that look for comments in the source text don't see these directives.
 
 I did not propose this because it does not work together with these existing cops.
