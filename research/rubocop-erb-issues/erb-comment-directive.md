@@ -4,7 +4,7 @@
 
 I see two ways to implement this, and I recommend the second.
 
-Below, both options are applied to this template:
+As an example, I'll show the results of both options for this template:
 
 ```erb
 <%# TODO fix this %>
