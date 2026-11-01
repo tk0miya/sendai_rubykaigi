@@ -2,17 +2,17 @@
 
 参考までに、もう 1 つの方針を置いておきます。issue を出す前に検討しましたが、技術上の問題があって提案しなかったものです。欠点はありますが、新しい cop は要りません。
 
-## 方針 3: ERB のコメントを出力せずに RuboCop に渡す
+## 方針 3: 無効化コメントを出力せずに RuboCop に渡す
 
-取り出した Ruby はそのままにして、ERB のコメントをコメントのオブジェクトとして `processed_source.comments` に足します。
+取り出した Ruby はそのままにして、ERB のコメントのうち無効化コメントだけを、コメントのオブジェクトとして `processed_source.comments` に足します。
 
 - Pros
   - RuboCop は `processed_source.comments` を見て、どこでどの cop を無効にするかを決めるので、どこに書いた directive も Ruby と同じ規則で効く。そのため cop は要らない
   - 取り出した Ruby を変えないので、`Herb.extract_ruby` の出力にさらに依存することはない
 - Cons
-  - コメントを `processed_source.comments` ではなく、ソースの文字列から探す cop が正しく動かない。ERB のコメントの位置のソースは空白だから
+  - コメントを `processed_source.comments` ではなく、ソースの文字列から探す cop には directive が見えない。ERB のコメントの位置のソースは空白だから
     - `Lint/RedundantCopEnableDirective` は、`processed_source.raw_source` に `enable` が含まれないと何もしないので、不要な `<%# rubocop:enable … %>` を報告しない
-    - 20 個ほどの cop は、コメントの行かどうかをソースの文字列で判断する（`RuboCop::Cop::Util#comment_line?`）ので、`processed_source.comments` と食い違う。`Metrics/MethodLength` や `Lint/SuppressedException`（`AllowComments`）のように、コードを検査する cop も含まれる。たとえば `Style/CommentAnnotation` は、ERB のコメントをすべて行末のコメントと見なして、続いたコメントの各行を調べる。Ruby では、続いたコメントは 1 行目だけを調べる
+    - 20 個ほどの cop は、コメントの行かどうかをソースの文字列で判断する（`RuboCop::Cop::Util#comment_line?`）ので、directive の行を空行と見なす。たとえば `Lint/SuppressedException`（`AllowComments`）は、本文が directive だけの `rescue` を報告する。Ruby では報告しない。directive は次の行から効くので、その directive でこの指摘を抑えることもできない
     - 直すには、これらの cop に 1 つずつパッチを当てる必要がある
 
 **例**
@@ -20,33 +20,35 @@
 テンプレート：
 
 ```erb
-<%# rubocop:disable Lint/LiteralAsCondition %><% if 'b' %>
-  <p>b</p>
+<% begin %>
+  <%= render 'a' %>
+<% rescue StandardError %>
+  <%# rubocop:disable Lint/SuppressedException %>
 <% end %>
+<%# rubocop:enable Lint/SuppressedException %>
 <%# rubocop:enable Style/StringLiterals %>
-<div>
-  <%# TODO fix this %>
-  <%# TODO fix that %>
-</div>
 ```
 
-1 行目の directive は効くので、`Lint/LiteralAsCondition` は出ません。一方で、4 行目の不要な `rubocop:enable` は報告されず、`Style/CommentAnnotation` は 6 行目と 7 行目の両方に出ます。同じコメントを Ruby のファイルに書くと、`Lint/RedundantCopEnableDirective` が出て、`Style/CommentAnnotation` は 1 つ目の `TODO` の行にだけ出ます。
+同じコメントを Ruby のファイルに書いた場合と比べると、3 行目に `Lint/SuppressedException` が出て、7 行目の `Lint/RedundantCopEnableDirective` が出ません。4 行目の 2 つの offense は Ruby でも出ます。
 
 ```console
 $ rubocop app/views/posts/show.html.erb
 Inspecting 1 file
-C
+W
 
 Offenses:
 
-app/views/posts/show.html.erb:6:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
-  <%# TODO fix this %>
-      ^^^^^
-app/views/posts/show.html.erb:7:7: C: [Correctable] Style/CommentAnnotation: Annotation keywords like TODO should be all upper case, followed by a colon, and a space, then a note describing the problem.
-  <%# TODO fix that %>
-      ^^^^^
+app/views/posts/show.html.erb:3:4: W: Lint/SuppressedException: Do not suppress exceptions.
+<% rescue StandardError %>
+   ^^^^^^^^^^^^^^^^^^^^^^^
+app/views/posts/show.html.erb:4:5: W: Lint/RedundantCopDisableDirective: Unnecessary disabling of Lint/SuppressedException.
+  <%# rubocop:disable Lint/SuppressedException %>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+app/views/posts/show.html.erb:4:5: C: Style/DirectiveScope: Use disable-next instead of a disable/enable pair around a single statement.
+  <%# rubocop:disable Lint/SuppressedException %>
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1 file inspected, 2 offenses detected, 2 offenses autocorrectable
+1 file inspected, 3 offenses detected
 ```
 
 これらの cop に 1 つずつパッチが要ることから、提案しませんでした。これを避けるには、ソースの文字列にないコメントをこれらの cop に伝える仕組みが、RuboCop 本体に要ります。

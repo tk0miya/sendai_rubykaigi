@@ -11,6 +11,7 @@
 # - directive_only_cops: directive_only に加え、processed_source.comments や raw_source から無効化コメントを探す cop に
 #                        ERB コメントを見せる
 # - comments_all:        Ruby のコードは変えず、ERB コメントを processed_source.comments に足して、すべての cop に見せる
+# - comments_directives: comments_all と同じだが、processed_source.comments に足すのは無効化コメントの行だけ
 #
 # 未設定か none なら何もしない（0.8.2 のまま）。
 require 'herb'
@@ -200,7 +201,7 @@ module ErbCommentDirective
 
   module ERBSourcePatch
     def comment_config
-      return @comment_config ||= TemplateCommentConfig.new(self) if ErbCommentDirective.mode == 'comments_all'
+      return @comment_config ||= TemplateCommentConfig.new(self) if %w[comments_all comments_directives].include?(ErbCommentDirective.mode)
       return super unless ErbCommentDirective.directive_only?
 
       @comment_config ||= ErbCommentConfig.new(self)
@@ -240,6 +241,10 @@ end
 module ErbCommentDirective
   module DirectiveViewPatch
     def comments
+      if ErbCommentDirective.mode == 'comments_directives'
+        directives = erb_comments.select { |comment| ErbCommentDirective::DIRECTIVE_REGEXP.match?(comment.text) }
+        return (super + directives).sort_by { |comment| comment.source_range.begin_pos }
+      end
       return super unless Thread.current[:erb_comment_directive_view] || ErbCommentDirective.mode == 'comments_all'
 
       (super + erb_comments).sort_by { |comment| comment.source_range.begin_pos }
