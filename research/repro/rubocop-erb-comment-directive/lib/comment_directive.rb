@@ -292,7 +292,8 @@ module RuboCop
     module Erb
       class IgnoredCopDirective < Base
         MESSAGES = {
-          code_after: 'This directive is ignored because Ruby code follows it on the same line.',
+          code_after: 'This directive has no effect because Ruby code follows it on the same line. ' \
+                      'Move it after the code or to its own line.',
           no_room: 'This directive is ignored because its line in the multi-line comment is indented by less than two characters.',
           no_space: 'This directive is ignored because there is no space after `#`.'
         }.freeze
