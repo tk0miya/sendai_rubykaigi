@@ -325,3 +325,15 @@ rubocop-erb には [r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop
 - 細かい点（複数行のコメントの中の無効化コメントを対象にするか、書き戻せない無効化コメントをどう知らせるか、HTML だけの行に書いた無効化コメントの範囲など）は、issue の議論の中で扱う
 - 方策 2a と方策 3 は issue では示さない
 - herb には別に、`Herb.extract_ruby(comments: true)` が、`%>` か本文が行頭にある複数行の `<%#` で位置を保たないことを報告できる
+
+## issue の状況
+
+[r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84) は、2026-11-01 時点で開いたまま、メンテナーが検討している段階です。
+
+- メンテナーは、ERB のコメントに無効化コメントを書けるようにする動機には強く賛成している
+- 方針 1 は、コメントの後ろのコードがコメント扱いされる危険があるので受け入れない
+- 方針 2 は、効かない無効化コメントを cop が RuboCop の指摘として報告すること（警告ではない）を補足した。返信の下書きは [rubocop-erb-issues/erb-comment-directive-reply.md](rubocop-erb-issues/erb-comment-directive-reply.md)（日本語版は [erb-comment-directive-reply.ja.md](rubocop-erb-issues/erb-comment-directive-reply.ja.md)）。メンテナーはこの点を理解したうえで、次の 2 点から慎重に検討したいとしている
+  - rubocop-erb はこれまで cop を提供していないので、cop を提供するようになること自体の影響が大きい
+  - `Herb.extract_ruby` に切り替えて日が浅く、コミュニティへの影響を読み切れていない。その出力にコメントを書き足すという、`Herb.extract_ruby` 固有の実装にさらに依存する機能には慎重になりたい
+- 同種の提案として、rubocop-slim では Slim のコメントに書いた無効化コメントを Ruby のコメントにする案（rubocop-slim#43）が、複雑になるという理由で却下されている（メンテナーの説明による。中身は確かめていない）
+- 【推測】2 つ目の懸念に対しては、方針 2 が新しく依存するのは、空白になったコメントの位置に無効化コメントの文字列を書き戻すことだけだと示せる。`Herb.extract_ruby` がコメントを長さを変えずに空白にすることと、`Herb.parse` のコメントノードの位置には、rubocop-erb 0.8 がすでに依存している。ただし、メンテナーが検討の時間を求めているので、聞かれたときに示す
