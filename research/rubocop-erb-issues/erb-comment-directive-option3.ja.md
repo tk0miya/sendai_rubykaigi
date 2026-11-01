@@ -1,6 +1,6 @@
 [erb-comment-directive-option3.md](erb-comment-directive-option3.md)（[r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84) への返信の下書き）の日本語版です。
 
-ご検討の材料として、もう 1 つの方針を共有させてください。issue を出す前に検討しましたが、技術上の問題があって提案しなかったものです。欠点はありますが、新しい cop は要りません。
+参考までに、もう 1 つの方針を置いておきます。issue を出す前に検討しましたが、技術上の問題があって提案しなかったものです。欠点はありますが、新しい cop は要りません。
 
 ## 方針 3: ERB のコメントを出力せずに RuboCop に渡す
 

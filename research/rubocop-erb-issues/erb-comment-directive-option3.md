@@ -1,4 +1,4 @@
-While you consider this, let me share one more approach. I looked into it before opening the issue but did not propose it because of its technical problems. It has drawbacks, but it does not need a new cop.
+FWIW, here is one more approach. I looked into it before opening the issue but did not propose it because of its technical problems. It has drawbacks, but it does not need a new cop.
 
 ## Option 3: Pass ERB comments to RuboCop without rendering them
 
