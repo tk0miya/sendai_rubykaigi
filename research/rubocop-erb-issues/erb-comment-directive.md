@@ -9,6 +9,7 @@ I see two ways to implement this, and I recommend the second.
 Use `Herb.extract_ruby(source, comments: true)`, which turns every ERB comment into a Ruby comment. It is a one-line change, but ERB comments are never processed by ERB, and this turns them into Ruby code, which RuboCop then misreads:
 
 - **Code after a comment is commented out.** An ERB comment ends at `%>`, but a Ruby comment runs to the end of the line. A valid template such as `<%# note %><% if x %>` … `<% end %>` reports `Lint/Syntax`, and a real syntax error after a comment on the same line goes unreported.
+
 ## Option 2: Render only directives, when it is safe (recommended)
 
 Write only `rubocop:` directives back into the extracted Ruby, in place:
