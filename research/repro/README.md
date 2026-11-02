@@ -425,7 +425,7 @@ $ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 -
 
 ## マーカーの比較
 
-[../ruby-rendering.md](../ruby-rendering.md) の再現手順です。rubocop-erb 0.8.2、PR 版、tk0miya/rubocop-herb と、rubocop-herb からマーカーを外した 3 つの版を比べます。「rubocop-erb 0.8」の節と「herb PR #2260」の節のセットアップ（`bundle install`）を済ませておきます。
+[../ruby-rendering.md](../ruby-rendering.md) の再現手順です。rubocop-erb 0.8.2、PR 版、tk0miya/rubocop-herb を比べます。「rubocop-erb 0.8」の節と「herb PR #2260」の節のセットアップ（`bundle install`）を済ませておきます。
 
 ### セットアップ
 
@@ -433,17 +433,15 @@ $ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 -
 $ cd research/repro
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-bcd6ee5"
 $ (cd "$TMPDIR/rubocop-herb-bcd6ee5" && git checkout bcd6ee5a2420b931df6af89b3ed74bfc2a19cf1a && bundle install)
-$ for v in notext nohtml nooutput; do ditto "$TMPDIR/rubocop-herb-bcd6ee5" "$TMPDIR/rubocop-herb-$v"; (cd "$TMPDIR/rubocop-herb-$v" && git apply "$OLDPWD/marker/$v.patch"); done
-$ export R="$PWD/rubocop-erb-0.8" P="$PWD/herb-pr2260" M="$PWD/marker"
+$ export R="$PWD/rubocop-erb-0.8" P="$PWD/herb-pr2260" M="$PWD/marker" RUBOCOP_HERB="$TMPDIR/rubocop-herb-bcd6ee5"
 $ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
 $ erb082x() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$M/erb-noexclude.yml" "$@"; }
 $ pr2260() { BUNDLE_GEMFILE="$P/Gemfile" bundle exec rubocop --cache false -c "$P/pr.yml" "$@"; }
-$ tkv() { v=$1; shift; RUBOCOP_HERB="$TMPDIR/rubocop-herb-$v" BUNDLE_GEMFILE="$TMPDIR/rubocop-herb-$v/Gemfile" bundle exec rubocop --cache false -c "$R/tk.yml" "$@"; }
+$ tkherb() { BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c "$R/tk.yml" "$@"; }
 ```
 
-- `tkv` には `--except Herb/Linting` を付ける（`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる）
-- `marker/notext.patch`: テキスト・HTML コメント・`<%%` に `_a;` を置かない。`marker/nohtml.patch`: それに加えて HTML のタグも描画しない。`marker/nooutput.patch`: `<%=` を `_ =` にしない
 - `marker/erb-noexclude.yml` は、rubocop-erb 0.8.2 が `**/*.erb` から除外している cop（`Rails/Presence` を除く 64 個）を ERB にもかける設定
+- `tkherb` には `--except Herb/Linting` を付ける（`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる）
 
 ### 組にしたサンプルにかける
 
@@ -452,13 +450,13 @@ $ X=Layout,Style/FrozenStringLiteralComment,Style/Semicolon,Style/StringLiterals
 $ erb082 --except $X --format emacs marker/ok marker/ng
 $ erb082x --except $X --format emacs marker/ok marker/ng
 $ pr2260 --except $X --format emacs marker/ok marker/ng
-$ for v in bcd6ee5 notext nohtml nooutput; do echo "== $v"; tkv $v --except Herb/Linting,$X --format emacs marker/ok marker/ng; done
-$ tkv bcd6ee5 --except Herb/Linting,Layout --format emacs marker/short
+$ tkherb --except Herb/Linting,$X --format emacs marker/ok marker/ng
+$ tkherb --except Herb/Linting,Layout --format emacs marker/short
 ```
 
 - `erb082x` は、9 組すべてで `ok/` と `ng/` に同じ cop が出る。`erb082` は `Style/CombinableLoops` だけが両方に出る
-- `tkv bcd6ee5` は、9 組すべてで `ng/` だけに出る（`ok/duplicate_branch.html.erb` の `Style/IdenticalConditionalBranches` を除く）
-- `notext`、`nohtml` は `ok/` に `Style/SafeNavigation`、`Style/SoleNestedConditional`、`Lint/DuplicateBranch`、`Style/CombinableLoops` が、`nooutput` は `Lint/Void`、`Style/SymbolProc` が出る
+- `pr2260` は、`Lint/EmptyConditionalBody` と `Style/EmptyElse` 以外の 7 組で両方に出る
+- `tkherb` は、9 組すべてで `ng/` だけに出る（`ok/duplicate_branch.html.erb` の `Style/IdenticalConditionalBranches` を除く）
 - `marker/short/safe_navigation.html.erb` に、rubocop-herb でも `Style/SafeNavigation` が出る（テキストが `|` 1 文字でマーカーを置けない）
 
 autocorrect はコピーに対して実行します。
@@ -466,13 +464,13 @@ autocorrect はコピーに対して実行します。
 ```console
 $ W="$TMPDIR/marker-ac" && mkdir -p "$W"
 $ for t in erb082x pr2260; do ditto marker/ok "$W/$t"; (cd "$W/$t" && $t -A .); done
-$ for v in bcd6ee5 notext nohtml nooutput; do ditto marker/ok "$W/tk-$v"; (cd "$W/tk-$v" && tkv $v --except Herb/Linting -A .); done
+$ ditto marker/ok "$W/tkherb"; (cd "$W/tkherb" && tkherb --except Herb/Linting -A .)
 $ for d in "$W"/*; do echo "== $d"; diff -r marker/ok "$d"; done
 ```
 
-- PR 版は `void.html.erb`、`symbol_proc.html.erb`、`safe_navigation.html.erb`、`sole_nested_conditional.html.erb` などの HTML や出力タグを消す
-- `notext`、`nohtml` は、`combinable_loops.html.erb` の `Prices:` を 1 つ目のループの中に移す
-- `nooutput` は、`void.html.erb` と `duplicate_branch.html.erb` の出力タグの中身を消す
+- PR 版は `void.html.erb`、`symbol_proc.html.erb`、`safe_navigation.html.erb`、`sole_nested_conditional.html.erb`、`combinable_loops.html.erb` の HTML や出力タグを消す
+- `erb082x` で変わるのは、`%>` の前の空白などの `Layout` の修正と `Style/StringLiterals` の修正だけ
+- `tkherb` で変わるのは `Style/StringLiterals` の修正だけ
 
 ### 実際のビューにかける
 
@@ -481,9 +479,7 @@ $ for d in "$W"/*; do echo "== $d"; diff -r marker/ok "$d"; done
 ```console
 $ ONLY=$(grep -E '^[A-Z][a-zA-Z]+/[A-Za-z]+:$' marker/erb-noexclude.yml | tr -d : | paste -sd, -)
 $ (cd "$V/orig" && erb082x --only $ONLY --format offenses .)
-$ (cd "$V/orig" && tkv bcd6ee5 --only $ONLY --format offenses .)
-$ for v in bcd6ee5 notext nohtml nooutput; do (cd "$V/orig" && tkv $v --except Herb/Linting --format offenses .); done
+$ (cd "$V/orig" && tkherb --only $ONLY --format offenses .)
 ```
 
 - 64 個の cop で、`erb082x` は 9,310 件、rubocop-herb は 278 件。`Layout` と `Style/Semicolon`、`Style/FrozenStringLiteralComment`、`Style/IfWithSemicolon`、`Lint/Syntax` を除くと、131 件と 22 件
-- すべての cop で、rubocop-herb と `notext` は 930 件、`nohtml` は 932 件、`nooutput` は 1,015 件（うち `Lint/Void` 77 件）
