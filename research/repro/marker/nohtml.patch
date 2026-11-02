@@ -1,0 +1,28 @@
+diff --git i/lib/rubocop/herb/ruby_renderer.rb w/lib/rubocop/herb/ruby_renderer.rb
+index 377af6d..3b6854f 100644
+--- i/lib/rubocop/herb/ruby_renderer.rb
++++ w/lib/rubocop/herb/ruby_renderer.rb
+@@ -224,6 +224,7 @@ module RuboCop
+       # so as not to overwrite the newline and shift the following lines
+       # @rbs node: ::Herb::AST::Node?
+       def render_tag_node(node) #: void
++        return
+         return unless node.is_a?(::Herb::AST::HTMLOpenTagNode) || node.is_a?(::Herb::AST::HTMLCloseTagNode)
+ 
+         tag_name = node.tag_name.not_nil!.value
+@@ -244,6 +245,7 @@ module RuboCop
+       # This indicates content presence to avoid Lint/EmptyBlock and similar cops
+       # @rbs node: ::Herb::AST::HTMLTextNode
+       def render_text_node(node) #: void
++        return
+         range = NodeRange.compute_char_range(node, source)
+         text = source.slice(range)
+         match = text.match(TEXT_MARKER_POSITION)
+@@ -283,6 +285,7 @@ module RuboCop
+       # Uses an alphabetic marker to avoid conflict with Ruby's numbered parameters (_1, _2, etc.)
+       # @rbs pos: Integer -- character position in ruby_code
+       def render_tag_marker(pos) #: void
++        return
+         ruby_code[pos, 3] = "_a;"
+       end
+ 

@@ -1,0 +1,6 @@
+<% if user %>
+  Welcome!
+  <% if user.admin? %>
+    <%= link_to "Admin", admin_path %>
+  <% end %>
+<% end %>

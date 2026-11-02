@@ -1,0 +1,12 @@
+diff --git i/lib/rubocop/herb/ruby_renderer.rb w/lib/rubocop/herb/ruby_renderer.rb
+index 377af6d..b366116 100644
+--- i/lib/rubocop/herb/ruby_renderer.rb
++++ w/lib/rubocop/herb/ruby_renderer.rb
+@@ -206,6 +206,7 @@ module RuboCop
+       # between the tag opening and the code is kept as the space after `=`
+       # @rbs node: erb_node
+       def render_output_marker(node) #: void
++        return
+         pos = byte_to_char_pos(node.tag_opening.not_nil!.range.to) - 3
+         ruby_code[pos, 3] = "_ ="
+       end
