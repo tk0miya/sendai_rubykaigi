@@ -29,7 +29,7 @@ ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと�
 
 ## まとめ
 
-- `<%#` の右側に何もない行（`trailing.html.erb`、`after_if.html.erb`）で無効化が効くのは、rubocop-herb と ruumba だけです。rubocop-erb 0.8.2 と herb#2260 では、`<%#` をどこに書いても効きません
+- `<%#` の右側に何もない行（`trailing.html.erb`、`after_if.html.erb`）で無効化が効くのは、rubocop-herb と ruumba だけです。rubocop-erb 0.8.2 と herb#2260 では、`<%#` をどこに書いても効きません。rubocop-erb に `<%#` の無効化コメントのサポートを提案しています（[r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84)、open）
 - `<%#` の右側にタグや HTML がある行（`leading.html.erb`）では、rubocop-herb は無効化を無視して `Herb/IgnoredCopDirective` を出します。ruumba では後ろの `<% if %>` がコメントに入り、検査されなくなります
 - erb_lint と rubocop-erb 0.7.2 は、タグを 1 つずつ検査するので、`<% if 'hello' %>` を構文エラーとして飛ばします。この入力では、無効化が効くかを確かめられません
 - herb-lint には、ERB コメントの行のインデント（入れ子の深さ）を検査するルールがありません。`--fix` をかけても変わりません
@@ -142,12 +142,12 @@ herb-format は、`<%# herb:disable … %>` を、ほかの `<%#` とは別に�
 ## 考察【推測】
 
 - rubocop-herb の行単位の無効化は、`<%#` がコードと同じ行の右端にあることを前提にしています。herb-format を使うプロジェクトでは、整形でこの前提が崩れ、無効化が外れます。多くの場合は offense が出るので気づけますが、`empty_if.html.erb` のように offense が出ないまま無効化の範囲だけが広がることもあります。herb-format と併用するなら、無効化コメントは独立した行に書き、`rubocop:enable` で閉じるのが確実です
-- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなります。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけです
+- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなります。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけです。また、タグの中の行末のコメントは、ERB や Erubi ではタグの後ろに生成されるコードまでコメントにするので、構文エラーになったり、テンプレートの残りが黙って出力されなくなったりします。herb-lint にこの書き方を禁止するルールを提案しています（[marcoroth/herb#2867](https://github.com/marcoroth/herb/issues/2867)、open）
 - `<%#` の右側にタグがあるときに rubocop-herb が `Herb/IgnoredCopDirective` を出すことは、ruumba のように後ろのコードを黙って検査から外すより安全です
 - `herb:disable` は herb-format で行末に残るように作られている一方、`rubocop:disable` の `<%#` は整形で動きます。ERB の中で使う 2 つの無効化コメントのうち、行末に書けるのが片方だけというのは釣り合いが取れていません。ただ、`herb:disable` の書き戻しもテキスト検索に頼っていて、制御構文や同じ内容のタグでは別の行に付きます。行末の無効化コメントを整形でどう保つかは、`herb:disable` と `rubocop:disable` をまとめて仕様を議論する必要があります
 
 ## 今後の検討事項
 
-- herb-format が `<%# rubocop:disable … %>`（と `<%# rubocop:enable … %>`）を、`herb:disable` と同じく行末に残すべきか。残すなら、どの行に付けるか（アンカーの決め方）
+- herb-format が `<%# rubocop:disable … %>`（と `<%# rubocop:enable … %>`）を、`herb:disable` と同じく行末に残すべきか。残すなら、どの行に付けるか（アンカーの決め方）。タグの直後の `<%# rubocop:disable … %>` が次の行に移ることを報告しています（[marcoroth/herb#2868](https://github.com/marcoroth/herb/issues/2868)、open）
 - `herb:disable` の書き戻しの行を、テキスト検索ではなくノードの位置で決められないか（`same_anchor.html.erb`、`empty_if.html.erb`、`if_sibling.html.erb`）
 - 無効化のコメントだけを本文に持つ `if` を、空として扱うか。herb-lint の `erb-no-empty-control-flow` は `<%#` を本文として数え、rubocop の `Lint/EmptyConditionalBody` は `AllowComments: true` でコメントだけの本文を許す。どちらも、無効化のコメントが指摘を消してしまう

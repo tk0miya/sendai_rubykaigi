@@ -133,7 +133,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `multiline_tag.html.erb` | `<%`⏎`  # rubocop:disable Style/StringLiterals`⏎`  x = "b"`⏎`%>` の後に `<%= "c" %>` | 同じタグの中の `x = "b"` だけに効く | 後の `<%= "c" %>` にも効く | 後の `<%= "c" %>` にも効く |
 | `multiline_range.html.erb` | `<%`⏎`  # rubocop:disable …`⏎`%>` と `<%`⏎`  # rubocop:enable …`⏎`%>` で範囲を区切る | 効かない | 範囲の中だけに効く | 範囲の中だけに効く |
 
-- 0.8.2 では、`Herb.extract_ruby` が `<%# … %>` と、`#` で始まる 1 行のタグ（`<% # … %>`）の中身を空白にするので、そこに書いた無効化コメントは RuboCop に届かない
+- 0.8.2 では、`Herb.extract_ruby` が `<%# … %>` と、`#` で始まる 1 行のタグ（`<% # … %>`）の中身を空白にするので、そこに書いた無効化コメントは RuboCop に届かない。`<%#` に書いた `rubocop:` の無効化コメントだけを、後ろに Ruby のコードがない場合に書き戻す実装を提案している（[r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84)、open）
 - タグの中の行末に書いたコメントは届くが、`extract_ruby` がタグの終わりに補う `  ;` がコメントの中に入り（`# rubocop:disable Style/StringLiterals  ;`）、`Lint/CopDirectiveSyntax`（Malformed directive comment）が出る。無効化そのものは効く
 - コメントの後で改行してから `%>` を書けば、補われる `;` が次の行に回るので、通常の Ruby のコメントとして扱われる。ファイル全体に効き、`# rubocop:enable` で範囲を区切れる
 - 0.7.2 はタグ 1 つを 1 つの Ruby として検査するので、無効化コメントは同じタグの中にしか効かない。`<% # rubocop:disable … %>` では、そのタグに `Lint/MissingCopEnableDirective` が出る
@@ -248,5 +248,5 @@ conference-app の `admin/talks/index.html.erb` の `<%= link_to "All events tal
 - ただし範囲しか見ないので、範囲がタグの中に収まる限り、ERB に合わない修正も通る。`Style/SingleLineDoEndBlock` の改行の挿入がその例。出力は変わらないが、ERB としては不自然な形になる。`<%= foo %>` の式を消すような修正（出力が変わる）も、範囲がタグの中なら止まらない。今回の入力では、`<% unused = 1 %>` → `<% 1 %>` のように `<%` のタグの中で起きた例だけだった
 - 誤検知への対策がファイル全体での除外なので、0.8 系では妥当な指摘も失われる。`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Style/EmptyElse` などは、rubocop-herb では ERB の構造を見て誤検知になる行だけで無効にしているので、本当に空のブロックや `map { |k| k.to_s }` を指摘できる。PR #70 の説明どおり、ERB の文脈を cop に教える改修が進めば差は縮まる
 - `Lint/Void` を除外しているので、`Lint/UselessAssignment` の修正の後に `<% 1 %>` が黙って残る。offense も出ないので、利用者は気付きにくい
-- `<%# rubocop:disable … %>` が効かないことは、既存のテンプレートに 0.8 系を入れるときの障害になりうる。このコメントで抑えていた指摘が、まとめて出る。タグの中の行末のコメントは効くが、`Lint/CopDirectiveSyntax` が出るので、実用上は使いにくい。0.8 系で無効化コメントを使うなら、Ruby のコメントだけを書いた複数行のタグにするのが確実
+- `<%# rubocop:disable … %>` が効かないことは、既存のテンプレートに 0.8 系を入れるときの障害になりうる。このコメントで抑えていた指摘が、まとめて出る。タグの中の行末のコメントは効くが、`Lint/CopDirectiveSyntax` が出るので、実用上は使いにくい。0.8 系で無効化コメントを使うなら、Ruby のコメントだけを書いた複数行のタグにするのが確実。`<%#` のサポートは [r7kamura/rubocop-erb#84](https://github.com/r7kamura/rubocop-erb/issues/84) で提案している
 - rubocop-herb にとっては、0.8 系が同じ土俵の比較対象になった。rubocop-herb の利点は、`<%=` と HTML の意味を残した変換と行単位の無効化により、除外する cop が少ないこと、修正後の ERB を検査すること、`<%# rubocop:disable %>` が効くこと。一方で、変換が複雑なぶん、`ReparsedEquivalence` のような RuboCop 側の仕組みと噛み合わない箇所がある。0.8 系は `Herb.extract_ruby` の結果をそのまま RuboCop に渡すので、この種の問題は起きにくい
