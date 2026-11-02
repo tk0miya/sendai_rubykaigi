@@ -1,0 +1,5 @@
+<% if user.admin? %>
+  <%= link_to "Admin", admin_path %>
+<% else %>
+  You are not an administrator.
+<% end %>

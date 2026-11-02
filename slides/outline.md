@@ -2,7 +2,7 @@
 
 - トーク: Building a Unified Ecosystem for ERB Development Experience（[proposal.md](../proposal.md)）
 - 枠: 15 分
-- 材料: [existing-erb-linters.md](../research/existing-erb-linters.md)、[report.md](../research/report.md)、[switching-decision.md](../research/switching-decision.md)
+- 材料: [existing-erb-linters.md](../research/existing-erb-linters.md)、[report.md](../research/report.md)、[switching-decision.md](../research/switching-decision.md)、[ruby-rendering.md](../research/ruby-rendering.md)（スライド 15 の裏付け）
 
 ## 方針
 
