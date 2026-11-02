@@ -1,0 +1,632 @@
+--- cases/comment/commented_out_output.html.erb
++++ cases/comment/commented_out_output.html.erb
+@@ -1 +1 @@
+-<% name = user.name # the full name %><%= name %>
++<% user.name # the full name %><%= name %>
+--- cases/comment/ruby_comment.html.erb
++++ cases/comment/ruby_comment.html.erb
+@@ -1,2 +1,2 @@
+ <% # note %>
+-<%= foo %>
++<%= foo%>
+--- cases/control_flow/case_when.html.erb
++++ cases/control_flow/case_when.html.erb
+@@ -1,6 +1,6 @@
+-<% case status %>
+-<% when :a %>
++<% case status%>
++<% when :a%>
+   A
+-<% when :b %>
++<% when :b%>
+   B
+ <% end %>
+--- cases/control_flow/cond_assign.html.erb
++++ cases/control_flow/cond_assign.html.erb
+@@ -1,6 +1,6 @@
+-<% if a %>
+-  <% x = 1 %>
+-<% else %>
+-  <% x = 2 %>
+-<% end %>
++<% x = if a%>
++  <% 1%>
++<%     else%>
++  <% 2%>
++<%     end%>
+ <%= x %>
+--- cases/control_flow/form_block.html.erb
++++ cases/control_flow/form_block.html.erb
+@@ -1,3 +1,3 @@
+-<%= form_with model: @user do |f| %>
+-  <%= f.text_field :name %>
+-<% end %>
++<%= form_with model: @user do |f|%>
++  <%= f.text_field :name%>
++<% end%>
+--- cases/control_flow/if_then_elsif_else.html.erb
++++ cases/control_flow/if_then_elsif_else.html.erb
+@@ -1,8 +1,8 @@
+-<% if !foo.nil? then %>
++<% if !foo.nil?%>
+   a
+-<% elsif bar == nil %>
++<% elsif bar.nil?%>
+   b
+ <% else %>
+-<% end %>
+-<% unless !x %>
+-<% end %>
++<% end%>
++<% if x%>
++<% end%>
+--- cases/control_flow/inline_if.html.erb
++++ cases/control_flow/inline_if.html.erb
+@@ -1 +1 @@
+-<% if a %>A<% else %>B<% end %>
++<% if a%> else%> end%>
+--- cases/control_flow/negated_if.html.erb
++++ cases/control_flow/negated_if.html.erb
+@@ -1,3 +1,3 @@
+-<% if !user.nil? %>
++<% unless user.nil?%>
+   <p>hi</p>
+-<% end %>
++<% end%>
+--- cases/control_flow/nil_comparison.html.erb
++++ cases/control_flow/nil_comparison.html.erb
+@@ -1,3 +1,3 @@
+-<% if foo == nil %>
++<% if foo.nil?%>
+   <p>yes</p>
+-<% end %>
++<% end%>
+--- cases/control_flow/safe_navigation.html.erb
++++ cases/control_flow/safe_navigation.html.erb
+@@ -1 +1 @@
+-<% if user && user.admin? %>ok<% end %>
++<% if user&.admin?%> end%>
+--- cases/control_flow/single_line_block.html.erb
++++ cases/control_flow/single_line_block.html.erb
+@@ -1 +1,3 @@
+-<%= cache "fragment" do %>This bit is cached<% end %>
++<%= cache 'fragment' do
++ %>This bit is cached<% 
++end%>
+--- cases/control_flow/trim.html.erb
++++ cases/control_flow/trim.html.erb
+@@ -1,3 +1,3 @@
+-<%- items.each do |item| -%>
+-  <%= item %>
+-<%- end -%>
++<%- items.each do |item|-%>
++  <%= item%>
++<%- end-%>
+--- cases/control_flow/unless_else.html.erb
++++ cases/control_flow/unless_else.html.erb
+@@ -1,5 +1,5 @@
+-<% unless foo %>
+-  <p>bar</p>
+-<% else %>
+-  <p>baz</p>
+-<% end %>
++<% if foo %>  ;
++            
++   else
++            
++   end %>
+--- cases/control_flow/unused_block_arg.html.erb
++++ cases/control_flow/unused_block_arg.html.erb
+@@ -1,3 +1,3 @@
+-<% items.each do |i| %>
++<% items.each do |i|%>
+   <li>item</li>
+-<% end %>
++<% end%>
+--- cases/erb_comment/after_if.html.erb
++++ cases/erb_comment/after_if.html.erb
+@@ -1,5 +1,3 @@
+ <div>
+-  <% if 'hello' %><%# rubocop:disable Lint/LiteralAsCondition %>
+-    <p>world</p>
+-  <% end %>
++  <%  %>
+ </div>
+--- cases/erb_comment/empty_if.html.erb
++++ cases/erb_comment/empty_if.html.erb
+@@ -1,2 +1,2 @@
+-<% if some_error %><%# rubocop:disable Lint/EmptyConditionalBody %>
+-<% end %>
++<% if some_error%><%# rubocop:disable Lint/EmptyConditionalBody %>
++<% end%>
+--- cases/erb_comment/indent.html.erb
++++ cases/erb_comment/indent.html.erb
+@@ -1,9 +1,6 @@
+ <div>
+   <ul>
+ <%# rubocop:disable Lint/LiteralAsCondition %>
+-    <% if 'hello' %>
+-            <%# rubocop:enable Lint/LiteralAsCondition %>
+-      <li>world</li>
+-    <% end %>
++    <%  %>
+   </ul>
+ </div>
+--- cases/erb_comment/leading.html.erb
++++ cases/erb_comment/leading.html.erb
+@@ -1 +1 @@
+-<%# rubocop:disable Lint/LiteralAsCondition %><% if 'hello' %>world<% end %>
++<%# rubocop:disable Lint/LiteralAsCondition %><%  %>
+--- cases/erb_comment/multiline_comment.html.erb
++++ cases/erb_comment/multiline_comment.html.erb
+@@ -2,7 +2,5 @@
+   <%#
+     rubocop:disable Lint/LiteralAsCondition
+   %>
+-  <% if 'hello' %>
+-    <p>world</p>
+-  <% end %>
++  <%  %>
+ </div>
+--- cases/erb_comment/multiline_tag.html.erb
++++ cases/erb_comment/multiline_tag.html.erb
+@@ -2,7 +2,7 @@
+   <%
+     # rubocop:disable Lint/LiteralAsCondition
+   %>
+-  <% if 'hello' %>
++  <% if 'hello'%>
+     <p>world</p>
+-  <% end %>
++  <% end%>
+ </div>
+--- cases/erb_comment/not_erb_tag.html.erb
++++ cases/erb_comment/not_erb_tag.html.erb
+@@ -1 +1 @@
+-<% if 'hello' %>world<% end %><# rubocop:disable Lint/LiteralAsCondition %>
++<%  %><# rubocop:disable Lint/LiteralAsCondition %>
+--- cases/erb_comment/trailing.html.erb
++++ cases/erb_comment/trailing.html.erb
+@@ -1 +1 @@
+-<% if 'hello' %>world<% end %><%# rubocop:disable Lint/LiteralAsCondition %>
++<%  %><%# rubocop:disable Lint/LiteralAsCondition %>
+--- cases/erb_comment/trailing_in_tag.html.erb
++++ cases/erb_comment/trailing_in_tag.html.erb
+@@ -1,5 +1,5 @@
+ <div>
+   <% if 'hello' # rubocop:disable Lint/LiteralAsCondition %>
+     <p>world</p>
+-  <% end %>
++  <% end%>
+ </div>
+--- cases/herb_disable/empty_if.html.erb
++++ cases/herb_disable/empty_if.html.erb
+@@ -1,2 +1,2 @@
+-<% if some_error %><%# herb:disable erb-no-empty-control-flow %>
+-<% end %>
++<% if some_error%><%# herb:disable erb-no-empty-control-flow %>
++<% end%>
+--- cases/herb_disable/if_sibling.html.erb
++++ cases/herb_disable/if_sibling.html.erb
+@@ -1,3 +1,3 @@
+ <div>
+-  <% if some_error %><%# herb:disable erb-no-empty-control-flow %><% end %>
++  <% if some_error%> end%>
+ </div>
+--- cases/marker/combinable_loops_ng.html.erb
++++ cases/marker/combinable_loops_ng.html.erb
+@@ -1,6 +1,2 @@
+-<% items.each do |item| %>
+-  <%= item.name %>
+-<% end %>
+-<% items.each do |item| %>
+-  <%= item.price %>
+-<% end %>
++<% items.each(&:name)%>
++<% items.each(&:price)%>
+--- cases/marker/combinable_loops_ok.html.erb
++++ cases/marker/combinable_loops_ok.html.erb
+@@ -1,7 +1,3 @@
+-<% items.each do |item| %>
+-  <%= item.name %>
+-<% end %>
++<% items.each(&:name)%>
+ Prices:
+-<% items.each do |item| %>
+-  <%= item.price %>
+-<% end %>
++<% items.each(&:price)%>
+--- cases/marker/duplicate_branch_ng.html.erb
++++ cases/marker/duplicate_branch_ng.html.erb
+@@ -1,5 +1,5 @@
+-<% if morning? %>
+-  <%= user.name %>
+-<% else %>
+-  <%= user.name %>
+-<% end %>
++<% if morning?%>
++  <%= user.name%>
++<% else%>
++  <%= user.name%>
++<% end%>
+--- cases/marker/duplicate_branch_ok.html.erb
++++ cases/marker/duplicate_branch_ok.html.erb
+@@ -1,5 +1,5 @@
+-<% if morning? %>
+-  Good morning, <%= user.name %>
+-<% else %>
+-  Hello, <%= user.name %>
+-<% end %>
++<% if morning?%>
++  Good morning, <%= user.name%>
++<% else%>
++  Hello, <%= user.name%>
++<% end%>
+--- cases/marker/empty_block_ng.html.erb
++++ cases/marker/empty_block_ng.html.erb
+@@ -1,2 +1,2 @@
+-<% items.each do %>
+-<% end %>
++<% items.each do%>
++<% end%>
+--- cases/marker/empty_block_ok.html.erb
++++ cases/marker/empty_block_ok.html.erb
+@@ -1,3 +1,3 @@
+-<% items.each do %>
++<% items.each do%>
+   <li>item</li>
+-<% end %>
++<% end%>
+--- cases/marker/empty_conditional_ng.html.erb
++++ cases/marker/empty_conditional_ng.html.erb
+@@ -1,2 +1,2 @@
+-<% if user.admin? %>
+-<% end %>
++<% if user.admin?%>
++<% end%>
+--- cases/marker/empty_conditional_ok.html.erb
++++ cases/marker/empty_conditional_ok.html.erb
+@@ -1,3 +1,3 @@
+-<% if user.admin? %>
++<% if user.admin?%>
+   You are an administrator.
+-<% end %>
++<% end%>
+--- cases/marker/empty_else_ng.html.erb
++++ cases/marker/empty_else_ng.html.erb
+@@ -1,4 +1,4 @@
+-<% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
+-<% else %>
+-<% end %>
++<% if user.admin?%>
++  <%= link_to 'Admin', admin_path%>
++<% else%>
++<% end%>
+--- cases/marker/empty_else_ok.html.erb
++++ cases/marker/empty_else_ok.html.erb
+@@ -1,5 +1,5 @@
+-<% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
+-<% else %>
++<% if user.admin?%>
++  <%= link_to 'Admin', admin_path%>
++<% else%>
+   You are not an administrator.
+-<% end %>
++<% end%>
+--- cases/marker/safe_navigation_ng.html.erb
++++ cases/marker/safe_navigation_ng.html.erb
+@@ -1,3 +1 @@
+-<% if user %>
+-  <% user.touch %>
+-<% end %>
++<% user&.touch%>
+--- cases/marker/safe_navigation_ok.html.erb
++++ cases/marker/safe_navigation_ok.html.erb
+@@ -1,3 +1 @@
+-<% if user %>
+-  Last login: <% user.touch %>
+-<% end %>
++<% user&.touch%>
+--- cases/marker/safe_navigation_short.html.erb
++++ cases/marker/safe_navigation_short.html.erb
+@@ -1,3 +1 @@
+-<% if user %>
+-  |<% user.touch %>
+-<% end %>
++<% user&.touch%>
+--- cases/marker/sole_nested_conditional_ng.html.erb
++++ cases/marker/sole_nested_conditional_ng.html.erb
+@@ -1,5 +1 @@
+-<% if user %>
+-  <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
+-  <% end %>
+-<% end %>
++<% if user
+\ No newline at end of file
+--- cases/marker/sole_nested_conditional_ok.html.erb
++++ cases/marker/sole_nested_conditional_ok.html.erb
+@@ -1,6 +1 @@
+-<% if user %>
+-  Welcome!
+-  <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
+-  <% end %>
+-<% end %>
++<% if user
+\ No newline at end of file
+--- cases/marker/symbol_proc_ng.html.erb
++++ cases/marker/symbol_proc_ng.html.erb
+@@ -1,5 +1,3 @@
+ <ul>
+-  <% items.each do |item| %>
+-    <% item.touch %>
+-  <% end %>
++  <% items.each(&:touch)%>
+ </ul>
+--- cases/marker/symbol_proc_ok.html.erb
++++ cases/marker/symbol_proc_ok.html.erb
+@@ -1,5 +1,3 @@
+ <ul>
+-  <% items.each do |item| %>
+-    <li><%= item.name %></li>
+-  <% end %>
++  <% items.each(&:name)%>
+ </ul>
+--- cases/marker/void_ng.html.erb
++++ cases/marker/void_ng.html.erb
+@@ -1,3 +1,2 @@
+-<% count = items.size %>
+-<p><% count + 1 %> items</p>
+-<p><%= count %> left</p>
++<% count = items.size%>%> items</p>
++<p><%= count%> left</p>
+--- cases/marker/void_ok.html.erb
++++ cases/marker/void_ok.html.erb
+@@ -1,3 +1,2 @@
+-<% count = items.size %>
+-<p><%= count + 1 %> items</p>
+-<p><%= count %> left</p>
++<% count = items.size%>%> items</p>
++<p><%= count%> left</p>
+--- cases/multibyte/emoji.html.erb
++++ cases/multibyte/emoji.html.erb
+@@ -1,2 +1,2 @@
+-<p>😀 日本語 <%= link_to "あ", path %> <%= x=1 %></p>
+-<% if foo == nil %>🍣<% end %>
++<p>😀 日本語 <%= link_to 'あ', path%> 1%></p>
++<% if foo.nil?%> end%>
+--- cases/multibyte/multibyte_comment.html.erb
++++ cases/multibyte/multibyte_comment.html.erb
+@@ -1,2 +1,2 @@
+ <%# 日本語のコメント %>
+-<%= y=2 %>
++<%= 2%>
+--- cases/multibyte/multibyte_html.html.erb
++++ cases/multibyte/multibyte_html.html.erb
+@@ -1 +1 @@
+-<p>日本語 <%= x=1 %></p>
++<p>日本語 <%= 1%></p>
+--- cases/multibyte/show.html.erb
++++ cases/multibyte/show.html.erb
+@@ -1,11 +1,11 @@
+ <div class="user">
+-  <p>こんにちは <%= link_to( "ホーム",root_path ) %></p>
++  <p>こんにちは <%= link_to('ホーム', root_path)%></p>
+ </div>
+-<% if foo == nil %>
++<% if foo.nil?%>
+   <span>empty</span>
+-<% end %>
+-<% unless a %>
+-  <p>x</p>
+-<% else %>
+-  <p>y</p>
+-<% end %>
++<% end%>
++<% if a%>  ;
++          
++   else
++          
++   end%>
+--- cases/output/attr.html.erb
++++ cases/output/attr.html.erb
+@@ -1 +1 @@
+-<div class="<%= active ? "on" : "off" %>">x</div>
++<div class="<%= active ? 'on' : 'off'%>">x</div>
+--- cases/output/empty_tag_after_output_tag.html.erb
++++ cases/output/empty_tag_after_output_tag.html.erb
+@@ -1,2 +1,2 @@
+ <% %>
+-<%= b %><% %>
++<%= b%>%>
+--- cases/output/escaped_tag.html.erb
++++ cases/output/escaped_tag.html.erb
+@@ -1,2 +1,2 @@
+ <%%= link_to "a", a_path %>
+-<%= link_to "b", b_path %>
++<%= link_to 'b', b_path%>
+--- cases/output/link_to_class.html.erb
++++ cases/output/link_to_class.html.erb
+@@ -1 +1 @@
+-<%= link_to "x", path, class: 'btn' %>
++<%= link_to 'x', path, class: 'btn'%>
+--- cases/output/one_tag_line.html.erb
++++ cases/output/one_tag_line.html.erb
+@@ -1 +1 @@
+-<li><%= link_to "a", a_path %></li>
++<li><%= link_to 'a', a_path%></li>
+--- cases/output/raw_output.html.erb
++++ cases/output/raw_output.html.erb
+@@ -1,2 +1,2 @@
+-<%== raw_html %>
+-<%= "hello" %>
++<%== raw_html%>
++<%= 'hello'%>
+--- cases/output/same_line_tags.html.erb
++++ cases/output/same_line_tags.html.erb
+@@ -1 +1 @@
+-<%= a %><%= b %>
++<%= a%> b%>
+--- cases/output/string_literal.html.erb
++++ cases/output/string_literal.html.erb
+@@ -1 +1 @@
+-<%= "hello" %>
++<%= 'hello'%>
+--- cases/output/symbol_proc.html.erb
++++ cases/output/symbol_proc.html.erb
+@@ -1,3 +1 @@
+-<% items.each do |item| %>
+-  <%= item.name %>
+-<% end %>
++<% items.each(&:name)%>
+--- cases/output/symbol_proc_map.html.erb
++++ cases/output/symbol_proc_map.html.erb
+@@ -1,3 +1,3 @@
+-<% users.map { |u| u.name }.each do |name| %>
+-  <%= name %>
+-<% end %>
++<% users.map(&:name).each do |name|%>
++  <%= name%>
++<% end%>
+--- cases/output/two_tags_line.html.erb
++++ cases/output/two_tags_line.html.erb
+@@ -1 +1 @@
+-<td><%= user.name %></td><td><%= user.email %></td>
++<td><%= user.name%> user.email%></td>
+--- cases/rubocop_disable/erb_comment.html.erb
++++ cases/rubocop_disable/erb_comment.html.erb
+@@ -1,2 +1,2 @@
+ <%# rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++<%= 'a'%>
+--- cases/rubocop_disable/multiline_range.html.erb
++++ cases/rubocop_disable/multiline_range.html.erb
+@@ -1,8 +1,5 @@
+ <%
+-  # rubocop:disable Style/StringLiterals
+-%>
+-<%= "a" %>
++  %>%>
+ <%
+-  # rubocop:enable Style/StringLiterals
+-%>
+-<%= "b" %>
++  %>
++<%= 'b'%>
+--- cases/rubocop_disable/multiline_tag.html.erb
++++ cases/rubocop_disable/multiline_tag.html.erb
+@@ -1,6 +1,4 @@
+ <%
+   # rubocop:disable Style/StringLiterals
+-  x = "b"
+-%>
+-<%= x %>
+-<%= "c" %>
++%>%>
++<%= "c"%>
+--- cases/rubocop_disable/ruby_comment_tag.html.erb
++++ cases/rubocop_disable/ruby_comment_tag.html.erb
+@@ -1,2 +1,2 @@
+ <% # rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++<%= 'a'%>
+--- cases/rubocop_disable/trailing_ruby_comment_output.html.erb
++++ cases/rubocop_disable/trailing_ruby_comment_output.html.erb
+@@ -1,2 +1,2 @@
+-<%= "a" # rubocop:disable Style/StringLiterals %>
+-<%= "b" %>
++ # rubocop:disable Style/StringLiterals %>
++<%= 'b'%>
+--- cases/style/empty_lines.html.erb
++++ cases/style/empty_lines.html.erb
+@@ -1,6 +1,5 @@
+-<% a = 1 %>
++<% a = 1%>
+ <p>
+-
+ 
+ </p>
+ <%= a %>
+--- cases/style/multiline_tag.html.erb
++++ cases/style/multiline_tag.html.erb
+@@ -2,4 +2,4 @@
+   x = 1
+   y = 2
+ %>
+-<%= x + y %>
++<%= x + y%>
+--- cases/style/reparse_cops_in_html.html.erb
++++ cases/style/reparse_cops_in_html.html.erb
+@@ -1,5 +1,5 @@
+ <div>
+-  <%= link_to root_path() %>
+-  <%= (a == b) ? 1 : 2 %>
+-  <%= (foo) %>
++  <%= link_to root_path%>
++  <%= a == b ? 1 : 2%>
++  <%= foo%>
+ </div>
+--- cases/style/ruby_style.html.erb
++++ cases/style/ruby_style.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to( 'Home',root_path ) %>
+-<%= user.name.nil? ? "anon" : user.name %>
+-<%= undefined_helper_xyz(@post) %>
++<%= link_to('Home', root_path)%>
++<%= user.name.nil? ? 'anon' : user.name%>
++<%= undefined_helper_xyz(@post)%>
+--- cases/syntax/syntax_errors_ignored.html.erb
++++ cases/syntax/syntax_errors_ignored.html.erb
+@@ -1,6 +1,6 @@
+-<%= items.map do |i| %>
+-  <%= i %>
+-<% end.join(", ") %>
+-<% result = if foo %>
++<%= items.map do |i|%>
++  <%= i%>
++<% end.join(', ')%>
++<% if foo%>
+   a
+-<% end %>
++<% end%>
+--- cases/variables/ambiguous_operator.html.erb
++++ cases/variables/ambiguous_operator.html.erb
+@@ -1,5 +1,4 @@
+-<% count = items.size %>
+-<p><%= count -1 %></p>
+-<% items.each do |item| %>
+-  <%= item *2 %>
+-<% end %>
++<% items.size%>%></p>
++<% items.each do |item|%>
++  <%= item * 2%>
++<% end%>
+--- cases/variables/cross_tag_variables.html.erb
++++ cases/variables/cross_tag_variables.html.erb
+@@ -1,6 +1,2 @@
+-<% total = items.sum(&:price) %>
+-<p><%= total %></p>
+-<% unused = 1 %>
+-<% items.each do |item| %>
+-  <li><%= item.name %></li>
+-<% end %>
++<% items.sum(&:price)%>%></p>%>
++<% items.each(&:name)%>
+--- cases/variables/output_concat.html.erb
++++ cases/variables/output_concat.html.erb
+@@ -1,3 +1,2 @@
+-<% name = "Alice" %>
+-<% count = items.size %>
+-<p><%= name %>: <%= count -1 %></p>
++%>
++<% items.size%>%> count - 1%></p>
+--- cases/variables/useless_assignment.html.erb
++++ cases/variables/useless_assignment.html.erb
+@@ -1,2 +1,2 @@
+-<% name = "Alice" %>
+-<p><%= name %></p>
++<% name = 'Alice'%>
++<p><%= name%></p>

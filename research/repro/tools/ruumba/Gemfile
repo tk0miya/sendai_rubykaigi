@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# ruumba は rubocop コマンドを子プロセスで実行する。bundle exec 経由で、この rubocop を使わせる
+gem "rubocop", "1.92.1"
+gem "ruumba", "0.1.17"

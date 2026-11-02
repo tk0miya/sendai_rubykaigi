@@ -1,0 +1,73 @@
+cases/comment/commented_out_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_end.html.erb:1:55: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_output.html.erb:1:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `name`.
+cases/control_flow/cond_assign.html.erb:1:4: C: Style/ConditionalAssignment: Use the return of the conditional for variable assignment and comparison.
+cases/control_flow/if_then_elsif_else.html.erb:1:17: C: [Correctable] Style/MultilineIfThen: Do not use `then` for multi-line `if`.
+cases/control_flow/if_then_elsif_else.html.erb:3:14: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/if_then_elsif_else.html.erb:7:4: C: [Correctable] Style/NegatedUnless: Favor `if` over `unless` for negative conditions.
+cases/control_flow/negated_if.html.erb:1:4: C: [Correctable] Style/NegatedIf: Favor `unless` over `if` for negative conditions.
+cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/single_line_block.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/unless_else.html.erb:1:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/erb_comment/after_if.html.erb:2:9: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/indent.html.erb:4:11: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/leading.html.erb:1:53: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/multiline_comment.html.erb:5:9: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/multiline_tag.html.erb:3:5: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.
+cases/erb_comment/not_erb_tag.html.erb:1:7: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/trailing_in_tag.html.erb:2:17: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/erb_comment/trailing.html.erb:1:7: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/marker/combinable_loops_ng.html.erb:4:4: C: Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/combinable_loops_ok.html.erb:5:4: C: Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/empty_else_ng.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/empty_else_ok.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ng.html.erb:3:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ok.html.erb:4:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/emoji.html.erb:1:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/emoji.html.erb:1:39: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
+cases/multibyte/emoji.html.erb:1:40: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/emoji.html.erb:2:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
+cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/multibyte_html.html.erb:1:12: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
+cases/multibyte/multibyte_html.html.erb:1:13: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/show.html.erb:2:24: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:2:25: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/show.html.erb:2:30: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/multibyte/show.html.erb:2:40: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:4:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/show.html.erb:7:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/output/attr.html.erb:1:26: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/attr.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/escaped_tag.html.erb:2:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/link_to_class.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/one_tag_line.html.erb:1:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/raw_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/erb_comment.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/multiline_range.html.erb:8:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/multiline_tag.html.erb:2:3: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/style/reparse_cops_in_html.html.erb:2:24: C: [Correctable] Style/MethodCallWithoutArgsParentheses: Do not use parentheses for method calls with no arguments.
+cases/style/reparse_cops_in_html.html.erb:3:7: C: [Correctable] Style/TernaryParentheses: Omit parentheses for ternary conditions.
+cases/style/reparse_cops_in_html.html.erb:4:7: C: [Correctable] Style/RedundantParentheses: Don't use parentheses around a method call.
+cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:2:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/syntax/missing_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/missing_end.html.erb:2:15: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/syntax_errors_ignored.html.erb:3:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/syntax/syntax_errors_ignored.html.erb:4:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `result`.
+cases/syntax/unclosed_paren.html.erb:1:27: F: Lint/Syntax: unexpected ';'; expected a `)` to close the arguments (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/variables/ambiguous_operator.html.erb:2:14: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
+cases/variables/ambiguous_operator.html.erb:4:12: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `*`.
+cases/variables/cross_tag_variables.html.erb:3:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `unused`.
+cases/variables/output_concat.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/variables/output_concat.html.erb:3:27: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
+cases/variables/useless_assignment.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

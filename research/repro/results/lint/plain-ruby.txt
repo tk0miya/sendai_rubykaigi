@@ -1,0 +1,8 @@
+equivalent.rb:4:1: C: [Correctable] Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+equivalent.rb:4:8: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+equivalent.rb:8:14: C: [Correctable] Style/MultilineIfThen: Do not use `then` for multi-line `if`.
+equivalent.rb:10:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+equivalent.rb:12:1: C: [Correctable] Style/EmptyElse: Redundant `else`-clause.
+equivalent.rb:14:1: C: [Correctable] Style/NegatedUnless: Favor `if` over `unless` for negative conditions.
+equivalent.rb:14:1: W: Lint/EmptyConditionalBody: Avoid `unless` branches without a body.
+equivalent.rb:17:16: W: [Correctable] Lint/UnusedBlockArgument: Unused block argument - `i`. You can omit the argument if you don't care about it.

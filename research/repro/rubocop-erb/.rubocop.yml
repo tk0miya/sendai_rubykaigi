@@ -1,6 +1,0 @@
-plugins:
-  - rubocop-erb
-
-AllCops:
-  NewCops: enable
-  SuggestExtensions: false

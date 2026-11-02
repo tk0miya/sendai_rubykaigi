@@ -3,7 +3,7 @@
 調査日: 2026-10-06
 
 「既存の ERB linter は、ERB に埋め込まれた Ruby 片を正しく lint できない」ことを確かめるための調査メモです。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md)）、【出典】はソースコードや issue で確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)。どのツールも `repro/cases/` の同じ ERB にかけた）、【出典】はソースコードや issue で確かめたこと、【推測】は解釈です。
 
 ## まとめ
 
@@ -27,7 +27,7 @@
 | ツール | HTML 構造 | Ruby の構文 | Ruby のスタイル (RuboCop) | タグを跨いだ Ruby 解析 | autocorrect | 型・意味解析 |
 |---|---|---|---|---|---|---|
 | erb_lint (Rubocop linter) | ○ (better_html) | △ (タグ単位。不完全な文はスキップ) | △ (タグ単位) | × | △ (テンプレートを壊す) | × |
-| rubocop-erb | × | △ (タグ単位。Lint/Syntax を除外) | △ (タグ単位。約 55 cop を除外) | × | △ (意味・構文を壊す) | × |
+| rubocop-erb 0.7 系 | × | △ (タグ単位。Lint/Syntax を除外) | △ (タグ単位。53 cop を除外) | × | △ (意味・構文を壊す) | × |
 | ruumba (メンテ停止) | × | ○ (文書全体) | △ (文書全体。出力・HTML 本文が失われ誤検知) | ○ | △ (実験的。黙って書き戻さないことがある) | × |
 | Herb (herb-lint) | ◎ | ◎ (Prism で文書全体) | × | ○ (未使用変数など) | ○ (約 40 ルール) | × |
 | herb-format | ◎ | △ | × (Ruby は trim のみ) | × | ○ (整形) | × |
@@ -63,25 +63,27 @@ return unless source.valid_syntax?
 
 ### 誤検知【実測】
 
-全 cop を有効にした設定（`repro/erb_lint/all_cops`）で次の結果になります。
+全 cop を有効にした設定（`bin/lint erb_lint-all`）で次の結果になります。
 
 | ERB | 結果 |
 |---|---|
-| `<%= "hello" %>` | `Layout/InitialIndentation`、`Layout/TrailingEmptyLines`、`Style/FrozenStringLiteralComment` が**タグごとに**出る |
-| `<% name = "Alice" %>` + `<p><%= name %></p>` | `Lint/UselessAssignment` が出る。次のタグで使っているので誤検知 |
+| `<%= "hello" %>`（`cases/output/string_literal`） | `Layout/InitialIndentation`、`Layout/TrailingEmptyLines`、`Style/FrozenStringLiteralComment` が**タグごとに**出る |
+| `<% name = "Alice" %>` + `<p><%= name %></p>`（`cases/variables/useless_assignment`） | `Lint/UselessAssignment` が出る。次のタグで使っているので誤検知 |
+
+`cases/` の 80 ファイルでは、`Style/FrozenStringLiteralComment` が 107 件、`Layout/TrailingEmptyLines` が 104 件、`Layout/InitialIndentation` が 102 件、`Lint/UselessAssignment` が 19 件出ます。
 
 README はこれらの cop を無効化するよう推奨しています（InitialIndentation, LineLength, TrailingEmptyLines, TrailingWhitespace, FileName, FrozenStringLiteralComment, UselessAssignment, Rails/OutputSafety）。issue [#126](https://github.com/Shopify/erb_lint/issues/126) ではメンテナが UselessAssignment について「this is normal … Consider disabling this cop」と回答しています。
 
 ### 見逃し【実測】
 
-推奨設定（`repro/erb_lint/recommended`）での結果と、同じ内容の Ruby（`repro/plain_ruby/equivalent.rb`）に RuboCop をかけた結果の比較です。
+推奨設定（`bin/lint erb_lint-recommended`）での結果と、同じ内容の Ruby（`repro/plain_ruby/equivalent.rb`。`bin/lint plain-ruby`）に RuboCop をかけた結果の比較です。
 
 | ERB | erb_lint | 同じ内容の Ruby |
 |---|---|---|
-| `<% if foo == nil %>…<% end %>` | 0 件 | `Style/NilComparison`, `Style/IfUnlessModifier` |
-| `<% if !foo.nil? then %>…<% elsif bar == nil %>…<% else %><% end %>` | 0 件 | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/EmptyElse` |
-| `<% unless !x %><% end %>` | 0 件 | `Style/NegatedUnless`, `Lint/EmptyConditionalBody` |
-| `<% items.each do \|i\| %>…<% end %>`（`i` 未使用） | 0 件 | `Lint/UnusedBlockArgument` |
+| `<% if foo == nil %>…<% end %>`（`cases/control_flow/nil_comparison`） | 0 件 | `Style/NilComparison`, `Style/IfUnlessModifier` |
+| `<% if !foo.nil? then %>…<% elsif bar == nil %>…<% else %><% end %>`（`cases/control_flow/if_then_elsif_else`） | 0 件 | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/EmptyElse` |
+| `<% unless !x %><% end %>`（同上） | 0 件 | `Style/NegatedUnless`, `Lint/EmptyConditionalBody` |
+| `<% items.each do \|i\| %>…<% end %>`（`i` 未使用。`cases/control_flow/unused_block_arg`） | 0 件 | `Lint/UnusedBlockArgument` |
 
 `if` の条件式が検査されない問題は issue [#332](https://github.com/Shopify/erb_lint/issues/332) として報告されています（open）。
 
@@ -92,9 +94,10 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 | 全 cop | `<%= link_to "x", path, class: 'btn' %>` | `# frozen_string_literal: true`⏎`link_to 'x', path, class: 'btn'`⏎` %>` |
 | 全 cop | `<% name = "Alice" %>` | `# frozen_string_literal: true`⏎`'Alice'`⏎` %>` |
 | 推奨設定 | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | `x = 1`⏎`  y = 2`⏎`%>` |
+| 推奨設定 | `<% count = items.size %>`⏎`<p><%= count -1 %></p>` | `<%= count(-1) %>`（前のタグの変数が見えず、メソッド呼び出しと解釈する。rubocop-erb 0.7 系と同じ） |
 
 - `<%=` や `<%` が消え、マジックコメントが HTML 本文に挿入される
-- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える
+- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える。`cases/` の 80 ファイルでは、推奨設定の `-a` で 6 ファイル（`<%` の直後で改行する複数行のタグと、`<% # … %>` のタグ）の `<%` が消え、全 cop の設定では書き換えた 54 ファイルすべてで HTML が変わる
 - 同系統の issue: [#142](https://github.com/Shopify/erb_lint/issues/142)（2019 年から open）, [#228](https://github.com/Shopify/erb_lint/issues/228), [#326](https://github.com/Shopify/erb_lint/issues/326), [#331](https://github.com/Shopify/erb_lint/issues/331), [#383](https://github.com/Shopify/erb_lint/issues/383), [#461](https://github.com/Shopify/erb_lint/issues/461)。修正 PR [#413](https://github.com/Shopify/erb_lint/pull/413) も open のまま
 
 ### その他【出典】
@@ -105,7 +108,7 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 ## rubocop-erb
 
 - リポジトリ: https://github.com/r7kamura/rubocop-erb
-- 対象: 0.7.1（2026-03-29）。0.7.0 で ERB パーサを better_html から Herb に移行（[#57](https://github.com/r7kamura/rubocop-erb/issues/57), [#59](https://github.com/r7kamura/rubocop-erb/pull/59)）
+- 対象: 0.7.2（2026-10-06。タグ単位の方式の最後の版）。0.7.0 で ERB パーサを better_html から Herb に移行（[#57](https://github.com/r7kamura/rubocop-erb/issues/57), [#59](https://github.com/r7kamura/rubocop-erb/pull/59)）
 - 0.8.0（2026-10-29）で、Ruby の取り出し方をタグ単位から `Herb.extract_ruby` による文書全体の変換に切り替えた（[#70](https://github.com/r7kamura/rubocop-erb/pull/70)）。この節は 0.7 系の内容。0.8 系は [rubocop-erb-0.8.md](rubocop-erb-0.8.md)
 
 ### 仕組み【出典】
@@ -126,16 +129,16 @@ r7kamura 氏自身が issue [#6](https://github.com/r7kamura/rubocop-erb/issues/
 
 ### 除外されている cop【出典】
 
-`config/default.yml` で約 55 個の cop が `**/*.erb` から除外されています。Layout 系の大半、`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void`、`Style/FrozenStringLiteralComment`、`Style/IfUnlessModifier`、`Metrics/BlockLength` などです。
+`config/default.yml` で 53 個の cop が `**/*.erb` から除外されています。Layout 系の大半、`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void`、`Style/FrozenStringLiteralComment`、`Style/IfUnlessModifier`、`Metrics/BlockLength` などです。
 
 ### 見逃し【実測】
 
-`repro/rubocop-erb` で `bundle exec rubocop` を実行した結果です。
+`bin/lint rubocop-erb-0.7` の結果です。
 
 | ERB | 結果 |
 |---|---|
-| `<% if !user.nil? %>…<% end %>` | `Style/NegatedIf` が出ない（`if` が削られるため） |
-| `<% items.each do \|item\| %><%= item.name %><% end %>` | `Style/SymbolProc` が出ない |
+| `<% if !user.nil? %>…<% end %>` | `Style/NegatedIf` が出ない（`if` が削られるため）。削った後の条件式は検査するので、`<% if foo == nil %>` の `Style/NilComparison` は出る |
+| `<% if !foo.nil? then %>` / `<% unless !x %>` | `Style/MultilineIfThen`、`Style/NegatedUnless` が出ない |
 | `<%= items.map do \|i\| %>…<% end.join(", ") %>` | 構文エラーになる断片が黙って無視される |
 | `<% result = if foo %>…<% end %>` | 同上 |
 
@@ -171,23 +174,23 @@ autocorrect のときは、各タグの中身の前後にマーカー行を挿�
 
 ### タグ単位の方式の問題は解消している【実測】
 
-erb_lint / rubocop-erb で使った再現例（`repro/erb_lint`, `repro/rubocop-erb`）にかけた結果です（ruumba 0.1.17, rubocop 1.91.0, README の推奨設定）。
+erb_lint / rubocop-erb 0.7 系と同じ `cases/` の ERB にかけた結果です（ruumba 0.1.17, rubocop 1.92.1, README の推奨設定）。
 
 | ERB | erb_lint / rubocop-erb | ruumba |
 |---|---|---|
-| `<% if foo == nil %>…<% end %>` | 見逃し | `Style/NilComparison` を検出し、`foo.nil?` に修正 |
+| `<% if foo == nil %>…<% end %>` | 見逃し（erb_lint） | `Style/NilComparison` を検出し、`foo.nil?` に修正 |
 | `<% if !user.nil? %>…<% end %>` | 見逃し | `Style/NegatedIf` を検出し、`unless user.nil?` に修正 |
 | `then` / `elsif bar == nil` / 空の `else` / `unless !x` | 見逃し | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/EmptyElse`, `Style/NegatedUnless` を検出 |
 | `<% name = "Alice" %>` + `<%= name %>` | `Lint/UselessAssignment`（誤検知） | 出ない |
-| `<% count = items.size %>` + `<%= count -1 %>` | `count(-1)` に書き換え（rubocop-erb） | ローカル変数と認識され、`Lint/AmbiguousOperator` は出ない |
-| `<% end.join(", ") %>` など | 黙って無視（rubocop-erb） | 正しく解析される |
+| `<% count = items.size %>` + `<%= count -1 %>` | `count(-1)` に書き換え | ローカル変数と認識され、`Lint/AmbiguousOperator` は出ない |
+| `<% end.join(", ") %>` など | 黙って無視 | 正しく解析される |
 | `Style/FrozenStringLiteralComment` など | タグごとに出る | ファイルに 1 回だけ |
 
 制御構造・変数スコープ・ファイルという 3 つの文脈は保たれています。
 
 ### 新たに生じる問題【実測】
 
-README の推奨設定を使った結果です（`repro/ruumba` ほか）。
+README の推奨設定（`bin/lint ruumba`）を使った結果です。
 
 **`<%=` の「出力する」という意味が失われる**
 
@@ -208,14 +211,15 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 **空白で埋めたことによる Layout 系の誤検知**
 
-- `repro/` の再現例 17 ファイル（erb_lint, rubocop-erb, ruumba の各ディレクトリ）に対して、`Layout/TrailingWhitespace` が 54 件、`Layout/InitialIndentation` が 17 件出た
+- `cases/` の 80 ファイルのうち 75 ファイルで、`Layout/TrailingWhitespace` が計 259 件、`Layout/InitialIndentation` が計 71 件出た
 - ほかに `Layout/IndentationConsistency`, `Layout/ExtraSpacing`, `Layout/SpaceBeforeSemicolon`, `Layout/BlockAlignment`, `Layout/EndAlignment` なども出る
 - `<%= a %><%= b %>` に補った `;` にも `Style/Semicolon` が出る
+- `<%%= link_to "a", a_path %>`（エスケープしたタグ。中身は Ruby ではない）も正規表現でタグとして取り出すので、`Lint/Syntax` が出る
 - README の推奨設定で無効化しているのは 5 個（FrozenStringLiteralComment, HashAlignment, ParameterAlignment, IndentationWidth, TrailingEmptyLines）だけで、これらは抑えられない
 
 **autocorrect が当てにならない**
 
-- 推奨設定のまま `--auto-correct` すると「88 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
+- 推奨設定のまま `--auto-correct` すると、`cases/` の 80 ファイルで「1220 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
 - ソースにも "auto-correct is still experimental and can cause invalid ruby to be generated when extracting ruby from ERBs" というコメントがある
 - `--only` で Style 系の cop に絞ると修正は反映される。ただし、関係のない `<%== raw_html %>` が `<%= raw raw_html %>` に書き換わる。解析前の `<%==` → `<%= raw` の置換がそのまま書き戻されるため
 - autocorrect のときはマーカー行を挿入したコードを検査するので、lint のときとは結果が変わる。例えば `Style/SymbolProc` は autocorrect のときには検出されない（ブロックの中身にマーカー行が入るため）
@@ -229,7 +233,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 ## Herb（herb-lint / herb-format）
 
 - リポジトリ: https://github.com/marcoroth/herb
-- 最新: v0.11.0（2026-09-24）。開発は活発。[rails/rails#58552](https://github.com/rails/rails/pull/58552) で ActionView に Herb ハンドラが追加された
+- 最新: v0.11.1。開発は活発。[rails/rails#58552](https://github.com/rails/rails/pull/58552) で ActionView に Herb ハンドラが追加された
 
 ### できること【出典・実測】
 
@@ -237,6 +241,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 - 構文チェックは、HTML を空白に置き換えて各タグの末尾に `;` を補い、Prism で**文書全体を 1 本のプログラムとして**解析する（`src/analyze/parse_errors.c`）
 - `end` の抜けを `RUBY_PARSE_ERROR` と `MISSING_ERB_END_TAG_ERROR` で検出する【実測】
 - `erb-no-unused-local-variable` はタグを跨いで変数を追跡し、本当に未使用の変数だけを検出する【実測】
+- ほかにも ERB の構造を見るルールがある。`erb-no-unused-block-argument`（未使用のブロック引数）、`erb-no-unused-expressions`（`<% count + 1 %>` のように値を捨てる `<%` のタグ）、`erb-no-empty-control-flow`（本当に空の分岐やブロック。本文が HTML なら出ない）など【実測】
 - lint ルールは 168 個（146 個がデフォルトで有効）
 
 ### 限界

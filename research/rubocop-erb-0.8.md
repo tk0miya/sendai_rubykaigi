@@ -3,20 +3,17 @@
 調査日: 2026-11-03
 
 rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位から `Herb.extract_ruby` による文書全体の変換に切り替えました（[r7kamura/rubocop-erb#70](https://github.com/r7kamura/rubocop-erb/pull/70)）。0.7 系（タグ単位）、0.8 系、tk0miya/rubocop-herb（以下「rubocop-herb」）の 3 つを、同じ入力にかけて比べた結果です。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#rubocop-erb-08)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
 
 ## 対象
 
 - rubocop-erb 0.7.2（2026-10-06。タグ単位の方式の最後の版。0.7.1 との違いは、存在しない cop 名を設定から消しただけ）
 - rubocop-erb 0.8.2（2026-10-30。最新）
 - rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
-- rubocop-erb は herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.92.0、rubocop-herb は herb 0.11.1 / rubocop 1.92.1（同リポジトリの `Gemfile.lock`）。ruby 4.0.5
-- 設定は 3 つとも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/rubocop-erb-0.8/](repro/rubocop-erb-0.8/)）
+- herb 0.11.1（rubygems のビルド済み gem）/ rubocop 1.92.1 / ruby 4.0.5。3 つとも揃えた
+- 設定は 3 つとも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/tools/](repro/tools/)）
 - 入力
-  - [repro/](repro/) の既存ツールの再現例と、[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/) の境界ケース（32 ファイル）
-  - 0.8 系向けの境界ケース（[repro/rubocop-erb-0.8/edge/](repro/rubocop-erb-0.8/edge/)、9 ファイル）
-  - 無効化コメントの書き方ごとの例（[repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/)、6 ファイル）
-  - 指摘の表示を見るための例（[repro/rubocop-erb-0.8/display/](repro/rubocop-erb-0.8/display/)、3 ファイル）
+  - 検証用 ERB（[repro/cases/](repro/cases/)、80 ファイル）。無効化コメントの書き方ごとの例（`rubocop_disable/`、6 ファイル）を含む
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -82,47 +79,47 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `<%%= … %>`（エスケープしたタグ） | 中身を Ruby として検査し、`-a` で書き換える【実測】 | 検査しない | 検査しない |
 | 規模（`lib/`） | 466 行 | 386 行 | 約 3,000 行 |
 
-## 既存の再現例と境界ケースでの結果【実測】
+## 検証用 ERB での結果【実測】
 
-`erb_lint`、`rubocop-erb`、`ruumba`、`herb/app`、`herb-pr2260/edge` の 32 ファイルにかけた結果です。
+[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint rubocop-erb-0.7`、`bin/lint rubocop-erb-0.8`、`bin/lint rubocop-herb --except Herb/Linting`）。
 
 | | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
-| offense の数 | 24 | 33 | 37 |
+| offense の数 | 53 | 73 | 88 |
 
 0.7.2 だけに出るもの、出ないもの:
 
 - `Lint/AmbiguousOperator`（3 件）、`Lint/RedundantSplatExpansion`（1 件）: `<% count = items.size %>` の後の `<%= count -1 %>` など。前のタグの変数が見えないための誤検知（[existing-erb-linters.md](existing-erb-linters.md#rubocop-erb)）。0.8.2 と rubocop-herb は `Layout/SpaceAroundOperators` を出す
-- `Style/NegatedIf`、`Style/NegatedUnless`、`Style/MultilineIfThen`、`Lint/UselessAssignment`、`Lint/Syntax` は 0.7.2 では出ない（タグ単位で `if` を削る、または除外しているため）
+- `Style/NegatedIf`、`Style/NegatedUnless`、`Style/MultilineIfThen`、`Style/UnlessElse`、`Lint/UselessAssignment`、`Lint/Syntax` は 0.7.2 では出ない（タグ単位で `if` を削る、または除外しているため）。`if` を削った後の条件式は検査するので、`<% if foo == nil %>` の `Style/NilComparison` は 0.7.2 でも出る
 
 0.8.2 と rubocop-herb の違い:
 
 | cop | 例 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
 | `Lint/UnusedBlockArgument` | `<% items.each do \|i\| %><li>item</li><% end %>` | 出ない。本文が空のブロックに見え、RuboCop の既定（`IgnoreEmptyBlocks`）で対象外になる | 出る |
-| `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` | 除外しているので出ない | 出る |
+| `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `control_flow/if_then_elsif_else` の本当に空の `else` / `unless` | 除外しているので出ない | 出る |
 | `Style/SafeNavigation` | `<% if user && user.admin? %>` | 除外しているので出ない | 出る。`-A` で `user&.admin?` に正しく修正 |
 | `Style/CommentAnnotation` | `<% # note %>` | 出ない（コメントが空白になる） | 出る |
-| `<%# rubocop:disable Style/StringLiterals %>` | `herb-pr2260/edge/disable.html.erb` | 効かず、次の行の `"a"` に `Style/StringLiterals` が出る | 効く。`Lint/MissingCopEnableDirective` が出る |
-| `<% x = "b" # rubocop:disable … %>` | 同上 | 効くが、`Lint/CopDirectiveSyntax`（Malformed directive comment）が出る。`extract_ruby` がタグの終わりに補う `  ;` がコメントの中に入るため | 効く |
+| `<%# rubocop:disable Style/StringLiterals %>` | `rubocop_disable/erb_comment` | 効かず、次の行の `"a"` に `Style/StringLiterals` が出る | 効く。`Lint/MissingCopEnableDirective` が出る |
+| `<% x = "b" # rubocop:disable … %>` | `rubocop_disable/trailing_ruby_comment` | 効くが、`Lint/CopDirectiveSyntax`（Malformed directive comment）が出る。`extract_ruby` がタグの終わりに補う `  ;` がコメントの中に入るため | 効く |
 
-0.8 系向けの境界ケース（[repro/rubocop-erb-0.8/edge/](repro/rubocop-erb-0.8/edge/)、9 ファイル）の結果です。
+0.8 系で差が出やすいケースの結果です。
 
 | ファイル | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
-| `single_line_block.html.erb`（`<%= cache "fragment" do %>…<% end %>`） | 出ない | `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`（誤検知） | 出ない（その行だけで無効にしている） |
-| `cond_assign.html.erb`（`if` / `else` の各分岐で `<% x = 1 %>`） | 出ない | `Style/ConditionalAssignment`（`x = if a … end` にせよ）。ERB には合わない指摘。修正は捨てられる | 出ない |
-| `unless_else.html.erb`（`unless` / `else` の本文が HTML） | 出ない | `Style/UnlessElse`。修正は捨てられる | `Style/UnlessElse` |
-| `empty_lines.html.erb`（ERB タグの間に空行を含む HTML） | 出ない | 出ない（除外） | `Layout/EmptyLines`（誤検知） |
-| `symbol_proc.html.erb`（`<% users.map { \|u\| u.name }.each do \|name\| %>`） | `Style/SymbolProc` | 出ない（除外） | `Style/SymbolProc` |
-| `escaped_tag.html.erb`（`<%%= link_to "a", a_path %>`） | `<%%=` の中身に `Style/StringLiterals` | 出ない | 出ない |
-| `multibyte.html.erb`（HTML と Ruby に絵文字と日本語） | 位置は正しい | 位置は正しく、`-A` の結果も元の位置に書き戻される | 同左 |
-| `reparse_cops_in_html.html.erb`（`<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)`） | 3 つとも出る | 3 つとも出て、`-A` で正しく修正 | `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない。`Style/TernaryParentheses` は出るが修正されない（下記） |
-| `disable_inline.html.erb`（タグの中の行末の `# rubocop:disable`） | 出ない | `Lint/CopDirectiveSyntax`（誤検知） | 出ない |
+| `control_flow/single_line_block`（`<%= cache "fragment" do %>…<% end %>`） | 出ない | `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`（誤検知） | 出ない（その行だけで無効にしている） |
+| `control_flow/cond_assign`（`if` / `else` の各分岐で `<% x = 1 %>`） | 出ない | `Style/ConditionalAssignment`（`x = if a … end` にせよ）。ERB には合わない指摘。修正は捨てられる | 出ない |
+| `control_flow/unless_else`（`unless` / `else` の本文が HTML） | 出ない | `Style/UnlessElse`。修正は捨てられる | `Style/UnlessElse` |
+| `style/empty_lines`（ERB タグの間に空行を含む HTML） | 出ない | 出ない（除外） | `Layout/EmptyLines`（誤検知） |
+| `output/symbol_proc_map`（`<% users.map { \|u\| u.name }.each do \|name\| %>`） | `Style/SymbolProc` | 出ない（除外） | `Style/SymbolProc` |
+| `output/escaped_tag`（`<%%= link_to "a", a_path %>`） | `<%%=` の中身に `Style/StringLiterals` | 出ない | 出ない |
+| `multibyte/emoji`（HTML と Ruby に絵文字と日本語） | 位置は正しい | 位置は正しく、`-A` の結果も元の位置に書き戻される | 同左 |
+| `style/reparse_cops_in_html`（`<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)`） | 3 つとも出る | 3 つとも出て、`-A` で正しく修正 | `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない。`Style/TernaryParentheses` は出るが修正されない（下記） |
+| `comment/commented_out_output`（`<% name = user.name # the full name %><%= name %>`） | 出ない | `Lint/UselessAssignment`。行末のコメントが後ろの `<%= name %>` をコメントにするので、ERB の実行結果と同じ | `Lint/UselessAssignment` と `Herb/CommentedOutCode` |
 
 ## 無効化コメントのサポート【実測】
 
-[repro/rubocop-erb-0.8/disable/](repro/rubocop-erb-0.8/disable/) の 6 ファイルで、`Style/StringLiterals` を無効にするコメントを書き方ごとに試した結果です。どのファイルも、コメントの後の行に `"a"` などの二重引用符の文字列があります。
+[repro/cases/rubocop_disable/](repro/cases/rubocop_disable/) の 6 ファイルで、`Style/StringLiterals` を無効にするコメントを書き方ごとに試した結果です。どのファイルも、コメントの後の行に `"a"` などの二重引用符の文字列があります。
 
 | ファイル | 書き方 | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|---|
@@ -143,24 +140,26 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 0.8 系は、HTML を空白にした Ruby（`Herb.extract_ruby` の出力）を RuboCop に渡します。rubocop-herb は、HTML を識別子にした Ruby を渡します。指摘の表示に違いが出るかを確かめました。
 
-- 指摘の行の表示（`--format clang` などのソースの抜粋とキャレット）は、3 つとも元の ERB の行になる。HTML やマルチバイト文字を含む行でも、HTML は空白にならず、キャレットの位置も同じ（`display/show.html.erb`）
+- 指摘の行の表示（`--format clang` などのソースの抜粋とキャレット）は、3 つとも元の ERB の行になる。HTML やマルチバイト文字を含む行でも、HTML は空白にならず、キャレットの位置も同じ（`multibyte/show`）
   - RuboCop 1.92 は、extractor が返した fragment で見つかった offense の範囲を、元のファイルのバッファに付け替えてから報告する（`RuboCop::Cop::Base#range_for_original`）。0.8 系も rubocop-herb も文字位置を元の ERB に揃えているので、付け替えた範囲がそのまま元の ERB の正しい位置になる
 - 実際のビュー 333 ファイルで、同じ位置に出た offense のメッセージは、0.8.2 と rubocop-herb で 1 件を除いて同じだった。違ったのは rails の `syntax_error.html.erb` の `Lint/Syntax` で、0.8.2 は「unexpected ';'; expected an argument」、rubocop-herb は「unexpected end-of-input; expected a `)` to close the arguments」
-- 構文エラーのメッセージには、ERB に書かれていない `;` が出ることがある。0.8.2 も rubocop-herb もタグの終わりに `;` を補うためで、`<p><%= link_to("a", path %></p>` には両方で「unexpected ';'; expected a `)` to close the arguments」が出る（`display/unclosed_paren.html.erb`）。キャレットは、0.8.2 では `%>` の `>` を、rubocop-herb では `%>` の前の空白を指す
-- メッセージにコードを引用する cop では、変換後の Ruby が出ることがある。rubocop-herb の `Style/IdenticalConditionalBranches` は、`<%= foo %>` について「Move `_ = foo` out of the conditional.」と報告する（`display/identical_branches.html.erb`）。`_ =` は rubocop-herb が `<%=` の位置に書く印で、ERB には書かれていない。0.8 系はこの cop を除外しているので出ない
+- 構文エラーのメッセージには、ERB に書かれていない `;` が出ることがある。0.8.2 も rubocop-herb もタグの終わりに `;` を補うためで、`<p><%= link_to("a", path %></p>` には両方で「unexpected ';'; expected a `)` to close the arguments」が出る（`syntax/unclosed_paren`）。キャレットは、0.8.2 では `%>` の `>` を、rubocop-herb では `%>` の前の空白を指す
+- メッセージにコードを引用する cop では、変換後の Ruby が出ることがある。rubocop-herb の `Style/IdenticalConditionalBranches` は、`<%= user.name %>` について「Move `_ = user.name` out of the conditional.」と報告する（`marker/duplicate_branch_ng`）。`_ =` は rubocop-herb が `<%=` の位置に書く印で、ERB には書かれていない。0.8 系はこの cop を除外しているので出ない
 
 ## autocorrect の結果【実測】
 
-既存の再現例と境界ケース（32 ファイル）で、`-a` と `-A` の前後を比べた結果です（[html_changes.rb](repro/herb-pr2260/html_changes.rb)。HTML は空白の違いを無視して比べる）。
+検証用 ERB（80 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
 
 | | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
 |---|---|---|---|
-| 0.7.2 `-a` | 15 | 0 | 0 |
-| 0.7.2 `-A` | 16 | 0 | 1 |
-| 0.8.2 `-a` | 18 | 0 | 0 |
-| 0.8.2 `-A` | 18 | 0 | 0 |
-| rubocop-herb `-a` | 18 | 0 | 0 |
-| rubocop-herb `-A` | 19 | 0 | 0 |
+| 0.7.2 `-a` | 29 | 0 | 0 |
+| 0.7.2 `-A` | 31 | 0 | 1 |
+| 0.8.2 `-a` | 30 | 0 | 0 |
+| 0.8.2 `-A` | 30 | 0 | 0 |
+| rubocop-herb `-a` | 30 | 0 | 1 |
+| rubocop-herb `-A` | 35 | 0 | 1 |
+
+0.7.2 の `-A` でパースエラーが増えたのは `control_flow/safe_navigation`（`user&&.admin?`）、rubocop-herb でパースエラーが増えたのは `output/empty_tag_after_output_tag`（出力タグの `%>` が消える。[report.md](report.md#未解決の問題実測)）です。
 
 `html_changes.rb` は HTML とパースエラーだけを見るので、Ruby の意味が変わる修正は数えていません。修正の中身は次のとおりです。
 
@@ -173,7 +172,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `<% unused = 1 %>`（未使用の変数） | 変わらない | `<% 1 %>` が残る（`Lint/Void` を除外しているので、offense も出ない） | タグごと消える |
 | `<% items.each do \|i\| %>`（`i` は未使用） | 変わらない | 変わらない | `\|_i\|` |
 | `<% if !foo.nil? then %>`…`<% else %>`⏎`<% end %>`（空の `else`） | 変わらない | `then` を消す。空の `else` は残る | `then` と空の `else` を消す |
-| `<%= cache "fragment" do %>This bit is cached<% end %>`（`rubocop-erb-0.8/edge/single_line_block.html.erb`） | `'fragment'` だけ | `<%= cache 'fragment' do`⏎` %>This bit is cached<% `⏎`end %>` | `'fragment'` だけ |
+| `<%= cache "fragment" do %>This bit is cached<% end %>`（`control_flow/single_line_block`） | `'fragment'` だけ | `<%= cache 'fragment' do`⏎` %>This bit is cached<% `⏎`end %>` | `'fragment'` だけ |
 
 - 0.8.2 で捨てられた修正（`Style/UnlessElse`、`Style/ConditionalAssignment` など）は、`[Correctable]` の表示のまま offense として残る
 - 0.8.2 の `Style/SingleLineDoEndBlock` の修正は、`do` の後と `end` の前に改行を入れる。範囲がそれぞれ 1 つのタグの Ruby に収まるので、検査を通る。改行はタグの中に入るので出力は変わらないが、`%>` が行頭に、`<% ` が行末の空白付きで残る
@@ -190,7 +189,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | うち HTML が変わったファイル | 0 | 0 | 0 |
 | `-A` でパースエラーが増えたファイル | 2 | 0 | 0 |
 | `-A` の後に残る offense | — | 9 | 123（うち `Layout/LineLength` 94） |
-| 実行時間（`--cache false`、検出のみ） | 6.0〜7.5 秒 | 2.2 秒 | 2.8 秒 |
+| 実行時間（`--cache false`、検出のみ） | 5.6 秒 | 2.0 秒 | 2.8 秒 |
 
 ### 0.7.2 と 0.8.2 の違い
 
@@ -237,7 +236,7 @@ end %>
 
 conference-app の `admin/talks/index.html.erb` の `<%= link_to "All events talks", admin_talks_path(), class: "…" %>` に、0.7.2 と 0.8.2 は `Style/MethodCallWithoutArgsParentheses` を出しますが、rubocop-herb は出しません。
 
-- RuboCop 1.92.0 の `Style/MethodCallWithoutArgsParentheses` は、括弧を外した結果をパースし直し、AST が変わらないことを確かめてから offense を出す（`ReparsedEquivalence`）。`Style/RedundantParentheses` も同じ確認をし、`Style/TernaryParentheses` は修正の前に同じ確認をする
+- RuboCop 1.92 の `Style/MethodCallWithoutArgsParentheses` は、括弧を外した結果をパースし直し、AST が変わらないことを確かめてから offense を出す（`ReparsedEquivalence`）。`Style/RedundantParentheses` も同じ確認をし、`Style/TernaryParentheses` は修正の前に同じ確認をする
 - rubocop-herb は、AST の HTML の識別子の名前を書き換える（`div` → `div__html0`）。パースし直した AST は書き換えないので、元の AST と一致せず、確認が必ず失敗する
 - 結果として、HTML を 1 つでも含むテンプレートでは、`Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` の offense が消え、`Style/TernaryParentheses` は offense は出るものの修正されない。HTML を含まないテンプレートでは起きない
 - 実際のビューでは、`Style/TernaryParentheses` の `<%= (name == trace_to_show) ? 'block' : 'none' %>`（rails の `rescues/_trace.html.erb`）を、0.8.2 は `-a` で修正し、rubocop-herb は修正しない

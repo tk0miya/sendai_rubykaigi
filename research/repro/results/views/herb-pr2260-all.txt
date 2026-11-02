@@ -1,0 +1,6 @@
+29  Lint/EmptyBlock
+14  Lint/Syntax
+7   Lint/Void [Safe Correctable]
+2   Naming/VariableNumber
+1   Style/SafeNavigationChainLength
+53  Total in 33 files

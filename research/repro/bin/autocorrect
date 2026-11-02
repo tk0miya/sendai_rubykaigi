@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# 検証用 ERB のコピーに autocorrect をかけ、元との違いを表示する
+#
+#   bin/autocorrect TOOL OPTIONS... [-- PATHS...]
+#
+#   bin/autocorrect rubocop-herb -a
+#   bin/autocorrect herb-pr2260 -A -- cases/marker
+#   bin/autocorrect ruumba --auto-correct --only Style/NilComparison
+#
+# PATHS（既定は cases）を work/TOOL/ にコピーし、そこで bin/lint TOOL OPTIONS... を実行する。
+# その後、書き換わったファイルの diff と、bin/html_changes.rb の結果（HTML が変わったファイルと
+# Herb のパースエラーが増えたファイルの数）を表示する。
+#
+# コピーは research/repro の中に置く。rubocop は、設定ファイルの `**/*.erb` などのパターンを
+# カレントディレクトリからの相対パスで照合するので、外に置くと除外の設定が効かなくなる。
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+tool="${1:?usage: bin/autocorrect TOOL OPTIONS... [-- PATHS...]}"
+shift
+
+options=()
+while [[ $# -gt 0 && "$1" != "--" ]]; do
+  options+=("$1")
+  shift
+done
+[[ $# -gt 0 ]] && shift
+paths=("$@")
+[[ ${#paths[@]} -eq 0 ]] && paths=(cases)
+
+work="work/$tool"
+rm -rf "$work"
+mkdir -p "$work/orig" "$work/corrected"
+for path in "${paths[@]}"; do
+  mkdir -p "$work/orig/$(dirname "$path")"
+  cp -R "$path" "$work/orig/$(dirname "$path")/"
+done
+cp -R "$work/orig/." "$work/corrected/"
+
+bin/lint "$tool" "${options[@]}" "$work/corrected" > "$work/output.txt" || true
+
+diff -ru "$work/orig" "$work/corrected" || true
+BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec ruby bin/html_changes.rb "$work/orig" "$work/corrected"

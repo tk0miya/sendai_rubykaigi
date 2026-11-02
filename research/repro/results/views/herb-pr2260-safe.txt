@@ -1,0 +1,12 @@
+29  Lint/EmptyBlock
+14  Lint/Syntax
+7   Lint/Void [Safe Correctable]
+6   Style/SymbolProc [Unsafe Correctable]
+3   Lint/AssignmentInCondition [Unsafe Correctable]
+3   Style/HashEachMethods [Unsafe Correctable]
+3   Style/SafeNavigation [Unsafe Correctable]
+2   Naming/VariableNumber
+1   Style/NumericPredicate [Unsafe Correctable]
+1   Style/SafeNavigationChainLength
+1   Style/StringConcatenation [Unsafe Correctable]
+70  Total in 47 files

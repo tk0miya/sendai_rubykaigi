@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Plain Ruby equivalent of erb_lint/recommended/*.html.erb
+# Plain Ruby equivalent of cases/control_flow/{nil_comparison,if_then_elsif_else,unused_block_arg}.html.erb
 if foo == nil
   puts 'yes'
 end

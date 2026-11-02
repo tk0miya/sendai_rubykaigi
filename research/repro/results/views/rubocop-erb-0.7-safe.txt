@@ -1,0 +1,7 @@
+2  Style/SafeNavigation [Unsafe Correctable]
+1  Style/DoubleNegation [Unsafe Correctable]
+1  Style/NumericPredicate [Unsafe Correctable]
+1  Style/SafeNavigationChainLength
+1  Style/StringConcatenation [Unsafe Correctable]
+1  Style/SymbolProc [Unsafe Correctable]
+7  Total in 7 files

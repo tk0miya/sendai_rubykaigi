@@ -1,0 +1,8 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# herb はビルド済みの gem（arm64-darwin など）を使う。BUNDLE_FROZEN=true bundle install で入れる
+gem "herb", "0.11.1"
+gem "rubocop", "1.92.1"
+gem "rubocop-erb", "0.8.2"

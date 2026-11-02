@@ -1,0 +1,11 @@
+3   Lint/AssignmentInCondition [Unsafe Correctable]
+3   Naming/FileName
+2   Lint/LiteralAsCondition [Safe Correctable]
+2   Naming/VariableNumber
+1   Lint/Syntax
+1   Style/DoubleNegation [Unsafe Correctable]
+1   Style/HashEachMethods [Unsafe Correctable]
+1   Style/NumericPredicate [Unsafe Correctable]
+1   Style/SafeNavigationChainLength
+1   Style/StringConcatenation [Unsafe Correctable]
+16  Total in 15 files

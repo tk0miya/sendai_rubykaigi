@@ -1,0 +1,6 @@
+3  Naming/FileName
+2  Lint/LiteralAsCondition [Safe Correctable]
+2  Naming/VariableNumber
+1  Lint/Syntax
+1  Style/SafeNavigationChainLength
+9  Total in 8 files

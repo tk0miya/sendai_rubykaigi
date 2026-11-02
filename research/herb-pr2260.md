@@ -3,17 +3,16 @@
 調査日: 2026-11-03
 
 herb 本体のリポジトリに提案されている RuboCop プラグイン（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)、以下「PR 版」）を、tk0miya/rubocop-herb（以下「rubocop-herb」）と比べた結果です。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#herb-pr-2260)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
 
 ## 対象
 
 - PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head。Draft）の `gems/rubocop-herb`
 - rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
-- PR 版は herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.91.0、rubocop-herb は herb 0.11.1 / rubocop 1.92.1（同リポジトリの `Gemfile.lock`）。ruby 4.0.5
-- 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/herb-pr2260/](repro/herb-pr2260/)）
+- rubocop 1.92.1 / ruby 4.0.5。herb は、PR 版が 0.11.0（gemspec で固定。rubygems のビルド済み gem）、rubocop-herb が 0.11.1
+- 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/tools/](repro/tools/)）
 - 入力
-  - [repro/](repro/) の既存ツールの再現例（20 ファイル）
-  - 境界ケース（[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/)、12 ファイル）
+  - 検証用 ERB（[repro/cases/](repro/cases/)、80 ファイル）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -93,47 +92,51 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 | `<%# rubocop:disable … %>` | 効かない（コメントは空白になる）。タグの中の行末のコメントは効く【実測】 | 効く【実測】 |
 | herb-lint の実行 | なし（PR の対象外） | `Herb/Linting` cop |
 
-## 既存の再現例での結果【実測】
+## 検証用 ERB での結果【実測】
 
-`erb_lint`、`rubocop-erb`、`ruumba`、`herb/app` の 20 ファイルにかけた結果です。
+[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint herb-pr2260`、`bin/lint rubocop-herb --except Herb/Linting`）。
 
 | | PR 版 | rubocop-herb |
 |---|---|---|
-| offense の数 | 88 | 28 |
-| `Layout/ExtraSpacing` | 55 | 0 |
+| offense の数 | 309 | 88 |
+| `Layout/ExtraSpacing` | 202 | 0 |
 
 `Layout/ExtraSpacing` を除くと、次の offense が片方にだけ出ます。
 
-PR 版だけに出るもの（すべて誤検知）:
+PR 版だけに出るもの:
 
 | cop | 例 | 理由 |
 |---|---|---|
-| `Layout/ExtraSpacing`（55 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
-| `Lint/Void`（4 件） | `<p><%= total %></p>`、`<%= name %>: <%= count -1 %>`、`<%= user.name.nil? ? "anon" : user.name %>` | 出力する式が、ただの式文になる |
-| `Style/SymbolProc`（3 件） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
-| `Lint/EmptyBlock`（1 件） | `<% items.each do \|i\| %><li>item</li><% end %>` | 本文の HTML が空白になる |
+| `Layout/ExtraSpacing`（202 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
+| `Lint/Void`（9 ファイル） | `<p><%= total %></p>`、`<%= name %>: <%= count -1 %>`、`<%= user.name.nil? ? "anon" : user.name %>`、`<p><%= count + 1 %> items</p>` | 出力する式が、ただの式文になる |
+| `Style/SymbolProc`（5 ファイル） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
+| `Lint/EmptyBlock`（3 ファイル） | `<% items.each do \|i\| %><li>item</li><% end %>`、1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 本文の HTML が空白になる |
+| `Lint/EmptyWhen`（2 件） | `case` / `when` の本文が HTML だけ（`control_flow/case_when`） | 同上 |
+| `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 同上 |
+| `Style/ConditionalAssignment` | `if` / `else` の各分岐で `<% x = 1 %>`（`control_flow/cond_assign`） | ERB には合わない指摘 |
+| `Style/SafeNavigation`、`Style/SoleNestedConditional`、`Lint/DuplicateBranch`、`Style/CombinableLoops` | `marker/` の ERB として正しい側（[ruby-rendering.md](ruby-rendering.md)） | HTML が空白になり、直すべきテンプレートと同じ Ruby になる |
+| `Lint/LiteralAsCondition`、`Style/StringLiterals`、`Lint/CopDirectiveSyntax` | `<%# rubocop:disable … %>` などで無効にした cop | 無効化コメントが効かない（[erb-comment-directive.md](erb-comment-directive.md)） |
+| `Style/MethodCallWithoutArgsParentheses`, `Style/RedundantParentheses` | `<div>` の中の `root_path()`、`(foo)`（`style/reparse_cops_in_html`） | 妥当な指摘。rubocop-herb の見逃し（[report.md](report.md#未解決の問題実測)） |
 
 rubocop-herb だけに出るもの:
 
 | cop | 例 | |
 |---|---|---|
 | `Lint/UnusedBlockArgument` | 上の `\|i\|` | PR 版は本文が空のブロックとみなすので出ない |
-| `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` | PR 版はファイル全体で除外している |
+| `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `control_flow/if_then_elsif_else` の本当に空の `else` / `unless`、`marker/` の直すべき側 | PR 版はファイル全体で除外している |
+| `Style/IdenticalConditionalBranches` | 2 つの分岐の最後が同じ `<%= user.name %>`（`marker/duplicate_branch_*`） | PR 版はファイル全体で除外している |
+| `Style/CommentAnnotation` | `<% # note %>`（`comment/ruby_comment`） | PR 版では空白になる。rubocop-herb は Ruby のコメントとして扱う |
+| `Lint/MissingCopEnableDirective` | `<%# rubocop:disable Style/StringLiterals %>` | rubocop-herb では無効化が効き、`rubocop:enable` がないことを報告する |
+| `Herb/CommentedOutCode`、`Herb/IgnoredCopDirective`、`Herb/EmptyErbTag` | 行末のコメントが後ろのタグを隠す例、空のタグ | rubocop-herb の cop |
 
-## 境界ケースでの結果【実測】
-
-[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/) の 12 ファイルの結果です。
-
-- マルチバイト文字: `<p>日本語 <%= x=1 %></p>` と `<%# 日本語のコメント %>` の次の行で、両方とも offense の位置は正しく、`-a` の結果も元の位置に書き戻される
-- `case` / `when` の本文が HTML だけのとき、PR 版では各 `when` に `Lint/EmptyWhen` が出る
-- `<% # note %>` は、PR 版では空白になる。rubocop-herb では Ruby のコメントとして扱われ、`Style/CommentAnnotation` が出る
-- `<%# rubocop:disable Style/StringLiterals %>` は、PR 版では効かない。`<% x = "b" # rubocop:disable Style/StringLiterals %>` は、両方で効く
+- マルチバイト文字（`<p>日本語 <%= x=1 %></p>` や `<%# 日本語のコメント %>` の次の行）では、両方とも offense の位置は正しく、`-a` の結果も元の位置に書き戻される
+- タグの中の行末のコメント `<% x = "b" # rubocop:disable Style/StringLiterals %>` は、両方で効く。PR 版では `Lint/CopDirectiveSyntax` も出る
 
 ## autocorrect の結果【実測】
 
 PR 版は、`-a` でも次のようにテンプレートを壊します。ファイルごとの `-a` の前後です。
 
-`repro/herb-pr2260/edge/two_tags_line.html.erb`:
+`repro/cases/output/two_tags_line.html.erb`:
 
 ```erb
 <td><%= user.name %></td><td><%= user.email %></td>
@@ -145,7 +148,7 @@ PR 版は、`-a` でも次のようにテンプレートを壊します。ファ
 <td><%= user.name%> user.email%></td>
 ```
 
-`repro/herb-pr2260/edge/inline_if.html.erb`:
+`repro/cases/control_flow/inline_if.html.erb`:
 
 ```erb
 <% if a %>A<% else %>B<% end %>
@@ -157,7 +160,7 @@ PR 版は、`-a` でも次のようにテンプレートを壊します。ファ
 <% if a%> else%> end%>
 ```
 
-`repro/herb/app/views/samples/cross_tag_variables.html.erb`:
+`repro/cases/variables/cross_tag_variables.html.erb`:
 
 ```erb
 <% total = items.sum(&:price) %>
@@ -182,14 +185,16 @@ PR 版は、`-a` でも次のようにテンプレートを壊します。ファ
 - 修正対象ではないタグでも、`%>` の前の空白が `Layout/ExtraSpacing` で削除される（`<% end %>` → `<% end%>`）
 - `-A` では、さらに `Style/SymbolProc` で、`cross_tag_variables.html.erb` の出力するブロックが `<% items.each(&:name)%>` になり、出力がなくなる
 
-再現例と境界ケース（32 ファイル）で、`-a` の前後を比べた結果です（[html_changes.rb](repro/herb-pr2260/html_changes.rb)。HTML は空白の違いを無視して比べる）。
+検証用 ERB（80 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
 
 | | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
 |---|---|---|---|
-| PR 版 `-a` | 31 | 8 | 8 |
-| PR 版 `-A` | 31 | 8 | 8 |
-| rubocop-herb `-a` | 18 | 0 | 0 |
-| rubocop-herb `-A` | 19 | 0 | 0 |
+| PR 版 `-a` | 73 | 24 | 19 |
+| PR 版 `-A` | 73 | 27 | 19 |
+| rubocop-herb `-a` | 30 | 0 | 1 |
+| rubocop-herb `-A` | 35 | 0 | 1 |
+
+rubocop-herb でパースエラーが増えた 1 ファイルは、`output/empty_tag_after_output_tag`（`<% %>`⏎`<%= b %><% %>`）です。2 つの cop の修正が重なって、出力タグの `%>` が消えます（[report.md](report.md#未解決の問題実測)）。
 
 `html_changes.rb` は HTML とパースエラーだけを見るので、`Style/SymbolProc` で出力がなくなるような変化は数えていません。
 
@@ -203,7 +208,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `-a` で書き換わったファイル | 251 | 140 |
 | うち HTML が変わったファイル | 63 | 0 |
 | うちパースエラーが増えたファイル | 59 | 0 |
-| 実行時間（`--cache false`、検出のみ） | 1.9 秒 | 2.8 秒 |
+| 実行時間（`--cache false`、検出のみ） | 1.8 秒 | 2.8 秒 |
 
 片方にだけ多く出る cop:
 

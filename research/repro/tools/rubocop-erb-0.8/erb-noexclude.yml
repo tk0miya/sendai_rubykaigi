@@ -1,0 +1,130 @@
+# rubocop-erb 0.8.2 が **/*.erb から除外している 65 個の cop のうち、Rails/Presence（rubocop-rails を入れていない）を除く 64 個を、ERB にもかける設定
+inherit_from: erb.yml
+Layout/ArgumentAlignment:
+  Exclude: []
+Layout/ArrayAlignment:
+  Exclude: []
+Layout/BlockAlignment:
+  Exclude: []
+Layout/ClosingParenthesisIndentation:
+  Exclude: []
+Layout/CommentIndentation:
+  Exclude: []
+Layout/InitialIndentation:
+  Exclude: []
+Layout/ElseAlignment:
+  Exclude: []
+Layout/EmptyLines:
+  Exclude: []
+Layout/EmptyLinesAroundBlockBody:
+  Exclude: []
+Layout/EmptyLineAfterGuardClause:
+  Exclude: []
+Layout/EndAlignment:
+  Exclude: []
+Layout/ExtraSpacing:
+  Exclude: []
+Layout/FirstArgumentIndentation:
+  Exclude: []
+Layout/FirstArrayElementIndentation:
+  Exclude: []
+Layout/FirstArrayElementLineBreak:
+  Exclude: []
+Layout/FirstHashElementIndentation:
+  Exclude: []
+Layout/FirstHashElementLineBreak:
+  Exclude: []
+Layout/FirstMethodArgumentLineBreak:
+  Exclude: []
+Layout/FirstParameterIndentation:
+  Exclude: []
+Layout/HashAlignment:
+  Exclude: []
+Layout/IndentationConsistency:
+  Exclude: []
+Layout/IndentationWidth:
+  Exclude: []
+Layout/LeadingEmptyLines:
+  Exclude: []
+Layout/LineEndStringConcatenationIndentation:
+  Exclude: []
+Layout/LineLength:
+  Exclude: []
+Layout/MultilineArrayBraceLayout:
+  Exclude: []
+Layout/MultilineAssignmentLayout:
+  Exclude: []
+Layout/MultilineBlockLayout:
+  Exclude: []
+Layout/MultilineHashBraceLayout:
+  Exclude: []
+Layout/MultilineMethodCallBraceLayout:
+  Exclude: []
+Layout/MultilineMethodCallIndentation:
+  Exclude: []
+Layout/MultilineMethodDefinitionBraceLayout:
+  Exclude: []
+Layout/MultilineOperationIndentation:
+  Exclude: []
+Layout/ParameterAlignment:
+  Exclude: []
+Layout/SpaceBeforeSemicolon:
+  Exclude: []
+Layout/TrailingEmptyLines:
+  Exclude: []
+Layout/TrailingWhitespace:
+  Exclude: []
+Lint/DuplicateBranch:
+  Exclude: []
+Lint/EmptyBlock:
+  Exclude: []
+Lint/EmptyConditionalBody:
+  Exclude: []
+Lint/EmptyFile:
+  Exclude: []
+Lint/EmptyWhen:
+  Exclude: []
+Lint/Void:
+  Exclude: []
+Style/EmptyElse:
+  Exclude: []
+Style/FrozenStringLiteralComment:
+  Exclude: []
+Style/IdenticalConditionalBranches:
+  Exclude: []
+Style/IfInsideElse:
+  Exclude: []
+Style/IfUnlessModifier:
+  Exclude: []
+Style/IfWithSemicolon:
+  Exclude: []
+Style/MultilineTernaryOperator:
+  Exclude: []
+Style/NestedTernaryOperator:
+  Exclude: []
+Style/Next:
+  Exclude: []
+Style/ParallelAssignment:
+  Exclude: []
+Style/RedundantCondition:
+  Exclude: []
+Style/RescueModifier:
+  Exclude: []
+Style/SafeNavigation:
+  Exclude: []
+Style/Semicolon:
+  Exclude: []
+Style/SoleNestedConditional:
+  Exclude: []
+Style/SymbolProc:
+  Exclude: []
+Style/TrailingCommaInArguments:
+  Exclude: []
+Style/TrailingCommaInArrayLiteral:
+  Exclude: []
+Style/TrailingCommaInHashLiteral:
+  Exclude: []
+Style/WhileUntilDo:
+  Exclude: []
+Style/WhileUntilModifier:
+  Exclude: []

@@ -1,0 +1,1083 @@
+cases/comment/commented_out_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_end.html.erb:1:55: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_output.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/comment/commented_out_output.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/comment/commented_out_output.html.erb:1:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `name`.
+cases/comment/ruby_comment.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/comment/ruby_comment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/comment/ruby_comment.html.erb:2:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/comment/ruby_comment.html.erb:2:5: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/comment/ruby_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/comment/ruby_comment.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/comment/ruby_comment.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/case_when.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/case_when.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/case_when.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:1:15: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/case_when.html.erb:1:17: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/case_when.html.erb:2:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
+cases/control_flow/case_when.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:2:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/case_when.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/case_when.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/case_when.html.erb:4:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
+cases/control_flow/case_when.html.erb:4:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:4:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/case_when.html.erb:4:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/case_when.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/case_when.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/case_when.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/cond_assign.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/cond_assign.html.erb:1:4: C: Style/ConditionalAssignment: Use the return of the conditional for variable assignment and comparison.
+cases/control_flow/cond_assign.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if a;` - use a ternary operator instead.
+cases/control_flow/cond_assign.html.erb:1:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:1:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:1:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:2:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:4:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:4:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:4:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/cond_assign.html.erb:6:5: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/control_flow/cond_assign.html.erb:6:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:6:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/cond_assign.html.erb:6:8: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/form_block.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/form_block.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/form_block.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:1:34: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/form_block.html.erb:1:36: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/form_block.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/control_flow/form_block.html.erb:2:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:2:25: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/form_block.html.erb:2:27: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/form_block.html.erb:3:4: C: [Correctable] Layout/BlockAlignment: `end` at 3, 3 is not aligned with `form_with model: @user do |f|  ;` at 1, 4.
+cases/control_flow/form_block.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/form_block.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/if_then_elsif_else.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/if_then_elsif_else.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/control_flow/if_then_elsif_else.html.erb:1:17: C: [Correctable] Style/MultilineIfThen: Do not use `then` for multi-line `if`.
+cases/control_flow/if_then_elsif_else.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:1:21: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:1:23: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/if_then_elsif_else.html.erb:3:4: W: Lint/EmptyConditionalBody: Avoid `elsif` branches without a body.
+cases/control_flow/if_then_elsif_else.html.erb:3:14: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/if_then_elsif_else.html.erb:3:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:3:20: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:3:22: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/if_then_elsif_else.html.erb:5:4: C: Style/EmptyElse: Redundant `else`-clause.
+cases/control_flow/if_then_elsif_else.html.erb:5:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:5:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:7:4: C: [Correctable] Style/NegatedUnless: Favor `if` over `unless` for negative conditions.
+cases/control_flow/if_then_elsif_else.html.erb:7:4: C: Style/IfWithSemicolon: Do not use `unless !x;` - use a ternary operator instead.
+cases/control_flow/if_then_elsif_else.html.erb:7:4: W: Lint/EmptyConditionalBody: Avoid `unless` branches without a body.
+cases/control_flow/if_then_elsif_else.html.erb:7:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:7:13: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:7:15: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/if_then_elsif_else.html.erb:8:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:8:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/if_then_elsif_else.html.erb:8:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/inline_if.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/inline_if.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/inline_if.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if a;` - use a ternary operator instead.
+cases/control_flow/inline_if.html.erb:1:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/inline_if.html.erb:1:11: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:15: C: Style/EmptyElse: Redundant `else`-clause.
+cases/control_flow/inline_if.html.erb:1:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:19: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/inline_if.html.erb:1:22: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:29: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:29: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/inline_if.html.erb:1:31: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/negated_if.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/negated_if.html.erb:1:4: C: [Correctable] Style/NegatedIf: Favor `unless` over `if` for negative conditions.
+cases/control_flow/negated_if.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/negated_if.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if !user.nil?;` - use a ternary operator instead.
+cases/control_flow/negated_if.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/control_flow/negated_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/negated_if.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/negated_if.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/negated_if.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/negated_if.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/negated_if.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/negated_if.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/nil_comparison.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/nil_comparison.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/nil_comparison.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if foo == nil;` - use a ternary operator instead.
+cases/control_flow/nil_comparison.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/nil_comparison.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/nil_comparison.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/nil_comparison.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/nil_comparison.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/nil_comparison.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/nil_comparison.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/nil_comparison.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/safe_navigation.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/safe_navigation.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/safe_navigation.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user && user.admin?;` - use a ternary operator instead.
+cases/control_flow/safe_navigation.html.erb:1:7: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/control_flow/safe_navigation.html.erb:1:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:26: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/safe_navigation.html.erb:1:29: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:37: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:37: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/safe_navigation.html.erb:1:39: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/single_line_block.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/single_line_block.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/single_line_block.html.erb:1:5: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/single_line_block.html.erb:1:27: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:51: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:51: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/single_line_block.html.erb:1:53: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/trim.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/trim.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/trim.html.erb:1:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:1:25: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/trim.html.erb:1:27: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/trim.html.erb:1:28: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/trim.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:2:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/trim.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/trim.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/trim.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/trim.html.erb:3:11: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/unless_else.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unless_else.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unless_else.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `unless foo;` - use a ternary operator instead.
+cases/control_flow/unless_else.html.erb:1:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/control_flow/unless_else.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `unless` branches without a body.
+cases/control_flow/unless_else.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/unless_else.html.erb:1:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/unless_else.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/unless_else.html.erb:3:4: C: Style/EmptyElse: Redundant `else`-clause.
+cases/control_flow/unless_else.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/unless_else.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/unless_else.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/unless_else.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/unless_else.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/unused_block_arg.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unused_block_arg.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unused_block_arg.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/unused_block_arg.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg.html.erb:1:21: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/unused_block_arg.html.erb:1:23: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/control_flow/unused_block_arg.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/unused_block_arg.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/unused_block_arg.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/after_if.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/after_if.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/after_if.html.erb:2:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/after_if.html.erb:2:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/erb_comment/after_if.html.erb:2:6: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/after_if.html.erb:2:6: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/erb_comment/after_if.html.erb:2:9: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/after_if.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/after_if.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/after_if.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/after_if.html.erb:2:19: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/after_if.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/after_if.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/after_if.html.erb:4:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/after_if.html.erb:4:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/after_if.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/erb_comment/after_if.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/empty_if.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/empty_if.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/empty_if.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if some_error;` - use a ternary operator instead.
+cases/erb_comment/empty_if.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/erb_comment/empty_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/empty_if.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/empty_if.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/empty_if.html.erb:1:20: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/empty_if.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/empty_if.html.erb:2:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/empty_if.html.erb:2:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/indent.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/indent.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:4:8: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/indent.html.erb:4:8: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/erb_comment/indent.html.erb:4:8: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/indent.html.erb:4:8: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/erb_comment/indent.html.erb:4:11: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/indent.html.erb:4:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/indent.html.erb:4:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/indent.html.erb:4:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/indent.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:6:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:7:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/indent.html.erb:7:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/indent.html.erb:7:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/indent.html.erb:8:1: C: Layout/TrailingEmptyLines: 2 trailing blank lines detected.
+cases/erb_comment/indent.html.erb:8:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/indent.html.erb:9:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/leading.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/leading.html.erb:1:50: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/leading.html.erb:1:50: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/leading.html.erb:1:53: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/leading.html.erb:1:60: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:60: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/leading.html.erb:1:63: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:74: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:74: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/leading.html.erb:1:76: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_comment.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_comment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/multiline_comment.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_comment.html.erb:3:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_comment.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_comment.html.erb:5:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/multiline_comment.html.erb:5:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/erb_comment/multiline_comment.html.erb:5:6: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/multiline_comment.html.erb:5:6: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/erb_comment/multiline_comment.html.erb:5:9: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/multiline_comment.html.erb:5:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_comment.html.erb:5:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/multiline_comment.html.erb:5:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_comment.html.erb:6:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_comment.html.erb:7:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_comment.html.erb:7:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/multiline_comment.html.erb:7:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_comment.html.erb:8:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/erb_comment/multiline_comment.html.erb:8:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_tag.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/multiline_tag.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_tag.html.erb:3:5: C: [Correctable] Layout/CommentIndentation: Incorrect indentation detected (column 4 instead of 3).
+cases/erb_comment/multiline_tag.html.erb:3:5: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/erb_comment/multiline_tag.html.erb:3:5: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.
+cases/erb_comment/multiline_tag.html.erb:4:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/multiline_tag.html.erb:4:4: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_tag.html.erb:5:6: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/multiline_tag.html.erb:5:6: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/erb_comment/multiline_tag.html.erb:5:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_tag.html.erb:5:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/multiline_tag.html.erb:5:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_tag.html.erb:6:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/multiline_tag.html.erb:7:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_tag.html.erb:7:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/multiline_tag.html.erb:7:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/multiline_tag.html.erb:8:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/erb_comment/multiline_tag.html.erb:8:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/not_erb_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/not_erb_tag.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/not_erb_tag.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/not_erb_tag.html.erb:1:7: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/not_erb_tag.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/not_erb_tag.html.erb:1:17: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:28: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/not_erb_tag.html.erb:1:30: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/not_erb_tag.html.erb:1:31: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/trailing_in_tag.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/trailing_in_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/trailing_in_tag.html.erb:2:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/trailing_in_tag.html.erb:2:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/erb_comment/trailing_in_tag.html.erb:2:17: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/erb_comment/trailing_in_tag.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/trailing_in_tag.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing_in_tag.html.erb:4:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/trailing_in_tag.html.erb:4:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/trailing_in_tag.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/erb_comment/trailing_in_tag.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/erb_comment/trailing.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/erb_comment/trailing.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/erb_comment/trailing.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if 'hello';` - use a ternary operator instead.
+cases/erb_comment/trailing.html.erb:1:7: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/trailing.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/trailing.html.erb:1:17: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:28: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/erb_comment/trailing.html.erb:1:30: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/erb_comment/trailing.html.erb:1:31: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/empty_if.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/herb_disable/empty_if.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/herb_disable/empty_if.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if some_error;` - use a ternary operator instead.
+cases/herb_disable/empty_if.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/herb_disable/empty_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/empty_if.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/herb_disable/empty_if.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/herb_disable/empty_if.html.erb:1:20: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/empty_if.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/empty_if.html.erb:2:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/herb_disable/empty_if.html.erb:2:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/herb_disable/if_sibling.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/if_sibling.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/herb_disable/if_sibling.html.erb:2:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/herb_disable/if_sibling.html.erb:2:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/herb_disable/if_sibling.html.erb:2:6: C: Style/IfWithSemicolon: Do not use `if some_error;` - use a ternary operator instead.
+cases/herb_disable/if_sibling.html.erb:2:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:19: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/herb_disable/if_sibling.html.erb:2:22: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:73: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:73: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/herb_disable/if_sibling.html.erb:2:75: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/herb_disable/if_sibling.html.erb:3:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/herb_disable/if_sibling.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/img.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/img.html.erb:1:2: C: Layout/TrailingEmptyLines: 3 trailing blank lines detected.
+cases/herb_disable/img.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/img.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/img.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/same_anchor.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/same_anchor.html.erb:1:2: C: Layout/TrailingEmptyLines: 3 trailing blank lines detected.
+cases/herb_disable/same_anchor.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/same_anchor.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/herb_disable/same_anchor.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/combinable_loops_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/combinable_loops_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/combinable_loops_ng.html.erb:1:15: C: Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ng.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:1:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:1:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ng.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/combinable_loops_ng.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ng.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ng.html.erb:4:4: C: Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/combinable_loops_ng.html.erb:4:15: C: Style/SymbolProc: Pass `&:price` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ng.html.erb:4:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:4:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:4:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ng.html.erb:5:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/combinable_loops_ng.html.erb:5:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:5:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:5:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ng.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ng.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/combinable_loops_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/combinable_loops_ok.html.erb:1:15: C: Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ok.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:1:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:1:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/combinable_loops_ok.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/combinable_loops_ok.html.erb:5:4: C: Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/combinable_loops_ok.html.erb:5:15: C: Style/SymbolProc: Pass `&:price` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ok.html.erb:5:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:5:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:5:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:6:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/combinable_loops_ok.html.erb:6:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:6:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:6:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/combinable_loops_ok.html.erb:7:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:7:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/combinable_loops_ok.html.erb:7:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/duplicate_branch_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/duplicate_branch_ng.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if morning?;` - use a ternary operator instead.
+cases/marker/duplicate_branch_ng.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:1:15: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ng.html.erb:1:17: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ng.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/duplicate_branch_ng.html.erb:2:7: C: Style/IdenticalConditionalBranches: Move `user.name` out of the conditional.
+cases/marker/duplicate_branch_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ng.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ng.html.erb:3:4: W: Lint/DuplicateBranch: Duplicate branch body detected.
+cases/marker/duplicate_branch_ng.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ng.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ng.html.erb:4:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/duplicate_branch_ng.html.erb:4:7: C: Style/IdenticalConditionalBranches: Move `user.name` out of the conditional.
+cases/marker/duplicate_branch_ng.html.erb:4:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:4:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ng.html.erb:4:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ng.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ng.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/duplicate_branch_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/duplicate_branch_ok.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if morning?;` - use a ternary operator instead.
+cases/marker/duplicate_branch_ok.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:1:15: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ok.html.erb:1:17: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ok.html.erb:2:4: C: Layout/IndentationWidth: Use 2 (not 17) spaces for indentation.
+cases/marker/duplicate_branch_ok.html.erb:2:21: C: Style/IdenticalConditionalBranches: Move `user.name` out of the conditional.
+cases/marker/duplicate_branch_ok.html.erb:2:30: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:2:30: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ok.html.erb:2:32: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ok.html.erb:3:4: W: Lint/DuplicateBranch: Duplicate branch body detected.
+cases/marker/duplicate_branch_ok.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ok.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ok.html.erb:4:4: C: Layout/IndentationWidth: Use 2 (not 10) spaces for indentation.
+cases/marker/duplicate_branch_ok.html.erb:4:14: C: Style/IdenticalConditionalBranches: Move `user.name` out of the conditional.
+cases/marker/duplicate_branch_ok.html.erb:4:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:4:23: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ok.html.erb:4:25: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/duplicate_branch_ok.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/duplicate_branch_ok.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_block_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_block_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_block_ng.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/marker/empty_block_ng.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ng.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_block_ng.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_block_ng.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ng.html.erb:2:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_block_ng.html.erb:2:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_block_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_block_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_block_ok.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/marker/empty_block_ok.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ok.html.erb:1:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_block_ok.html.erb:1:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_block_ok.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/empty_block_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ok.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_block_ok.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_conditional_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_conditional_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_conditional_ng.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user.admin?;` - use a ternary operator instead.
+cases/marker/empty_conditional_ng.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/marker/empty_conditional_ng.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ng.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_conditional_ng.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_conditional_ng.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ng.html.erb:2:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_conditional_ng.html.erb:2:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_conditional_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_conditional_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_conditional_ok.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user.admin?;` - use a ternary operator instead.
+cases/marker/empty_conditional_ok.html.erb:1:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/marker/empty_conditional_ok.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ok.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_conditional_ok.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_conditional_ok.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/empty_conditional_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ok.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_conditional_ok.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_else_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_else_ng.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user.admin?;` - use a ternary operator instead.
+cases/marker/empty_else_ng.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ng.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ng.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/empty_else_ng.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/empty_else_ng.html.erb:2:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:2:34: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ng.html.erb:2:36: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ng.html.erb:3:4: C: Style/EmptyElse: Redundant `else`-clause.
+cases/marker/empty_else_ng.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ng.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ng.html.erb:4:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:4:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ng.html.erb:4:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/empty_else_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/empty_else_ok.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user.admin?;` - use a ternary operator instead.
+cases/marker/empty_else_ok.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ok.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ok.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/empty_else_ok.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/empty_else_ok.html.erb:2:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:2:34: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ok.html.erb:2:36: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ok.html.erb:3:4: C: Style/EmptyElse: Redundant `else`-clause.
+cases/marker/empty_else_ok.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:3:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ok.html.erb:3:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/empty_else_ok.html.erb:4:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/empty_else_ok.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/empty_else_ok.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/safe_navigation_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/safe_navigation_ng.html.erb:1:4: C: Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/marker/safe_navigation_ng.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user;` - use a ternary operator instead.
+cases/marker/safe_navigation_ng.html.erb:1:4: C: Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_ng.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:1:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ng.html.erb:1:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ng.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ng.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ng.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/safe_navigation_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/safe_navigation_ok.html.erb:1:4: C: Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/marker/safe_navigation_ok.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user;` - use a ternary operator instead.
+cases/marker/safe_navigation_ok.html.erb:1:4: C: Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_ok.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:1:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ok.html.erb:1:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ok.html.erb:2:4: C: Layout/IndentationWidth: Use 2 (not 14) spaces for indentation.
+cases/marker/safe_navigation_ok.html.erb:2:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:2:28: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ok.html.erb:2:30: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_ok.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_short.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/safe_navigation_short.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/safe_navigation_short.html.erb:1:4: C: Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/marker/safe_navigation_short.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user;` - use a ternary operator instead.
+cases/marker/safe_navigation_short.html.erb:1:4: C: Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_short.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:1:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_short.html.erb:1:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_short.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/safe_navigation_short.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:2:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_short.html.erb:2:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/safe_navigation_short.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/safe_navigation_short.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/sole_nested_conditional_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/sole_nested_conditional_ng.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user;` - use a ternary operator instead.
+cases/marker/sole_nested_conditional_ng.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:1:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ng.html.erb:1:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ng.html.erb:2:6: C: Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/marker/sole_nested_conditional_ng.html.erb:2:6: C: Style/SoleNestedConditional: Consider merging nested conditions into outer `if` conditions.
+cases/marker/sole_nested_conditional_ng.html.erb:2:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:2:20: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ng.html.erb:2:22: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ng.html.erb:3:6: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/sole_nested_conditional_ng.html.erb:3:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ng.html.erb:3:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:3:36: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ng.html.erb:3:38: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ng.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:4:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ng.html.erb:4:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ng.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ng.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/sole_nested_conditional_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/sole_nested_conditional_ok.html.erb:1:4: C: Style/IfWithSemicolon: Do not use `if user;` - use a ternary operator instead.
+cases/marker/sole_nested_conditional_ok.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:1:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ok.html.erb:1:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ok.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/sole_nested_conditional_ok.html.erb:3:6: C: Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/marker/sole_nested_conditional_ok.html.erb:3:6: C: Style/SoleNestedConditional: Consider merging nested conditions into outer `if` conditions.
+cases/marker/sole_nested_conditional_ok.html.erb:3:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:3:20: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ok.html.erb:3:22: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ok.html.erb:4:6: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/marker/sole_nested_conditional_ok.html.erb:4:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ok.html.erb:4:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:4:36: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ok.html.erb:4:38: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ok.html.erb:5:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:5:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ok.html.erb:5:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/sole_nested_conditional_ok.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/sole_nested_conditional_ok.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ng.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/symbol_proc_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/symbol_proc_ng.html.erb:2:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/symbol_proc_ng.html.erb:2:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/marker/symbol_proc_ng.html.erb:2:17: C: Style/SymbolProc: Pass `&:touch` as an argument to `each` instead of a block.
+cases/marker/symbol_proc_ng.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ng.html.erb:2:26: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ng.html.erb:2:28: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ng.html.erb:3:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ng.html.erb:3:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ng.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ng.html.erb:4:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ng.html.erb:4:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ng.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/marker/symbol_proc_ng.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/symbol_proc_ok.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/symbol_proc_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/symbol_proc_ok.html.erb:2:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/symbol_proc_ok.html.erb:2:6: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/marker/symbol_proc_ok.html.erb:2:17: C: Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/symbol_proc_ok.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:2:26: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ok.html.erb:2:28: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ok.html.erb:3:6: C: Layout/IndentationWidth: Use 2 (not 7) spaces for indentation.
+cases/marker/symbol_proc_ok.html.erb:3:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:3:22: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ok.html.erb:3:24: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ok.html.erb:3:25: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/symbol_proc_ok.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:4:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/symbol_proc_ok.html.erb:4:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/symbol_proc_ok.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/marker/symbol_proc_ok.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/void_ng.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/void_ng.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/void_ng.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ng.html.erb:1:22: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ng.html.erb:1:24: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ng.html.erb:2:7: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/marker/void_ng.html.erb:2:13: W: [Correctable] Lint/Void: Operator `+` used in void context.
+cases/marker/void_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ng.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ng.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ng.html.erb:2:19: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/void_ng.html.erb:3:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/marker/void_ng.html.erb:3:13: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ng.html.erb:3:15: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ng.html.erb:3:16: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/void_ok.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/marker/void_ok.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/void_ok.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:1:22: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ok.html.erb:1:24: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ok.html.erb:2:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/marker/void_ok.html.erb:2:14: W: [Correctable] Lint/Void: Operator `+` used in void context.
+cases/marker/void_ok.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:2:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ok.html.erb:2:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ok.html.erb:2:20: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/marker/void_ok.html.erb:3:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/marker/void_ok.html.erb:3:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:3:13: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/marker/void_ok.html.erb:3:15: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/marker/void_ok.html.erb:3:16: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/emoji.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/multibyte/emoji.html.erb:1:14: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/multibyte/emoji.html.erb:1:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/emoji.html.erb:1:31: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:31: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/emoji.html.erb:1:33: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/emoji.html.erb:1:34: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:39: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
+cases/multibyte/emoji.html.erb:1:40: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/emoji.html.erb:1:42: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:42: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/emoji.html.erb:1:44: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/emoji.html.erb:1:45: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/emoji.html.erb:2:4: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/multibyte/emoji.html.erb:2:4: C: Style/IfWithSemicolon: Do not use `if foo == nil;` - use a ternary operator instead.
+cases/multibyte/emoji.html.erb:2:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/emoji.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/emoji.html.erb:2:20: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:27: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/emoji.html.erb:2:29: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/multibyte_comment.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/multibyte_comment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/multibyte/multibyte_comment.html.erb:2:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/multibyte/multibyte_comment.html.erb:2:5: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
+cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/multibyte_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/multibyte_comment.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/multibyte_comment.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/multibyte_html.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/multibyte/multibyte_html.html.erb:1:12: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/multibyte/multibyte_html.html.erb:1:12: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
+cases/multibyte/multibyte_html.html.erb:1:13: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/multibyte_html.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/multibyte_html.html.erb:1:15: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/multibyte_html.html.erb:1:17: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/multibyte_html.html.erb:1:18: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/multibyte/show.html.erb:2:16: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/multibyte/show.html.erb:2:16: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/multibyte/show.html.erb:2:24: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:2:25: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/show.html.erb:2:30: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/multibyte/show.html.erb:2:40: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:2:42: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:2:42: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:2:44: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/show.html.erb:2:45: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:3:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:4:4: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/multibyte/show.html.erb:4:4: C: Style/IfWithSemicolon: Do not use `if foo == nil;` - use a ternary operator instead.
+cases/multibyte/show.html.erb:4:4: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/multibyte/show.html.erb:4:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/show.html.erb:4:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:4:17: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:4:19: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/show.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/show.html.erb:7:4: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/multibyte/show.html.erb:7:4: C: Style/IfWithSemicolon: Do not use `unless a;` - use a ternary operator instead.
+cases/multibyte/show.html.erb:7:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/multibyte/show.html.erb:7:4: W: Lint/EmptyConditionalBody: Avoid `unless` branches without a body.
+cases/multibyte/show.html.erb:7:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:7:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:7:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/show.html.erb:8:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:9:4: C: Style/EmptyElse: Redundant `else`-clause.
+cases/multibyte/show.html.erb:9:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:9:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:9:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/multibyte/show.html.erb:10:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/multibyte/show.html.erb:11:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:11:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/multibyte/show.html.erb:11:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/attr.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/attr.html.erb:1:17: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/attr.html.erb:1:26: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/attr.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/attr.html.erb:1:38: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/attr.html.erb:1:38: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/attr.html.erb:1:40: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/attr.html.erb:1:41: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/output/empty_tag_after_output_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/empty_tag_after_output_tag.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/empty_tag_after_output_tag.html.erb:1:5: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/empty_tag_after_output_tag.html.erb:2:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/empty_tag_after_output_tag.html.erb:2:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/empty_tag_after_output_tag.html.erb:2:9: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/empty_tag_after_output_tag.html.erb:2:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/empty_tag_after_output_tag.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/escaped_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/escaped_tag.html.erb:1:27: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/escaped_tag.html.erb:1:27: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/escaped_tag.html.erb:2:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/escaped_tag.html.erb:2:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/escaped_tag.html.erb:2:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/escaped_tag.html.erb:2:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/link_to_class.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/link_to_class.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/link_to_class.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/link_to_class.html.erb:1:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/link_to_class.html.erb:1:36: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/link_to_class.html.erb:1:38: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/one_tag_line.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/one_tag_line.html.erb:1:9: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/one_tag_line.html.erb:1:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/one_tag_line.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/one_tag_line.html.erb:1:28: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/one_tag_line.html.erb:1:30: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/one_tag_line.html.erb:1:31: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/output/raw_output.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/raw_output.html.erb:1:6: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/raw_output.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/raw_output.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/raw_output.html.erb:1:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/raw_output.html.erb:2:5: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/output/raw_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/raw_output.html.erb:2:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/raw_output.html.erb:2:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/raw_output.html.erb:2:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/same_line_tags.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/same_line_tags.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/same_line_tags.html.erb:1:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/same_line_tags.html.erb:1:8: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/same_line_tags.html.erb:1:9: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/same_line_tags.html.erb:1:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/string_literal.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/string_literal.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/string_literal.html.erb:1:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/string_literal.html.erb:1:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/string_literal.html.erb:1:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc_map.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/symbol_proc_map.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/symbol_proc_map.html.erb:1:14: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `map` instead of a block.
+cases/output/symbol_proc_map.html.erb:1:43: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:1:43: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc_map.html.erb:1:45: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc_map.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/output/symbol_proc_map.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:2:11: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc_map.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc_map.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc_map.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/symbol_proc.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/symbol_proc.html.erb:1:15: C: Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/output/symbol_proc.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc.html.erb:1:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc.html.erb:1:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/output/symbol_proc.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/symbol_proc.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc.html.erb:3:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/symbol_proc.html.erb:3:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/two_tags_line.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/two_tags_line.html.erb:1:9: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/two_tags_line.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/two_tags_line.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/two_tags_line.html.erb:1:21: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:44: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:44: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/two_tags_line.html.erb:1:46: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/two_tags_line.html.erb:1:47: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/erb_comment.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/erb_comment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/erb_comment.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/erb_comment.html.erb:2:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/erb_comment.html.erb:2:5: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/rubocop_disable/erb_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/erb_comment.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/erb_comment.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_range.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/multiline_range.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/multiline_range.html.erb:2:3: C: [Correctable] Layout/CommentIndentation: Incorrect indentation detected (column 2 instead of 1).
+cases/rubocop_disable/multiline_range.html.erb:2:3: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/rubocop_disable/multiline_range.html.erb:3:2: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/multiline_range.html.erb:3:2: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_range.html.erb:4:5: W: Lint/Void: Literal `"a"` used in void context.
+cases/rubocop_disable/multiline_range.html.erb:4:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_range.html.erb:4:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/multiline_range.html.erb:4:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_range.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/multiline_range.html.erb:6:3: C: [Correctable] Layout/CommentIndentation: Incorrect indentation detected (column 2 instead of 1).
+cases/rubocop_disable/multiline_range.html.erb:7:2: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_range.html.erb:8:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/multiline_range.html.erb:8:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_range.html.erb:8:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/multiline_range.html.erb:8:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_tag.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/multiline_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/multiline_tag.html.erb:2:3: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/rubocop_disable/multiline_tag.html.erb:2:3: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
+cases/rubocop_disable/multiline_tag.html.erb:3:3: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/multiline_tag.html.erb:4:2: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_tag.html.erb:5:5: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/rubocop_disable/multiline_tag.html.erb:5:5: W: Lint/Void: Variable `x` used in void context.
+cases/rubocop_disable/multiline_tag.html.erb:5:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_tag.html.erb:5:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/multiline_tag.html.erb:5:8: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/multiline_tag.html.erb:6:5: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/rubocop_disable/multiline_tag.html.erb:6:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_tag.html.erb:6:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/multiline_tag.html.erb:6:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/ruby_comment_tag.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/rubocop_disable/ruby_comment_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:5: W: Lint/Void: Literal `"a"` used in void context.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:2:5: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:2:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:2:8: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/empty_lines.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/empty_lines.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/empty_lines.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/empty_lines.html.erb:1:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/empty_lines.html.erb:1:11: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/empty_lines.html.erb:2:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/empty_lines.html.erb:4:1: C: Layout/EmptyLines: Extra blank line detected.
+cases/style/empty_lines.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/empty_lines.html.erb:6:5: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/style/empty_lines.html.erb:6:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/empty_lines.html.erb:6:8: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/multiline_tag.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/multiline_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/multiline_tag.html.erb:2:3: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/multiline_tag.html.erb:2:3: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/style/multiline_tag.html.erb:4:2: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/multiline_tag.html.erb:5:5: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/style/multiline_tag.html.erb:5:10: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/multiline_tag.html.erb:5:10: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/multiline_tag.html.erb:5:12: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/reparse_cops_in_html.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/reparse_cops_in_html.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/reparse_cops_in_html.html.erb:2:7: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/reparse_cops_in_html.html.erb:2:7: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
+cases/style/reparse_cops_in_html.html.erb:2:24: C: [Correctable] Style/MethodCallWithoutArgsParentheses: Do not use parentheses for method calls with no arguments.
+cases/style/reparse_cops_in_html.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:2:26: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/reparse_cops_in_html.html.erb:2:28: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/reparse_cops_in_html.html.erb:3:7: C: [Correctable] Style/TernaryParentheses: Omit parentheses for ternary conditions.
+cases/style/reparse_cops_in_html.html.erb:3:18: W: Lint/Void: Literal `1` used in void context.
+cases/style/reparse_cops_in_html.html.erb:3:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:3:23: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/reparse_cops_in_html.html.erb:3:25: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/reparse_cops_in_html.html.erb:4:7: C: [Correctable] Style/RedundantParentheses: Don't use parentheses around a method call.
+cases/style/reparse_cops_in_html.html.erb:4:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:4:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/reparse_cops_in_html.html.erb:4:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/reparse_cops_in_html.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
+cases/style/reparse_cops_in_html.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/ruby_style.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/ruby_style.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:1:32: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:1:32: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/ruby_style.html.erb:1:34: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/ruby_style.html.erb:2:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/ruby_style.html.erb:2:22: W: Lint/Void: Literal `"anon"` used in void context.
+cases/style/ruby_style.html.erb:2:40: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:2:40: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/ruby_style.html.erb:2:42: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/style/ruby_style.html.erb:3:32: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:3:32: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/style/ruby_style.html.erb:3:34: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/missing_close.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/syntax/missing_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/missing_end.html.erb:2:15: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/syntax_errors_ignored.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/syntax/syntax_errors_ignored.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/syntax/syntax_errors_ignored.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:1:21: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/syntax/syntax_errors_ignored.html.erb:1:23: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/syntax_errors_ignored.html.erb:2:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/syntax/syntax_errors_ignored.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:2:8: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/syntax/syntax_errors_ignored.html.erb:2:10: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/syntax_errors_ignored.html.erb:3:4: C: [Correctable] Layout/BlockAlignment: `end` at 3, 3 is not aligned with `items.map do |i|  ;` at 1, 4.
+cases/syntax/syntax_errors_ignored.html.erb:3:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/syntax/syntax_errors_ignored.html.erb:3:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:3:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/syntax/syntax_errors_ignored.html.erb:3:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/syntax_errors_ignored.html.erb:4:4: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/syntax/syntax_errors_ignored.html.erb:4:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `result`.
+cases/syntax/syntax_errors_ignored.html.erb:4:13: C: Style/IfWithSemicolon: Do not use `if foo;` - use a ternary operator instead.
+cases/syntax/syntax_errors_ignored.html.erb:4:13: W: Lint/EmptyConditionalBody: Avoid `if` branches without a body.
+cases/syntax/syntax_errors_ignored.html.erb:4:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:4:19: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/syntax/syntax_errors_ignored.html.erb:4:21: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/syntax_errors_ignored.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/syntax/syntax_errors_ignored.html.erb:6:4: W: [Correctable] Layout/EndAlignment: `end` at 6, 3 is not aligned with `if` at 4, 12.
+cases/syntax/syntax_errors_ignored.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/syntax/syntax_errors_ignored.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/syntax/unclosed_paren.html.erb:1:27: F: Lint/Syntax: unexpected ';'; expected a `)` to close the arguments (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/variables/ambiguous_operator.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/variables/ambiguous_operator.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/variables/ambiguous_operator.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:1:22: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/ambiguous_operator.html.erb:1:24: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/ambiguous_operator.html.erb:2:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/variables/ambiguous_operator.html.erb:2:14: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
+cases/variables/ambiguous_operator.html.erb:2:14: W: [Correctable] Lint/Void: Operator `-` used in void context.
+cases/variables/ambiguous_operator.html.erb:2:16: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/ambiguous_operator.html.erb:2:18: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/ambiguous_operator.html.erb:2:19: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/variables/ambiguous_operator.html.erb:3:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:3:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/ambiguous_operator.html.erb:3:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/ambiguous_operator.html.erb:4:4: C: [Correctable] Layout/IndentationWidth: Use 2 (not 3) spaces for indentation.
+cases/variables/ambiguous_operator.html.erb:4:12: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `*`.
+cases/variables/ambiguous_operator.html.erb:4:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:4:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/ambiguous_operator.html.erb:4:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/ambiguous_operator.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:5:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/ambiguous_operator.html.erb:5:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/variables/cross_tag_variables.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/variables/cross_tag_variables.html.erb:1:30: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:1:30: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:1:32: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:2:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/variables/cross_tag_variables.html.erb:2:8: W: Lint/Void: Variable `total` used in void context.
+cases/variables/cross_tag_variables.html.erb:2:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:2:13: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:2:15: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:2:16: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/variables/cross_tag_variables.html.erb:3:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `unused`.
+cases/variables/cross_tag_variables.html.erb:3:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:3:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:3:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:4:15: C: Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/variables/cross_tag_variables.html.erb:4:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:4:24: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:4:26: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:5:4: C: Layout/IndentationWidth: Use 2 (not 7) spaces for indentation.
+cases/variables/cross_tag_variables.html.erb:5:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:5:20: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:5:22: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/cross_tag_variables.html.erb:5:23: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/variables/cross_tag_variables.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:6:7: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/cross_tag_variables.html.erb:6:9: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/output_concat.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/variables/output_concat.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/variables/output_concat.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/variables/output_concat.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/output_concat.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/output_concat.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/output_concat.html.erb:2:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/output_concat.html.erb:2:22: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/output_concat.html.erb:2:24: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/output_concat.html.erb:3:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/variables/output_concat.html.erb:3:8: W: Lint/Void: Variable `name` used in void context.
+cases/variables/output_concat.html.erb:3:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/output_concat.html.erb:3:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/output_concat.html.erb:3:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/output_concat.html.erb:3:15: C: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/output_concat.html.erb:3:27: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
+cases/variables/output_concat.html.erb:3:29: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/output_concat.html.erb:3:29: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/output_concat.html.erb:3:31: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/output_concat.html.erb:3:32: C: Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/variables/useless_assignment.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/variables/useless_assignment.html.erb:1:4: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/variables/useless_assignment.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/variables/useless_assignment.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/useless_assignment.html.erb:1:18: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/useless_assignment.html.erb:1:20: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/useless_assignment.html.erb:2:8: C: Layout/IndentationConsistency: Inconsistent indentation detected.
+cases/variables/useless_assignment.html.erb:2:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/useless_assignment.html.erb:2:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/variables/useless_assignment.html.erb:2:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/variables/useless_assignment.html.erb:2:15: C: Layout/TrailingWhitespace: Trailing whitespace detected.

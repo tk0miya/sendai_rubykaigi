@@ -3,17 +3,18 @@
 調査日: 2026-11-03
 
 ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと同じ行やブロックの中に書いたときに、各 linter で無効化が効くかを調べました。あわせて、herb-lint と herb-format がこのコメントの行をどうインデントするか、整形した後も無効化が同じ範囲に効くかを調べました。比較のため、herb-lint の無効化コメント `<%# herb:disable … %>` を herb-format がどう扱うかも調べました。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#erb-コメントの無効化コメント)）、【出典】はドキュメントで確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)）、【出典】はドキュメントで確かめたこと、【推測】は解釈です。
 
 ## 対象
 
-- erb_lint 0.9.0（README の推奨設定。rubocop 1.91.0）
-- rubocop-erb 0.7.2 / 0.8.2（rubocop 1.92.0、herb 0.11.0）
+- erb_lint 0.9.0（README の推奨設定）
+- rubocop-erb 0.7.2 / 0.8.2（herb 0.11.1）
 - marcoroth/herb#2260 の rubocop-herb（`d0323df`。以下「herb#2260」）
 - ruumba 0.1.17（README の推奨設定）
 - tk0miya/rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e`（以下「rubocop-herb」。`Herb/Linting` は無効。rubocop 1.92.1、herb 0.11.1）
-- @herb-tools/linter 0.11.0（herb-lint）/ @herb-tools/formatter 0.11.0（herb-format）
-- 入力は [repro/erb-comment/](repro/erb-comment/) の 9 ファイル。`empty_if.html.erb` 以外は、`Lint/LiteralAsCondition` を無効にするコメントと、その対象になる `<% if 'hello' %>` を含む。`herb:disable` の入力は [repro/erb-comment/herb-disable/](repro/erb-comment/herb-disable/) の 4 ファイル（[herb:disable と herb-format](#herbdisable-と-herb-format実測出典)）
+- @herb-tools/linter 0.11.1（herb-lint）/ @herb-tools/formatter 0.11.1（herb-format）
+- rubocop は、どのツールでも 1.92.1
+- 入力は [repro/cases/erb_comment/](repro/cases/erb_comment/) の 9 ファイル。`empty_if.html.erb` 以外は、`Lint/LiteralAsCondition` を無効にするコメントと、その対象になる `<% if 'hello' %>` を含む。`herb:disable` の入力は [repro/cases/herb_disable/](repro/cases/herb_disable/) の 4 ファイル（[herb:disable と herb-format](#herbdisable-と-herb-format実測出典)）
 
 | ファイル | 内容 |
 |---|---|
@@ -40,7 +41,7 @@ ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと�
 
 ## `<%#` の無効化が効くか【実測】
 
-1 ファイルずつ実行しました。「効く」は無効にした cop（`Lint/LiteralAsCondition` か `Lint/EmptyConditionalBody`）が出ないこと、「効かない」は出ることです。
+`bin/lint TOOL cases/erb_comment` の結果です。「効く」は無効にした cop（`Lint/LiteralAsCondition` か `Lint/EmptyConditionalBody`）が出ないこと、「効かない」は出ることです。
 
 | ファイル | erb_lint | rubocop-erb 0.7.2 | rubocop-erb 0.8.2 / herb#2260 | ruumba | rubocop-herb |
 |---|---|---|---|---|---|
@@ -65,14 +66,14 @@ ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと�
 
 ## herb-lint とインデント【出典・実測】
 
-herb-lint 0.11.0 のルールのうち、インデントに関わるものは次の 2 つです【出典: `@herb-tools/linter` の `docs/rules/`】。
+herb-lint 0.11.1 のルールのうち、インデントに関わるものは次の 2 つです【出典: `@herb-tools/linter` の `docs/rules/`】。
 
 - `source-indentation`: インデントの文字が設定（`formatter.indentStyle`、既定は空白）と合っているかだけを見る。入れ子の深さは見ない
 - `erb-closing-tag-indent`: 複数行のタグの `%>` の位置を見る。ERB コメントと、Ruby のコメントを含むタグは対象外
 
 インデントがずれた `indent.html.erb` に、herb-lint の offense は出ません。`--fix` をかけても、ファイルは変わりません【実測】。
 
-インデントを直すのは herb-format です。0.11.0 の herb-format は experimental preview で、`.herb.yml` で `formatter.enabled: true` にするか、`--force` を付けないと動きません【出典: `@herb-tools/formatter` の README】。
+インデントを直すのは herb-format です。0.11.1 の herb-format は experimental preview で、`.herb.yml` で `formatter.enabled: true` にするか、`--force` を付けないと動きません【出典: `@herb-tools/formatter` の README】。
 
 ### herb-format の整形【実測】
 
@@ -104,7 +105,7 @@ herb-lint 0.11.0 のルールのうち、インデントに関わるものは次
 
 ### 整形すると無効化の範囲が変わる【実測】
 
-herb-format で整形したファイル（`multiline_tag.html.erb` は、さらに herb-lint の `--fix` をかけたものも）を、rubocop-erb 0.8.2 と rubocop-herb にかけ直しました。
+herb-format で整形したファイル（`bin/autocorrect herb-format --force -- cases/erb_comment`。`multiline_tag.html.erb` は、さらに herb-lint の `--fix` をかけたものも）を、rubocop-erb 0.8.2 と rubocop-herb にかけ直しました。
 
 | ファイル | rubocop-erb 0.8.2（整形前 → 整形後） | rubocop-herb（整形前 → 整形後） |
 |---|---|---|
@@ -127,7 +128,7 @@ herb-format は、`<%# herb:disable … %>` を、ほかの `<%#` とは別に�
 - 整形の後、アンカーのテキスト（ERB タグなら `<%= … %>` の全文、要素なら `</div` のようなタグ名）を出力の先頭から検索し、最初に見つかった行の末尾に空白 1 つを挟んでコメントを付け直す
 - アンカーがない、またはテキストで検索できないノード（`if` などの制御構文）のときは、親のノードのテキストで検索する。それも見つからなければ、出力の最後の行に付ける
 
-[repro/erb-comment/herb-disable/](repro/erb-comment/herb-disable/) の 4 ファイルを整形した結果です【実測】。
+[repro/cases/herb_disable/](repro/cases/herb_disable/) の 4 ファイルを整形した結果です【実測】。
 
 | ファイル | 整形前 | 整形後 | herb-lint の結果（整形前 → 整形後） |
 |---|---|---|---|

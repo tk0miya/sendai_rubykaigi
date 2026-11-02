@@ -1,479 +1,273 @@
-# 既存 ERB linter の問題の再現例
+# ERB linter の検証環境
 
-[../existing-erb-linters.md](../existing-erb-linters.md) で挙げた問題を再現するための最小例です。
+research の文書で挙げた挙動を確かめるための、検証用 ERB とツールの設定です。
+**入力は `cases/` の 1 セットだけ**で、`bin/lint` の第 1 引数でツールを切り替えて同じ入力にかけます。
 
-## 確認環境（2026-10-06）
+## 構成
+
+| パス | 内容 |
+|---|---|
+| `cases/` | 検証用 ERB（79 ファイル）。[ケースの一覧](#ケースの一覧) |
+| `plain_ruby/` | 比較用の Ruby。`cases/control_flow/` のいくつかのケースと同じ内容を、普通の Ruby として書いたもの |
+| `tools/TOOL/` | ツールごとの `Gemfile` と設定 |
+| `package.json`, `.herb.yml` | herb-lint / herb-format（`@herb-tools/linter`、`@herb-tools/formatter`） |
+| `bin/lint` | ツールを切り替えて検査する |
+| `bin/autocorrect` | `cases/` のコピーに autocorrect をかけ、元との diff を出す |
+| `bin/record`, `bin/record-views` | すべてのツールの結果を `results/` に書き出す |
+| `bin/fetch-views` | 実際のビュー（rails/rails と kaigionrails/conference-app）を取得する |
+| `results/` | `bin/record`、`bin/record-views` の結果 |
+
+統合していない入力は次の 2 つです。
+
+- `plain_ruby/equivalent.rb`: ERB ではなく Ruby なので、ERB のツールにはかけない。ERB と同じ内容を普通の Ruby として書くと RuboCop が何を出すかを示す比較の基準
+- 実際のビュー: 外部のリポジトリのファイルなので、コミットを固定して `bin/fetch-views` で取得する（`work/views/`。git には入れない）
+
+## 確認環境
 
 - ruby 4.0.5
-- erb_lint 0.9.0 / rubocop 1.91.0 / rubocop-erb 0.7.1 / ruumba 0.1.17（`Gemfile` で固定）
-- @herb-tools/linter 0.11.0（node v26.9.0）
+- rubocop 1.92.1（すべてのツールで共通）
+- herb 0.11.1（marcoroth/herb#2260 だけは、gemspec が固定している 0.11.0）
+- @herb-tools/linter 0.11.1 / @herb-tools/formatter 0.11.1（node v26.9.0）
+
+| TOOL | ツール | 設定 |
+|---|---|---|
+| `erb_lint-all` | erb_lint 0.9.0 の Rubocop linter | 全 cop を有効（`tools/erb_lint/all_cops.yml`） |
+| `erb_lint-recommended` | 同上 | README の推奨どおりに cop を無効化（`tools/erb_lint/recommended.yml`。rubocop-rails を入れていないので `Rails/OutputSafety` は除く） |
+| `rubocop-erb-0.7` | rubocop-erb 0.7.2（タグ単位） | `tools/rubocop-erb-0.7/erb.yml` |
+| `rubocop-erb-0.8` | rubocop-erb 0.8.2（`Herb.extract_ruby` で文書全体） | `tools/rubocop-erb-0.8/erb.yml` |
+| `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
+| `herb-pr2260` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-pr2260/pr.yml` |
+| `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
+| `rubocop-herb` | tk0miya/rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/rubocop-herb/tk.yml`） |
+| `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
+| `herb-format` | @herb-tools/formatter | 同上 |
+| `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
+
+rubocop 系の設定は、どれも `NewCops: enable`、`TargetRubyVersion: 3.4` に揃えてあります。
 
 ## セットアップ
 
 ```console
 $ cd research/repro
-$ bundle install
-$ (cd herb && npm install)
-$ export BUNDLE_GEMFILE="$PWD/Gemfile"   # コピー先のディレクトリでも bundle exec できるように
-```
-
-以下のコマンドは、特に断りがない限り `research/repro` から実行します。
-
-## erb_lint
-
-`erb_lint/all_cops/` は全 cop を有効にした設定、`erb_lint/recommended/` は README の推奨どおりに cop を無効化した設定です（rubocop-rails を入れていないため `Rails/OutputSafety` は除外）。
-
-```console
-$ cd erb_lint/all_cops
-$ bundle exec erb_lint --config .erb_lint.yml per_tag_file_cops.html.erb useless_assignment.html.erb
-```
-
-- `per_tag_file_cops.html.erb`: タグごとに `Layout/InitialIndentation`、`Layout/TrailingEmptyLines`、`Style/FrozenStringLiteralComment` が出る
-- `useless_assignment.html.erb`: 次のタグで使っている変数に `Lint/UselessAssignment` が出る（誤検知）
-
-```console
-$ cd erb_lint/recommended
-$ bundle exec erb_lint --config .erb_lint.yml if_condition.html.erb control_flow.html.erb unused_block_arg.html.erb
-```
-
-- `if_condition.html.erb`, `control_flow.html.erb`, `unused_block_arg.html.erb`: offense は 0 件（見逃し）
-- 同じ内容の Ruby を `plain_ruby/` で `bundle exec rubocop equivalent.rb` すると、`Style/NilComparison`、`Style/NegatedUnless`、`Lint/UnusedBlockArgument` など 8 件出る
-
-### autocorrect（ファイルを書き換えるので、コピーに対して実行すること）
-
-```console
-$ cp -R erb_lint "$TMPDIR/erb_lint" && cd "$TMPDIR/erb_lint/all_cops"
-$ bundle exec erb_lint --config .erb_lint.yml -a autocorrect_output_tag.html.erb useless_assignment.html.erb
-$ cd ../recommended
-$ bundle exec erb_lint --config .erb_lint.yml -a autocorrect_multiline_tag.html.erb
-```
-
-- `autocorrect_output_tag.html.erb`: `<%=` が消え、`# frozen_string_literal: true` が HTML 本文に挿入される
-- `useless_assignment.html.erb`: 代入が消え、`'Alice'` だけが残る
-- `autocorrect_multiline_tag.html.erb`: 推奨設定でも `Layout/LeadingEmptyLines` の修正で `<%` が消える
-
-## rubocop-erb
-
-```console
-$ cd rubocop-erb
-$ bundle exec rubocop
-```
-
-- `negated_if.html.erb`: `Style/NegatedIf` が出ない（見逃し）
-- `symbol_proc.html.erb`: `Style/SymbolProc` が出ない（見逃し）
-- `syntax_errors_ignored.html.erb`: 構文エラーになる断片が黙って無視される
-- `autocorrect_*.html.erb`: autocorrect 対象の offense が出る
-
-autocorrect はコピーに対して実行します。
-
-```console
-$ cp -R rubocop-erb "$TMPDIR/rubocop-erb" && cd "$TMPDIR/rubocop-erb"
-$ bundle exec rubocop -A
-```
-
-- `autocorrect_local_variable.html.erb`: `count -1` が `count(-1)`、`item *2` が `item(2)` に書き換わる（ローカル変数がメソッド呼び出しになる）
-- `autocorrect_safe_navigation.html.erb`: `user && user.admin?` が `user&&.admin?` に書き換わる（構文エラー）。rubocop 1.86.1 では `user&.admin?` に正しく修正される
-
-## ruumba
-
-`ruumba/.ruumba.yml` は ruumba の README の推奨設定です。ruumba は `rubocop` コマンドを子プロセスで実行するので、`bundle exec` 経由で Gemfile の rubocop を使わせます。
-
-erb_lint / rubocop-erb の再現例にかけると、タグ単位の方式の問題が解消されていることを確認できます。
-
-```console
-$ bundle exec ruumba -D -e -c ruumba/.ruumba.yml erb_lint rubocop-erb
-```
-
-- `if_condition.html.erb`, `control_flow.html.erb`, `negated_if.html.erb`: `Style/NilComparison`、`Style/NegatedIf` などを検出する
-- `useless_assignment.html.erb`: `Lint/UselessAssignment` は出ない
-- `autocorrect_local_variable.html.erb`: `Lint/AmbiguousOperator` は出ない（`count` をローカル変数と認識する）
-- どのファイルにも `Layout/TrailingWhitespace` や `Layout/InitialIndentation` が出る（空白で埋めたことによる誤検知）
-
-`ruumba/` の再現例では、文書全体を 1 本の Ruby にする方式で新たに生じる問題を確認できます。
-
-```console
-$ cd ruumba
-$ bundle exec ruumba -D -e -c .ruumba.yml .
-```
-
-- `control_flow.html.erb`: `Style/NilComparison` と `Style/NegatedIf` を検出する一方、本文が HTML だけの `if` に `Lint/EmptyConditionalBody` が出る
-- `local_variable.html.erb`: `<%= name %>: <%= count -1 %>` が `name; count -1` と連結され、`name` に `Lint/Void` が出る
-- `output_in_block.html.erb`: `Style/SymbolProc` が `items.each(&:name)` を提案する（従うと出力がなくなる）
-- `same_line_tags.html.erb`: 補った `;` に `Style/Semicolon` が出る
-
-### autocorrect（コピーに対して実行すること）
-
-```console
-$ cp -R ruumba "$TMPDIR/ruumba" && cd "$TMPDIR/ruumba"
-$ bundle exec ruumba -e -c .ruumba.yml --auto-correct .
-```
-
-「88 offenses corrected」と表示されますが、ERB ファイルは 1 つも書き換わりません（Layout 系の修正でマーカー行がずれ、書き戻しが黙って中止される）。
-
-```console
-$ bundle exec ruumba -e -c .ruumba.yml --auto-correct --only Style/NilComparison,Style/NegatedIf,Style/StringLiterals .
-```
-
-- `control_flow.html.erb`: `foo == nil` が `foo.nil?`、`if !user.nil?` が `unless user.nil?` に正しく修正される
-- `raw_output.html.erb`: 修正対象ではない `<%== raw_html %>` が `<%= raw raw_html %>` に書き換わる
-
-## Herb（herb-lint）
-
-```console
-$ cd herb
-$ npx herb-lint app/views/samples
-```
-
-- `cross_tag_variables.html.erb`: タグを跨いだ変数を追跡し、本当に未使用の `unused` だけを `erb-no-unused-local-variable` で検出する
-- `missing_end.html.erb`: `end` の抜けを `RUBY_PARSE_ERROR` と `MISSING_ERB_END_TAG_ERROR` で検出する
-- `ruby_style.html.erb`: `link_to( 'Home',root_path )` のようなスタイル違反や未定義メソッドは検出されない（offense 0 件）
-
-## rubocop-herb
-
-[../report.md](../report.md) の再現手順です。rubocop-herb は rubygems に公開されていないので、リポジトリを clone して、その `Gemfile` と開発用の設定（`config/develop/rubocop.yml`）を使います。
-
-```console
+$ for d in tools/*/; do [ -f "$d/Gemfile" ] && (cd "$d" && BUNDLE_FROZEN=true bundle install); done
+$ npm install
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
 $ (cd "$TMPDIR/rubocop-herb" && git checkout 4d915335e559aa93b7e3ec82adbbe203054e631e && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
-$ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$RUBOCOP_HERB/config/develop/rubocop.yml"'
 ```
 
-- `--except Herb/Linting` は、herb-lint（Node.js の `@herb-tools/linter`）を入れていない環境で、セットアップを促すエラーを出さないためのものです。RuboCop の結果だけを比べます
-
-### 既存ツールの再現例にかける
-
-```console
-$ rubocop-herb erb_lint rubocop-erb ruumba herb/app
-```
-
-- erb_lint / rubocop-erb で見逃していた `Style/NilComparison`、`Style/NegatedIf`、`Lint/UnusedBlockArgument` などを検出する
-- erb_lint の `Lint/UselessAssignment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は出ない
-- `erb_lint/recommended/control_flow.html.erb` の本当に空の `else` / `unless` には `Style/EmptyElse` / `Lint/EmptyConditionalBody` が出る
-- `herb/app/views/samples/missing_end.html.erb` に `Lint/Syntax` が出る
-
-autocorrect はコピーに対して実行します。
-
-```console
-$ cp -R . "$TMPDIR/repro-herb" && cd "$TMPDIR/repro-herb"
-$ rubocop-herb -A erb_lint rubocop-erb ruumba herb/app
-$ diff -r "$OLDPWD" .
-```
-
-- `count -1` は `count - 1`、`user && user.admin?` は `user&.admin?` に正しく修正される
-- `herb/app/views/samples/cross_tag_variables.html.erb` の `<% unused = 1 %>` は、行ごと消える（`Lint/UselessAssignment`、`Lint/Void`、`Herb/EmptyErbTag` の順に修正される）
-
-### Herb/Linting（herb-lint）
-
-`Herb/Linting` は `@herb-tools/linter` を RuboCop のプロジェクトのルート（上へたどって最初に見つかる `Gemfile` のディレクトリ）から読み込みます。`herb/` で実行すると `research/repro/Gemfile` のある `research/repro` がルートになって見つからないので、`Gemfile` のないディレクトリにコピーして実行します。
-
-```console
-$ (cd herb && npm install)
-$ mkdir "$TMPDIR/herb-lint" && cp -R herb/. "$TMPDIR/herb-lint/" && cp rubocop-herb/*.html.erb "$TMPDIR/herb-lint/app/views/samples/"
-$ printf '<div><span></div>\n' > "$TMPDIR/herb-lint/app/views/samples/missing_close.html.erb"
-$ cd "$TMPDIR/herb-lint"
-$ BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c "$RUBOCOP_HERB/config/develop/rubocop.yml" app
-$ npx herb-lint app/views/samples
-```
-
-- `missing_close.html.erb`、`cross_tag_variables.html.erb` に、herb-lint 単体と同じ offense が `Herb/Linting: [rule-name] …` として出る
-- `empty_tag_after_output_tag.html.erb` には herb-lint 単体では `erb-no-empty-tags` が出るが、`Herb/Linting` は出さない。代わりに `Herb/EmptyErbTag` が出る
-- `missing_end.html.erb` には herb-lint 単体では `parser-no-errors` が出るが、`Herb/Linting` は出ない（Ruby の構文エラーがあるファイルでは herb-lint を実行しない）。`Lint/Syntax` は出る
-- `herb/` で実行すると、`@herb-tools/linter is not installed in …/research/repro` というエラーが出る
-
-### 未解決の問題
-
-`rubocop-herb/` の再現例です。autocorrect はコピーに対して実行します。
-
-```console
-$ cd rubocop-herb
-$ rubocop-herb .
-$ cp -R . "$TMPDIR/rubocop-herb-ac" && cd "$TMPDIR/rubocop-herb-ac"
-$ rubocop-herb -a .
-$ diff -r "$OLDPWD" .
-```
-
-- 出力タグの直後の空のタグを消すと、出力タグの `%>` も消える（`empty_tag_after_output_tag.html.erb`）: `-a` で `<% %>`⏎`<%= b %><% %>` が `<%= b ` になる。`--only Herb/EmptyErbTag` や `--only Layout/SpaceBeforeSemicolon` を付けて片方だけ修正すると壊れない
-- HTML を含むテンプレートで、パースし直して確かめる cop の指摘・修正が消える（`reparse_cops_in_html.html.erb`）: `<div>` の中の `root_path()`、`(foo)` に `Style/MethodCallWithoutArgsParentheses`、`Style/RedundantParentheses` が出ない。`(a == b) ? …` に `Style/TernaryParentheses` は出るが、`[Correctable]` が付かず修正されない。`<div>` と `</div>` の行を消すと、3 つとも出て修正される
-
-## herb PR #2260
-
-[../herb-pr2260.md](../herb-pr2260.md) の再現手順です。herb 本体のリポジトリに提案されている rubocop-herb（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)）と、tk0miya/rubocop-herb を同じ入力にかけて比べます。
-
-### セットアップ
-
-PR 版の gem（`gems/rubocop-herb`）は Ruby だけでできているので、herb のリポジトリはビルドしません。`herb-pr2260/Gemfile` は次のように作ってあります。
-
-- herb は rubygems のビルド済み gem（`herb-0.11.0-arm64-darwin` など）を使う。`Gemfile.lock` からは `ruby` プラットフォーム（ソースからビルドする gem）を外してある
+- herb はビルド済みの gem（`herb-0.11.1-arm64-darwin` など）を使う。`Gemfile.lock` からは `ruby` プラットフォーム（ソースからビルドする gem）を外してある
 - `bundle install` は必ず `BUNDLE_FROZEN=true` を付けて実行する。付けないと、`Gemfile.lock` にないプラットフォームでは Bundler がそのプラットフォームを足して解決し直し、ビルド済み gem がなければソースの gem を選んでビルドを始める。付けると「Add the current platform to the lockfile」というエラーで止まる
-- PR 版の gem は Bundler の git ソースで、PR の head（`d0323df`）の `gems/rubocop-herb/*.gemspec` だけを読む。herb のリポジトリで `bundle install` や `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）
-- 実行すると `already initialized constant Herb::VERSION` という警告が出る。PR 版の gemspec が、git から取ってきたリポジトリの `lib/herb/version.rb` を読むためで、どちらも 0.11.0 なので影響はない
+- `herb-pr2260` は、PR の head の `gems/rubocop-herb/*.gemspec` だけを Bundler の git ソースで読む。herb のリポジトリで `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）。実行すると `already initialized constant Herb::VERSION` という警告が出るが、影響はない
+- rubocop-herb は rubygems に公開されていないので、clone して、その `Gemfile` で実行する
+
+## 使い方
+
+コマンドはすべて `research/repro` で実行します。
 
 ```console
-$ cd research/repro
-$ (cd herb-pr2260 && BUNDLE_FROZEN=true bundle install)
-$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
-$ alias pr2260='BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec rubocop --cache false -c "$PR2260/pr.yml"'
-$ alias rubocop-herb-head='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$PR2260/tk.yml"'
+$ bin/lint rubocop-herb                              # cases/ 全体
+$ bin/lint herb-pr2260 --format emacs cases/marker   # オプションとパスを渡す
+$ bin/lint rubocop-herb --except Herb/Linting,Layout cases/marker
+$ bin/lint herb-lint cases/erb_comment
+$ bin/lint plain-ruby
 ```
 
-- `pr.yml` は PR 版を読み込む設定、`tk.yml` は `$RUBOCOP_HERB/config/develop/rubocop.yml` を継承する設定。どちらも `NewCops: enable` と `TargetRubyVersion: 3.4` に揃えてある
-- rubocop-herb は「rubocop-herb」の節で clone したものを使う
+- オプションは各ツールにそのまま渡す。パスを省略すると `cases/` 全体を検査する
+- `rubocop-herb` は `Herb/Linting` cop で herb-lint も実行する。RuboCop の結果だけを見るときは `--except Herb/Linting` を付ける。`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる
+- `Herb/Linting` は、`@herb-tools/linter` を RuboCop のプロジェクトのルート（上へたどって最初に見つかる `Gemfile` のディレクトリ。なければカレントディレクトリ）の `node_modules` から読み込む。`research/repro` とその上には `Gemfile` がないので、`research/repro/node_modules` が使われる。`research/` に空の `Gemfile` を置くと、`research/` がルートになり、「`@herb-tools/linter is not installed in …/research`」というエラーになる
 
-### 再現例と境界ケースにかける
+### autocorrect
+
+autocorrect はファイルを書き換えるので、`bin/autocorrect` でコピーに対して実行します。
 
 ```console
-$ pr2260 --format offenses erb_lint rubocop-erb ruumba herb/app
-$ rubocop-herb-head --format offenses erb_lint rubocop-erb ruumba herb/app
-$ pr2260 --format emacs herb-pr2260/edge
-$ rubocop-herb-head --format emacs herb-pr2260/edge
+$ bin/autocorrect rubocop-herb -a
+$ bin/autocorrect herb-pr2260 -A -- cases/marker
+$ bin/autocorrect ruumba --auto-correct --only Style/NilComparison,Style/NegatedIf,Style/StringLiterals
+$ bin/autocorrect herb-format --force -- cases/erb_comment cases/herb_disable
+$ bin/autocorrect herb-lint --fix -- cases/erb_comment
 ```
 
-- 再現例 20 ファイルで、PR 版は 88 件（うち `Layout/ExtraSpacing` 55 件）、rubocop-herb は 28 件
-- PR 版だけに `Lint/Void`、`Style/SymbolProc`、`Lint/EmptyBlock` が、rubocop-herb だけに `Lint/UnusedBlockArgument`、`Style/EmptyElse`、`Lint/EmptyConditionalBody` が出る
-- `herb-pr2260/edge/case.html.erb` に、PR 版だけ `Lint/EmptyWhen` が出る。`herb-pr2260/edge/disable.html.erb` の `<%# rubocop:disable … %>` は PR 版では効かない
+- `-- PATHS` の前がツールに渡すオプション。パスを省略すると `cases/` 全体
+- `work/TOOL/orig/` にコピーし、`work/TOOL/corrected/` を書き換える。ツールの出力は `work/TOOL/output.txt`
+- 最後に、`bin/html_changes.rb` で、書き換わったファイルの数、そのうち HTML（ERB タグ以外。空白の違いは無視）が変わったファイル、Herb のパースエラーが増えたファイルの数を出す。HTML とパースエラーしか見ないので、出力がなくなるような Ruby の変化は数えない
+- コピーを `research/repro` の中（`work/`）に置くのは、rubocop が設定ファイルの `**/*.erb` などのパターンをカレントディレクトリからの相対パスで照合するため。外に置くと、rubocop-erb などの除外の設定が効かなくなる。RuboCop が既定で除外する `tmp/` も使えない
+- macOS のファイルシステムは大文字と小文字を区別しないので、`-a` と `-A` の結果を `foo-a` / `foo-A` のような名前で分けない（同じファイルになる）。`results/` では `safe` / `all` と呼ぶ
 
-### autocorrect（コピーに対して実行すること）
+### 結果の記録
 
 ```console
-$ W="$TMPDIR/pr2260-ac" && mkdir -p "$W/orig/herb"
-$ for d in erb_lint rubocop-erb ruumba; do ditto "$d" "$W/orig/$d"; done
-$ ditto herb/app "$W/orig/herb/app" && ditto herb-pr2260/edge "$W/orig/edge"
-$ for t in pr-safe pr-all tk-safe tk-all; do ditto "$W/orig" "$W/$t"; done
-$ (cd "$W/pr-safe" && pr2260 -a .)
-$ (cd "$W/pr-all" && pr2260 -A .)
-$ (cd "$W/tk-safe" && rubocop-herb-head -a .)
-$ (cd "$W/tk-all" && rubocop-herb-head -A .)
-$ diff -r "$W/orig" "$W/pr-safe"
-$ for t in pr-safe pr-all tk-safe tk-all; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$W/orig" "$W/$t"; done
+$ bin/record
+$ bin/fetch-views && bin/record-views
 ```
 
-- macOS のファイルシステムは大文字と小文字を区別しないので、`-a` と `-A` のコピーに `pr_a` / `pr_A` のような名前を付けない（同じディレクトリになる）
-- `html_changes.rb` は、書き換わったファイルのうち、HTML（空白の違いは無視）が変わったものと Herb のパースエラーが増えたものを数える
-- PR 版は `-a` でも 8 ファイルで HTML が変わる。`edge/two_tags_line.html.erb` が `<td><%= user.name%> user.email%></td>` に、`edge/inline_if.html.erb` が `<% if a%> else%> end%>` になる。rubocop-herb は `-a`、`-A` とも 0 ファイル
+| ファイル | 内容 |
+|---|---|
+| `results/lint/TOOL.txt` | `cases/` の offense（`file:line:col: …` の 1 行 1 件。行順） |
+| `results/autocorrect/TOOL-safe.diff`, `TOOL-all.diff` | `-a`、`-A` の前後の diff |
+| `results/autocorrect/summary.txt` | 書き換わったファイル、HTML が変わったファイル、パースエラーが増えたファイルの数 |
+| `results/views/TOOL.txt` | 実際のビューでの cop ごとの offense の数 |
+| `results/views/TOOL-safe.txt`, `TOOL-all.txt` | `-a`、`-A` の後に残る offense の数 |
+| `results/views/TOOL-excluded-cops.txt` | rubocop-erb 0.8.2 が ERB から除外している 64 個の cop だけをかけた結果 |
+| `results/views/summary.txt` | 実際のビューでの autocorrect の集計 |
 
-### 実際のビューにかける
+ツールの版やケースを変えたら、記録し直して `git diff results/` で変化を確かめます。
+`bin/fetch-views` は git の clone を使うので、`.git` を作れない sandbox の中では動きません。
 
-rails/rails と kaigionrails/conference-app の `*.html.erb` を、コミットを固定して取得します。
+## ケースの一覧
 
-```console
-$ S="$TMPDIR/views-src" && mkdir -p "$S/rails" "$S/conference-app"
-$ (cd "$S/rails" && git init -q && git fetch --depth 1 https://github.com/rails/rails.git 0f591639b864de6bf3fd760a6921f5eda17b2905 && git checkout -q FETCH_HEAD)
-$ (cd "$S/conference-app" && git init -q && git fetch --depth 1 https://github.com/kaigionrails/conference-app.git 25a02cc871861dd94d76a4af983fad7b08008333 && git checkout -q FETCH_HEAD)
-$ V="$TMPDIR/views" && rsync -a --prune-empty-dirs --exclude node_modules --exclude vendor --exclude tmp --exclude .git --include '*/' --include '*.html.erb' --exclude '*' "$S/" "$V/orig/"
-$ (cd "$V/orig" && pr2260 --format offenses .)
-$ (cd "$V/orig" && rubocop-herb-head --format offenses .)
-$ ditto "$V/orig" "$V/pr" && ditto "$V/orig" "$V/tk"
-$ (cd "$V/pr" && pr2260 -a .) ; (cd "$V/tk" && rubocop-herb-head -a .)
-$ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
-```
+各ケースは、どこかの文書の主張を確かめるためのものです。同じ形のケースをツールごとに持たず、1 つのケースをすべてのツールにかけます。
 
-- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 930 件
-- `-a` で HTML が変わるファイルは、PR 版が 63、rubocop-herb が 0
+### `control_flow/`: タグを跨ぐ制御構造
 
-## rubocop-erb 0.8
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `nil_comparison` | `<% if foo == nil %>` の本文が HTML | タグ単位の方式は条件式を検査しない（`Style/NilComparison` の見逃し）。HTML を空白にする方式は本文を空と見なす |
+| `negated_if` | `<% if !user.nil? %>` | rubocop-erb 0.7 系は `if` を削るので `Style/NegatedIf` が出ない |
+| `if_then_elsif_else` | `then`、`elsif bar == nil`、本当に空の `else`、`unless !x` | タグ単位の方式の見逃し。本当に空の `else` / `unless` を検出できるか |
+| `unless_else` | `unless` / `else` の本文が HTML | `Style/UnlessElse` の修正は HTML を ERB タグの中に入れるので、捨てるべき |
+| `case_when` | `when` の本文が HTML だけ | HTML を空白にすると `Lint/EmptyWhen` が出る |
+| `inline_if` | `<% if a %>A<% else %>B<% end %>` | 同じ行のタグの間の HTML を `Layout/ExtraSpacing` が消す |
+| `cond_assign` | `if` / `else` の各分岐で `<% x = 1 %>` | `Style/ConditionalAssignment` は ERB には合わない |
+| `safe_navigation` | `<% if user && user.admin? %>` | rubocop 1.86.2 以降の rubocop-erb 0.7 系で `user&&.admin?`（構文エラー）になる |
+| `single_line_block` | `<%= cache "fragment" do %>…<% end %>` を 1 行で | HTML を空白にすると `Style/SingleLineDoEndBlock` が出る |
+| `unused_block_arg` | `<% items.each do \|i\| %>` の本文が HTML | `i` の未使用（`Lint/UnusedBlockArgument`）。本文を空と見なすと出ない |
+| `form_block` | `<%= form_with … do \|f\| %>` | ブロック付きの出力タグ |
+| `trim` | `<%-` / `-%>` | トリムのあるタグでも位置がずれないか |
 
-[../rubocop-erb-0.8.md](../rubocop-erb-0.8.md) の再現手順です。rubocop-erb 0.7.2（タグ単位）、0.8.2（`Herb.extract_ruby`）、tk0miya/rubocop-herb を同じ入力にかけて比べます。
+### `variables/`: タグを跨ぐ変数
 
-### セットアップ
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `useless_assignment` | `<% name = "Alice" %>` を次のタグで使う | タグ単位の方式の `Lint/UselessAssignment` の誤検知。erb_lint の autocorrect が代入を消す |
+| `cross_tag_variables` | 使う変数と、本当に未使用の `unused` | 本当に未使用の変数だけを検出するか |
+| `ambiguous_operator` | `<%= count -1 %>`、`<%= item *2 %>`（`count`、`item` は前のタグの変数） | タグ単位の方式は変数が見えず、`count(-1)` に書き換える |
+| `output_concat` | `<p><%= name %>: <%= count -1 %></p>` | 出力タグを連結すると `name` に `Lint/Void` が出る |
 
-`rubocop-erb-0.8/v0.7.2/` と `rubocop-erb-0.8/v0.8.2/` に、それぞれの版の `Gemfile` があります。herb はビルド済みの gem を使うので、「herb PR #2260」の節と同じく `BUNDLE_FROZEN=true` を付けて `bundle install` します。rubocop は 1.92.0、herb は 0.11.0 で固定してあります。rubocop-herb は「rubocop-herb」の節で clone したものを使います。
+### `output/`: 出力タグと同じ行のタグ
 
-```console
-$ cd research/repro
-$ (cd rubocop-erb-0.8/v0.7.2 && BUNDLE_FROZEN=true bundle install)
-$ (cd rubocop-erb-0.8/v0.8.2 && BUNDLE_FROZEN=true bundle install)
-$ export R="$PWD/rubocop-erb-0.8" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
-$ erb072() { BUNDLE_GEMFILE="$R/v0.7.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
-$ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
-$ tkherb() { BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$R/tk.yml" "$@"; }
-```
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `symbol_proc` | `<% items.each do \|item\| %><%= item.name %><% end %>` | 出力の意味が消えると `Style/SymbolProc` が出て、従うと出力がなくなる |
+| `symbol_proc_map` | `<% users.map { \|u\| u.name }.each do \|name\| %>` | 1 つのタグの中の、妥当な `Style/SymbolProc` |
+| `string_literal` | `<%= "hello" %>` | タグごとに出るファイル単位の cop（erb_lint）。autocorrect でマジックコメントが入る |
+| `link_to_class` | `<%= link_to "x", path, class: 'btn' %>` | erb_lint の autocorrect で `<%=` が消える |
+| `raw_output` | `<%== raw_html %>` | ruumba が `<%= raw raw_html %>` に書き換える |
+| `same_line_tags` | `<%= a %><%= b %>` | 補った `;` への `Style/Semicolon` |
+| `two_tags_line` | `<td><%= user.name %></td><td><%= user.email %></td>` | 同じ行のタグの間の HTML を `Layout/ExtraSpacing` が消す |
+| `one_tag_line` | `<li><%= link_to "a", a_path %></li>` | 行に 1 つだけのタグ |
+| `attr` | 属性値の中のタグ | 属性値の中のタグも位置がずれないか |
+| `escaped_tag` | `<%%= link_to "a", a_path %>` | エスケープしたタグの中身は Ruby ではない |
+| `empty_tag_after_output_tag` | `<% %>`⏎`<%= b %><% %>` | rubocop-herb の `-a` で、出力タグの `%>` が消える |
 
-- `erb.yml` は rubocop-erb を読み込む設定（0.7.2 と 0.8.2 で共通）、`tk.yml` は `$RUBOCOP_HERB/config/develop/rubocop.yml` を継承する設定。どちらも `NewCops: enable` と `TargetRubyVersion: 3.4` に揃えてある
-- zsh では、入力のディレクトリを変数にまとめるときは配列（`IN=(erb_lint rubocop-erb …)` と `$IN`）にする。文字列にすると 1 つの引数として渡る
+### `style/`: スタイル
 
-### 再現例と境界ケースにかける
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `ruby_style` | `<%= link_to( 'Home',root_path ) %>` など | herb-lint はスタイル違反を見ない |
+| `multiline_tag` | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | erb_lint の推奨設定でも、`Layout/LeadingEmptyLines` の修正で `<%` が消える |
+| `reparse_cops_in_html` | `<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)` | HTML を含むテンプレートで、修正をパースし直して確かめる cop が rubocop-herb で働かない |
+| `empty_lines` | タグの間に空行を含む HTML | `Layout/EmptyLines` |
 
-```console
-$ for t in erb072 erb082 tkherb; do $t --format offenses erb_lint rubocop-erb ruumba herb/app herb-pr2260/edge; done
-$ for t in erb072 erb082 tkherb; do $t --format emacs rubocop-erb-0.8/edge; done
-```
+### `syntax/`: 構文エラー
 
-- 32 ファイルで、0.7.2 は 24 件、0.8.2 は 33 件、rubocop-herb は 37 件
-- `rubocop-erb-0.8/edge/single_line_block.html.erb` に、0.8.2 だけ `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出る
-- `rubocop-erb-0.8/edge/reparse_cops_in_html.html.erb` に、rubocop-herb だけ `Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` が出ない
-- `rubocop-erb-0.8/edge/disable_inline.html.erb` に、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `missing_end` | `end` の抜け | `Lint/Syntax` を検出するか（rubocop-erb 0.7 系は除外） |
+| `syntax_errors_ignored` | `<% end.join(", ") %>`、`<% result = if foo %>` | タグ単位の方式は構文エラーになる断片を黙って飛ばす |
+| `unclosed_paren` | `<p><%= link_to("a", path %></p>` | 構文エラーのメッセージに、ERB にない `;` が出る |
 
-無効化コメントの書き方ごとの例は、無効化がファイルをまたがないよう、1 ファイルずつ実行します。
+### `multibyte/`: マルチバイト文字
 
-```console
-$ for f in rubocop-erb-0.8/disable/*.html.erb; do for t in erb072 erb082 tkherb; do echo "== $t $f"; $t --format emacs "$f"; done; done
-```
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `multibyte_html` | `<p>日本語 <%= x=1 %></p>` | HTML のマルチバイト文字の後ろでも、offense と修正の位置がずれないか |
+| `multibyte_comment` | `<%# 日本語のコメント %>` の次の行 | 同上（ERB のコメント） |
+| `emoji` | 絵文字と日本語を HTML と Ruby の両方に含む | 同上 |
+| `show` | HTML と日本語を含む行の `link_to( "ホーム",root_path )` など | 指摘の行が元の ERB のまま表示されるか（`--format clang`） |
 
-- `erb_comment.html.erb`（`<%# rubocop:disable … %>`）は、0.7.2 と 0.8.2 では効かず、`Style/StringLiterals` が出る。rubocop-herb では効く
-- `trailing.html.erb`、`trailing_output_tag.html.erb`（タグの中の行末のコメント）は 3 つとも効くが、0.8.2 だけ `Lint/CopDirectiveSyntax` が出る
-- `multiline_range.html.erb`（複数行のタグで `rubocop:disable` と `rubocop:enable` を書く）は、0.8.2 と rubocop-herb では範囲の中だけに効く。0.7.2 では効かない
+### `comment/`: タグの中の Ruby のコメント
 
-指摘の表示は `--format clang` で比べます。
+| ファイル | 内容 | 確かめること |
+|---|---|---|
+| `ruby_comment` | `<% # note %>` | `Herb.extract_ruby` は空白にする。rubocop-herb は Ruby のコメントとして扱う |
+| `commented_out_output` | `<% name = user.name # the full name %><%= name %>` | ERB では行末のコメントが後ろの出力タグまでコメントにする（`Herb/CommentedOutCode`） |
+| `commented_out_end` | `<% if admin? # only for admins %><p>admin</p><% end %>` | 同上。`<% end %>` がコメントになって構文エラーになる |
 
-```console
-$ for t in erb072 erb082 tkherb; do echo "== $t"; $t --format clang rubocop-erb-0.8/display; done
-```
+### `rubocop_disable/`: `Style/StringLiterals` を無効にするコメントの書き方
 
-- `show.html.erb`: 3 つとも、指摘の行は元の ERB（HTML と日本語を含む行）のまま表示され、キャレットの位置も同じ
-- `unclosed_paren.html.erb`: 0.8.2 と rubocop-herb の両方で、`Lint/Syntax` のメッセージに ERB にない `;` が出る
-- `identical_branches.html.erb`: rubocop-herb だけ、`Style/IdenticalConditionalBranches` のメッセージに `_ = foo` が出る
+どのファイルも、コメントの後に `"a"` などの二重引用符の文字列があります。
 
-### autocorrect（コピーに対して実行すること）
+| ファイル | 書き方 |
+|---|---|
+| `erb_comment` | `<%# rubocop:disable Style/StringLiterals %>` |
+| `ruby_comment_tag` | `<% # rubocop:disable Style/StringLiterals %>` |
+| `trailing_ruby_comment` | `<% x = "b" # rubocop:disable Style/StringLiterals %>` |
+| `trailing_ruby_comment_output` | `<%= "a" # rubocop:disable Style/StringLiterals %>` |
+| `multiline_tag` | `<%`⏎`  # rubocop:disable Style/StringLiterals`⏎`  x = "b"`⏎`%>` の後に `<%= "c" %>` |
+| `multiline_range` | `<%`⏎`  # rubocop:disable …`⏎`%>` と `<%`⏎`  # rubocop:enable …`⏎`%>` で範囲を区切る |
 
-```console
-$ W="$TMPDIR/rerb-ac" && mkdir -p "$W/orig/herb"
-$ for d in erb_lint rubocop-erb ruumba; do ditto "$d" "$W/orig/$d"; done
-$ ditto herb/app "$W/orig/herb/app" && ditto herb-pr2260/edge "$W/orig/edge"
-$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do ditto "$W/orig" "$W/$t"; done
-$ (cd "$W/o-safe" && erb072 -a .) ; (cd "$W/o-all" && erb072 -A .)
-$ (cd "$W/n-safe" && erb082 -a .) ; (cd "$W/n-all" && erb082 -A .)
-$ (cd "$W/tk-safe" && tkherb -a .) ; (cd "$W/tk-all" && tkherb -A .)
-$ diff -r "$W/orig" "$W/n-all"
-$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$W/orig" "$W/$t"; done
-```
+### `erb_comment/`: `<%# rubocop:disable %>` の置き場所と herb-format の整形
 
-- 0.7.2 の `-A` で `rubocop-erb/autocorrect_safe_navigation.html.erb` が `user&&.admin?` になる。0.8.2 と rubocop-herb は HTML を変えない
+`empty_if` 以外は、`Lint/LiteralAsCondition` を無効にするコメントと、その対象になる `<% if 'hello' %>` を含みます。
 
-`rubocop-erb-0.8/edge/` の autocorrect も同じようにコピーに対して実行します。
+| ファイル | 内容 |
+|---|---|
+| `trailing` | `<% if 'hello' %>world<% end %><%# rubocop:disable … %>` |
+| `leading` | `<%# rubocop:disable … %><% if 'hello' %>world<% end %>` |
+| `after_if` | `<% if 'hello' %><%# rubocop:disable … %>` の後に本文と `<% end %>` |
+| `not_erb_tag` | `<% if 'hello' %>world<% end %><# rubocop:disable … %>`（`%` のない `<#`） |
+| `indent` | 独立した行の `<%# rubocop:disable … %>` と `<%# rubocop:enable … %>`。インデントが入れ子の深さと合っていない |
+| `multiline_comment` | `<%#`⏎`  rubocop:disable …`⏎`%>` の後に `<% if 'hello' %>` |
+| `multiline_tag` | `<%`⏎`  # rubocop:disable …`⏎`%>` の後に `<% if 'hello' %>` |
+| `trailing_in_tag` | `<% if 'hello' # rubocop:disable … %>` の後に本文と `<% end %>` |
+| `empty_if` | `<% if some_error %><%# rubocop:disable Lint/EmptyConditionalBody %>`⏎`<% end %>` |
 
-```console
-$ E="$TMPDIR/edge08-ac" && for t in o n tk; do ditto rubocop-erb-0.8/edge "$E/$t"; done
-$ (cd "$E/o" && erb072 -A .) ; (cd "$E/n" && erb082 -A .) ; (cd "$E/tk" && tkherb -A .)
-$ for t in o n tk; do diff -r rubocop-erb-0.8/edge "$E/$t"; done
-```
+### `herb_disable/`: `<%# herb:disable %>` と herb-format の整形
 
-- 0.8.2 で、`single_line_block.html.erb` の 1 行のブロックが 3 行に分かれる
-- rubocop-herb で、`reparse_cops_in_html.html.erb` の `root_path()`、`(a == b)`、`(foo)` の括弧が残る
+herb-lint / herb-format のためのケースです。rubocop 系のツールにもかけますが、ほかのケースと同じ観点の結果しか出ません。
 
-### 実際のビューにかける
+| ファイル | 内容 |
+|---|---|
+| `img` | `<img src="a.png"> <%# herb:disable html-img-require-alt %>` |
+| `same_anchor` | 同じ `<img src="a.png">` が 2 行並び、2 行目の行末に `herb:disable` |
+| `empty_if` | `<% if some_error %><%# herb:disable erb-no-empty-control-flow %>`⏎`<% end %>` |
+| `if_sibling` | `<div>` の中で `<% if some_error %><%# herb:disable … %><% end %>` |
 
-ビューの取得は「herb PR #2260」の節と同じです（`$V/orig` に 333 ファイル）。
+### `marker/`: ERB として正しいものと直すべきものの組
 
-```console
-$ (cd "$V/orig" && for t in erb072 erb082 tkherb; do $t --format offenses .; done)
-$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do ditto "$V/orig" "$V/$t"; done
-$ (cd "$V/o-safe" && erb072 -a .) ; (cd "$V/o-all" && erb072 -A .)
-$ (cd "$V/n-safe" && erb082 -a .) ; (cd "$V/n-all" && erb082 -A .)
-$ (cd "$V/tk-safe" && tkherb -a .) ; (cd "$V/tk-all" && tkherb -A .)
-$ for t in o-safe o-all n-safe n-all tk-safe tk-all; do BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
-$ (cd "$V/n-all" && erb082 --format offenses .) ; (cd "$V/tk-all" && tkherb --format offenses .)
-$ diff -r "$V/orig/rails/railties/lib/rails/generators" "$V/o-safe/rails/railties/lib/rails/generators"
-```
+cop ごとに、ERB として正しいテンプレート（`*_ok`）と、同じ形で本当に直すべきテンプレート（`*_ng`）を 1 つずつ置いています。`Herb.extract_ruby` で変換すると、組の 2 つが同じ Ruby になります。
 
-- 333 ファイルで、0.7.2 は 762 件、0.8.2 は 763 件、rubocop-herb は 930 件
-- `-a`・`-A` で HTML が変わるファイルは、3 つとも 0。`-A` でパースエラーが増えるファイルは、0.7.2 が 2、ほかの 2 つは 0
-- `-A` の後に残る offense は、0.8.2 が 9 件、rubocop-herb が 123 件
-- 0.7.2 の `-a` は、rails の認証ジェネレーターのテンプレートの `<%%= … %>` の中身を書き換える（`html_changes.rb` では数えられない）
+| cop（ファイル） | `*_ok`（ERB として正しい） | `*_ng`（直すべき） |
+|---|---|---|
+| `Lint/Void`（`void`） | `<p><%= count + 1 %> items</p>` | `<p><% count + 1 %> items</p>`（`=` の書き忘れ） |
+| `Style/SymbolProc`（`symbol_proc`） | `<% items.each do \|item\| %>` `<li><%= item.name %></li>` `<% end %>` | `<% items.each do \|item\| %>` `<% item.touch %>` `<% end %>` |
+| `Lint/EmptyBlock`（`empty_block`） | `<% items.each do %>` `<li>item</li>` `<% end %>` | `<% items.each do %>` `<% end %>` |
+| `Lint/EmptyConditionalBody`（`empty_conditional`） | `<% if user.admin? %>` `You are an administrator.` `<% end %>` | `<% if user.admin? %>` `<% end %>` |
+| `Style/EmptyElse`（`empty_else`） | `<% else %>` `You are not an administrator.` `<% end %>` | `<% else %>` `<% end %>` |
+| `Style/SafeNavigation`（`safe_navigation`） | `<% if user %>` `Last login: <% user.touch %>` `<% end %>` | `<% if user %>` `<% user.touch %>` `<% end %>` |
+| `Style/SoleNestedConditional`（`sole_nested_conditional`） | 外側の `if` の本文に `Welcome!` と内側の `if` | 外側の `if` の本文が内側の `if` だけ |
+| `Lint/DuplicateBranch`（`duplicate_branch`） | `Good morning, <%= user.name %>` と `Hello, <%= user.name %>` | `<%= user.name %>` と `<%= user.name %>` |
+| `Style/CombinableLoops`（`combinable_loops`） | 2 つの `items.each` の間に `Prices:` | 2 つの `items.each` が連続 |
 
-## ERB コメントの無効化コメント
+`safe_navigation_short` は、`<% if user %>` の本文が `|<% user.touch %>` のものです。テキストが短くて rubocop-herb がマーカーを置けない例です。
 
-[../erb-comment-directive.md](../erb-comment-directive.md) の再現手順です。「rubocop-erb 0.8」の節の `erb072`、`erb082`、`tkherb` と、「herb PR #2260」の節の `pr2260` を使います。
-
-### 各 linter で無効化が効くか
-
-無効化がファイルをまたがないよう、1 ファイルずつ実行します。
-
-```console
-$ cd research/repro
-$ for f in erb-comment/*.html.erb; do
-    echo "== $f"
-    bundle exec erb_lint --config erb_lint/recommended/.erb_lint.yml "$f"
-    for t in erb072 erb082 tkherb; do $t --format emacs "$f"; done
-    pr2260 --format emacs "$f"
-    bundle exec ruumba -D -e -c ruumba/.ruumba.yml --format emacs "$f"
-  done
-```
-
-- `trailing.html.erb`、`after_if.html.erb`: 0.8.2 と PR 版に `Lint/LiteralAsCondition` が出る。ruumba と rubocop-herb には出ない
-- `leading.html.erb`: rubocop-herb に `Herb/IgnoredCopDirective` と `Lint/LiteralAsCondition` が出る。ruumba には `Lint/CopDirectiveSyntax` が出て、`Lint/LiteralAsCondition` は出ない（`if` がコメントに入る）
-- `multiline_comment.html.erb`: rubocop-herb に `Layout/EmptyComment` が出る
-- `trailing_in_tag.html.erb`: 0.8.2 と PR 版に `Lint/CopDirectiveSyntax` が出る
-- `empty_if.html.erb`: どれにも `Lint/EmptyConditionalBody` は出ない
-- erb_lint は `multiline_tag.html.erb` 以外で、0.7.2 は `multiline_tag.html.erb` と `trailing_in_tag.html.erb` 以外で offense 0 件
-
-### herb-lint と herb-format
-
-`herb/` の `node_modules` を使います。コピーしたディレクトリに移ってから実行します（`$W` の外から rubocop-erb を実行すると、0.8.2 が除外している cop も出る）。
-
-```console
-$ (cd herb && npm install)
-$ W="$TMPDIR/erb-comment" && mkdir -p "$W" && cp -R erb-comment "$W/orig" && cp -R erb-comment "$W/fmt"
-$ cp herb/package.json "$W/" && ln -s "$PWD/herb/node_modules" "$W/node_modules"
-$ cd "$W"
-$ npx herb-lint --force orig
-$ npx herb-format --force fmt
-$ diff -ru orig fmt
-$ cp -R fmt fmtfix && npx herb-lint --force --fix fmtfix ; diff -r fmt fmtfix
-$ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 --format emacs "$f"; tkherb --format emacs "$f"; done; done
-```
-
-- `erb-comment/` の直下のファイルへの herb-lint の offense は、`not_erb_tag.html.erb` の `STRAY_ERB_CLOSING_TAG_ERROR` だけ。`indent.html.erb` のインデントのずれにも、`empty_if.html.erb` の空の `if` にも何も出ない
-- herb-format は、`indent.html.erb` の `<%#` を入れ子の深さに合わせてインデントし、同じ行に並んだタグを別々の行に分ける。`multiline_tag.html.erb` は `<% # rubocop:disable … %>` の 1 行になり、herb-lint の `--fix` で `<%#` に直る。`empty_if.html.erb` のコメントは `if` の本文に移る。`trailing_in_tag.html.erb` は変わらない。`not_erb_tag.html.erb` はパースエラーで飛ばす
-- 整形の後、rubocop-herb で `fmt/trailing.html.erb` と `fmt/after_if.html.erb` に `Lint/LiteralAsCondition` が出る。`fmt/empty_if.html.erb` には `Lint/MissingCopEnableDirective` と `Lint/RedundantCopDisableDirective` が出る。0.8.2 では `fmt/multiline_tag.html.erb` と `fmtfix/multiline_tag.html.erb` に `Lint/LiteralAsCondition` が出る
-- `herb-disable/`（`herb:disable` の例）: 整形の前は、`empty_if.html.erb` と `if_sibling.html.erb` に `herb-disable-comment-unnecessary` が出る。`same_anchor.html.erb` には、無効化していない 1 行目の `<img>` に `html-img-require-alt` が出る
-- 整形の後、`herb:disable` は行末に残るが、`same_anchor.html.erb` では 1 行目の `<img>` に、`empty_if.html.erb` では `<% end %>` の行に、`if_sibling.html.erb` では `</div>` の行に付く。この 3 ファイルでは、無効化したかった行に offense が出る
-
-## マーカーの比較
-
-[../ruby-rendering.md](../ruby-rendering.md) の再現手順です。rubocop-erb 0.8.2、PR 版、tk0miya/rubocop-herb を比べます。「rubocop-erb 0.8」の節と「herb PR #2260」の節のセットアップ（`bundle install`）を済ませておきます。
-
-### セットアップ
-
-```console
-$ cd research/repro
-$ export R="$PWD/rubocop-erb-0.8" P="$PWD/herb-pr2260" M="$PWD/marker" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
-$ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
-$ erb082x() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$M/erb-noexclude.yml" "$@"; }
-$ pr2260() { BUNDLE_GEMFILE="$P/Gemfile" bundle exec rubocop --cache false -c "$P/pr.yml" "$@"; }
-$ tkherb() { BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c "$R/tk.yml" "$@"; }
-```
-
-- `marker/erb-noexclude.yml` は、rubocop-erb 0.8.2 が `**/*.erb` から除外している cop（`Rails/Presence` を除く 64 個）を ERB にもかける設定
-- `tkherb` には `--except Herb/Linting` を付ける（`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる）
-
-### 組にしたサンプルにかける
+組にした比較では、内容に関わらない cop を外して実行します。
 
 ```console
 $ X=Layout,Style/FrozenStringLiteralComment,Style/Semicolon,Style/StringLiterals
-$ erb082 --except $X --format emacs marker/ok marker/ng
-$ erb082x --except $X --format emacs marker/ok marker/ng
-$ pr2260 --except $X --format emacs marker/ok marker/ng
-$ tkherb --except Herb/Linting,$X --format emacs marker/ok marker/ng
-$ tkherb --except Herb/Linting,Layout --format emacs marker/short
+$ for t in rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-pr2260; do bin/lint $t --except $X --format emacs cases/marker; done
+$ bin/lint rubocop-herb --except Herb/Linting,$X --format emacs cases/marker
 ```
 
-- `erb082x` は、9 組すべてで `ok/` と `ng/` に同じ cop が出る。`erb082` は `Style/CombinableLoops` だけが両方に出る
-- `pr2260` は、`Lint/EmptyConditionalBody` と `Style/EmptyElse` 以外の 7 組で両方に出る
-- `tkherb` は、9 組すべてで `ng/` だけに出る（`ok/duplicate_branch.html.erb` の `Style/IdenticalConditionalBranches` を除く）
-- `marker/short/safe_navigation.html.erb` に、rubocop-herb でも `Style/SafeNavigation` が出る（テキストが `|` 1 文字でマーカーを置けない）
+## 実際のビュー
 
-autocorrect はコピーに対して実行します。
+rails/rails `0f591639b864de6bf3fd760a6921f5eda17b2905` と kaigionrails/conference-app `25a02cc871861dd94d76a4af983fad7b08008333` の `*.html.erb`（333 ファイル）です。
 
 ```console
-$ W="$TMPDIR/marker-ac" && mkdir -p "$W"
-$ for t in erb082x pr2260; do ditto marker/ok "$W/$t"; (cd "$W/$t" && $t -A .); done
-$ ditto marker/ok "$W/tkherb"; (cd "$W/tkherb" && tkherb --except Herb/Linting -A .)
-$ for d in "$W"/*; do echo "== $d"; diff -r marker/ok "$d"; done
+$ bin/fetch-views
+$ bin/lint rubocop-herb --except Herb/Linting --format offenses work/views
+$ bin/autocorrect herb-pr2260 -a -- work/views
+$ bin/record-views
 ```
-
-- PR 版は `void.html.erb`、`symbol_proc.html.erb`、`safe_navigation.html.erb`、`sole_nested_conditional.html.erb`、`combinable_loops.html.erb` の HTML や出力タグを消す
-- `erb082x` で変わるのは、`%>` の前の空白などの `Layout` の修正と `Style/StringLiterals` の修正だけ
-- `tkherb` で変わるのは `Style/StringLiterals` の修正だけ
-
-### 実際のビューにかける
-
-ビューの取得は「herb PR #2260」の節と同じです（`$V/orig` に 333 ファイル）。
-
-```console
-$ ONLY=$(grep -E '^[A-Z][a-zA-Z]+/[A-Za-z]+:$' marker/erb-noexclude.yml | tr -d : | paste -sd, -)
-$ (cd "$V/orig" && erb082x --only $ONLY --format offenses .)
-$ (cd "$V/orig" && tkherb --only $ONLY --format offenses .)
-```
-
-- 64 個の cop で、`erb082x` は 9,310 件、rubocop-herb は 278 件。`Layout` と `Style/Semicolon`、`Style/FrozenStringLiteralComment`、`Style/IfWithSemicolon`、`Lint/Syntax` を除くと、131 件と 22 件

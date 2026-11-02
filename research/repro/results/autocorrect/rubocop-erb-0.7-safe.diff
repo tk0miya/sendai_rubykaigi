@@ -1,0 +1,223 @@
+--- cases/control_flow/if_then_elsif_else.html.erb
++++ cases/control_flow/if_then_elsif_else.html.erb
+@@ -1,6 +1,6 @@
+ <% if !foo.nil? then %>
+   a
+-<% elsif bar == nil %>
++<% elsif bar.nil? %>
+   b
+ <% else %>
+ <% end %>
+--- cases/control_flow/nil_comparison.html.erb
++++ cases/control_flow/nil_comparison.html.erb
+@@ -1,3 +1,3 @@
+-<% if foo == nil %>
++<% if foo.nil? %>
+   <p>yes</p>
+ <% end %>
+--- cases/control_flow/single_line_block.html.erb
++++ cases/control_flow/single_line_block.html.erb
+@@ -1 +1 @@
+-<%= cache "fragment" do %>This bit is cached<% end %>
++<%= cache 'fragment' do %>This bit is cached<% end %>
+--- cases/erb_comment/multiline_tag.html.erb
++++ cases/erb_comment/multiline_tag.html.erb
+@@ -1,7 +1,6 @@
+ <div>
+   <%
+-    # rubocop:disable Lint/LiteralAsCondition
+-  %>
++      %>
+   <% if 'hello' %>
+     <p>world</p>
+   <% end %>
+--- cases/erb_comment/trailing_in_tag.html.erb
++++ cases/erb_comment/trailing_in_tag.html.erb
+@@ -1,5 +1,5 @@
+ <div>
+-  <% if 'hello' # rubocop:disable Lint/LiteralAsCondition %>
++  <% if 'hello'%>
+     <p>world</p>
+   <% end %>
+ </div>
+--- cases/marker/empty_else_ng.html.erb
++++ cases/marker/empty_else_ng.html.erb
+@@ -1,4 +1,4 @@
+ <% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
++  <%= link_to 'Admin', admin_path %>
+ <% else %>
+ <% end %>
+--- cases/marker/empty_else_ok.html.erb
++++ cases/marker/empty_else_ok.html.erb
+@@ -1,5 +1,5 @@
+ <% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
++  <%= link_to 'Admin', admin_path %>
+ <% else %>
+   You are not an administrator.
+ <% end %>
+--- cases/marker/sole_nested_conditional_ng.html.erb
++++ cases/marker/sole_nested_conditional_ng.html.erb
+@@ -1,5 +1,5 @@
+ <% if user %>
+   <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
++    <%= link_to 'Admin', admin_path %>
+   <% end %>
+ <% end %>
+--- cases/marker/sole_nested_conditional_ok.html.erb
++++ cases/marker/sole_nested_conditional_ok.html.erb
+@@ -1,6 +1,6 @@
+ <% if user %>
+   Welcome!
+   <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
++    <%= link_to 'Admin', admin_path %>
+   <% end %>
+ <% end %>
+--- cases/multibyte/emoji.html.erb
++++ cases/multibyte/emoji.html.erb
+@@ -1,2 +1,2 @@
+-<p>😀 日本語 <%= link_to "あ", path %> <%= x=1 %></p>
+-<% if foo == nil %>🍣<% end %>
++<p>😀 日本語 <%= link_to 'あ', path %> <%= x = 1 %></p>
++<% if foo.nil? %>🍣<% end %>
+--- cases/multibyte/multibyte_comment.html.erb
++++ cases/multibyte/multibyte_comment.html.erb
+@@ -1,2 +1,2 @@
+ <%# 日本語のコメント %>
+-<%= y=2 %>
++<%= y = 2 %>
+--- cases/multibyte/multibyte_html.html.erb
++++ cases/multibyte/multibyte_html.html.erb
+@@ -1 +1 @@
+-<p>日本語 <%= x=1 %></p>
++<p>日本語 <%= x = 1 %></p>
+--- cases/multibyte/show.html.erb
++++ cases/multibyte/show.html.erb
+@@ -1,7 +1,7 @@
+ <div class="user">
+-  <p>こんにちは <%= link_to( "ホーム",root_path ) %></p>
++  <p>こんにちは <%= link_to('ホーム', root_path) %></p>
+ </div>
+-<% if foo == nil %>
++<% if foo.nil? %>
+   <span>empty</span>
+ <% end %>
+ <% unless a %>
+--- cases/output/attr.html.erb
++++ cases/output/attr.html.erb
+@@ -1 +1 @@
+-<div class="<%= active ? "on" : "off" %>">x</div>
++<div class="<%= active ? 'on' : 'off' %>">x</div>
+--- cases/output/escaped_tag.html.erb
++++ cases/output/escaped_tag.html.erb
+@@ -1,2 +1,2 @@
+-<%%= link_to "a", a_path %>
+-<%= link_to "b", b_path %>
++<%%= link_to 'a', a_path %>
++<%= link_to 'b', b_path %>
+--- cases/output/link_to_class.html.erb
++++ cases/output/link_to_class.html.erb
+@@ -1 +1 @@
+-<%= link_to "x", path, class: 'btn' %>
++<%= link_to 'x', path, class: 'btn' %>
+--- cases/output/one_tag_line.html.erb
++++ cases/output/one_tag_line.html.erb
+@@ -1 +1 @@
+-<li><%= link_to "a", a_path %></li>
++<li><%= link_to 'a', a_path %></li>
+--- cases/output/raw_output.html.erb
++++ cases/output/raw_output.html.erb
+@@ -1,2 +1,2 @@
+ <%== raw_html %>
+-<%= "hello" %>
++<%= 'hello' %>
+--- cases/output/string_literal.html.erb
++++ cases/output/string_literal.html.erb
+@@ -1 +1 @@
+-<%= "hello" %>
++<%= 'hello' %>
+--- cases/rubocop_disable/erb_comment.html.erb
++++ cases/rubocop_disable/erb_comment.html.erb
+@@ -1,2 +1,2 @@
+ <%# rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++<%= 'a' %>
+--- cases/rubocop_disable/multiline_range.html.erb
++++ cases/rubocop_disable/multiline_range.html.erb
+@@ -1,8 +1,8 @@
+ <%
+   # rubocop:disable Style/StringLiterals
+ %>
+-<%= "a" %>
++<%= 'a' %>
+ <%
+   # rubocop:enable Style/StringLiterals
+ %>
+-<%= "b" %>
++<%= 'b' %>
+--- cases/rubocop_disable/multiline_tag.html.erb
++++ cases/rubocop_disable/multiline_tag.html.erb
+@@ -3,4 +3,4 @@
+   x = "b"
+ %>
+ <%= x %>
+-<%= "c" %>
++<%= 'c' %>
+--- cases/rubocop_disable/ruby_comment_tag.html.erb
++++ cases/rubocop_disable/ruby_comment_tag.html.erb
+@@ -1,2 +1,2 @@
+ <% # rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++<%= 'a' %>
+--- cases/rubocop_disable/trailing_ruby_comment_output.html.erb
++++ cases/rubocop_disable/trailing_ruby_comment_output.html.erb
+@@ -1,2 +1,2 @@
+ <%= "a" # rubocop:disable Style/StringLiterals %>
+-<%= "b" %>
++<%= 'b' %>
+--- cases/style/reparse_cops_in_html.html.erb
++++ cases/style/reparse_cops_in_html.html.erb
+@@ -1,5 +1,5 @@
+ <div>
+-  <%= link_to root_path() %>
+-  <%= (a == b) ? 1 : 2 %>
+-  <%= (foo) %>
++  <%= link_to root_path %>
++  <%= a == b ? 1 : 2 %>
++  <%= foo %>
+ </div>
+--- cases/style/ruby_style.html.erb
++++ cases/style/ruby_style.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to( 'Home',root_path ) %>
+-<%= user.name.nil? ? "anon" : user.name %>
++<%= link_to('Home', root_path) %>
++<%= user.name.nil? ? 'anon' : user.name %>
+ <%= undefined_helper_xyz(@post) %>
+--- cases/variables/ambiguous_operator.html.erb
++++ cases/variables/ambiguous_operator.html.erb
+@@ -1,5 +1,5 @@
+ <% count = items.size %>
+-<p><%= count -1 %></p>
++<p><%= count(-1) %></p>
+ <% items.each do |item| %>
+-  <%= item *2 %>
++  <%= item(2) %>
+ <% end %>
+--- cases/variables/output_concat.html.erb
++++ cases/variables/output_concat.html.erb
+@@ -1,3 +1,3 @@
+-<% name = "Alice" %>
++<% name = 'Alice' %>
+ <% count = items.size %>
+-<p><%= name %>: <%= count -1 %></p>
++<p><%= name %>: <%= count(-1) %></p>
+--- cases/variables/useless_assignment.html.erb
++++ cases/variables/useless_assignment.html.erb
+@@ -1,2 +1,2 @@
+-<% name = "Alice" %>
++<% name = 'Alice' %>
+ <p><%= name %></p>
