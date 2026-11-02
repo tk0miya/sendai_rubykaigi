@@ -1,6 +1,6 @@
 # rubocop-erb 0.8 系と 0.7 系、tk0miya/rubocop-herb の比較
 
-調査日: 2026-10-31
+調査日: 2026-11-03
 
 rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位から `Herb.extract_ruby` による文書全体の変換に切り替えました（[r7kamura/rubocop-erb#70](https://github.com/r7kamura/rubocop-erb/pull/70)）。0.7 系（タグ単位）、0.8 系、tk0miya/rubocop-herb（以下「rubocop-herb」）の 3 つを、同じ入力にかけて比べた結果です。
 【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#rubocop-erb-08)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
@@ -9,8 +9,8 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 - rubocop-erb 0.7.2（2026-10-06。タグ単位の方式の最後の版。0.7.1 との違いは、存在しない cop 名を設定から消しただけ）
 - rubocop-erb 0.8.2（2026-10-30。最新）
-- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `96d31cf8dff39109dbe4506b808e19693a92b2e2`（2026-10-29 時点の main）
-- herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.92.0 / ruby 4.0.5。rubocop と herb は、3 つとも rubocop-herb の `Gemfile.lock` に揃えた
+- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
+- rubocop-erb は herb 0.11.0（rubygems のビルド済み gem）/ rubocop 1.92.0、rubocop-herb は herb 0.11.1 / rubocop 1.92.1（同リポジトリの `Gemfile.lock`）。ruby 4.0.5
 - 設定は 3 つとも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/rubocop-erb-0.8/](repro/rubocop-erb-0.8/)）
 - 入力
   - [repro/](repro/) の既存ツールの再現例と、[repro/herb-pr2260/edge/](repro/herb-pr2260/edge/) の境界ケース（32 ファイル）
@@ -23,7 +23,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 - 0.8 系は、marcoroth/herb#2260（[herb-pr2260.md](herb-pr2260.md)）と同じく `Herb.extract_ruby` で文書全体を 1 本の Ruby にします。0.7 系の見逃し（`Style/NegatedIf` など）、`Lint/Syntax` の除外、`count -1` を `count(-1)` にするような意味を壊す autocorrect は、いずれも解消しています
 - herb#2260 との大きな違いは、**autocorrect の修正範囲を検査する仕組みがある**ことです。修正の範囲が 1 つの ERB タグの Ruby の中に収まらなければ、その offense の修正をまるごと捨てます。実際のビュー 333 ファイルで `-a`、`-A` とも HTML が変わったファイル、パースエラーが増えたファイルは 0 でした。0.7 系は `-A` で 2 ファイルを構文エラーにしました
-- 誤検知への対策は、cop をファイル全体で除外することです。除外は 65 個（0.7 系は 53 個、rubocop-herb は 9 個）で、`Lint/Void`、`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Layout/LineLength` なども除外しています。このため、ERB でも妥当な指摘（本当に空のブロック、`map { |k| k.to_s }` など）も出ません
+- 誤検知への対策は、cop をファイル全体で除外することです。除外は 65 個（0.7 系は 53 個、rubocop-herb は 10 個）で、`Lint/Void`、`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Layout/LineLength` なども除外しています。このため、ERB でも妥当な指摘（本当に空のブロック、`map { |k| k.to_s }` など）も出ません
 - 除外していない cop には、HTML が空白になることによる誤検知が残ります。実際のビューでは、`<%= cache "x" do %>…<% end %>` のように 1 行に書いたブロックに `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出て、`-a` で `do`⏎` %>…<% `⏎`end %>` のようにタグの中に改行が入ります（8 ファイル。出力は変わらない）
 - 無効化コメントは、ERB でよく書く `<%# rubocop:disable … %>` が効きません。確実に効くのは、Ruby のコメントだけを書いた複数行のタグ（`<%`⏎`  # rubocop:disable …`⏎`%>`）です。タグの中の行末の `# rubocop:disable …` は効きますが、`Lint/CopDirectiveSyntax` が出ます（[無効化コメントのサポート](#無効化コメントのサポート実測)）
 - 実際のビューで、0.8.2 と rubocop-herb の offense は、rubocop-herb の `Layout/LineLength`（162 件）などを除けばほぼ同じです。一方、**rubocop-herb には、HTML を含むファイルで `Style/MethodCallWithoutArgsParentheses` などの指摘や修正が消える問題**が見つかりました（[rubocop-herb-issues/reparse-cops-skip-html-files.md](rubocop-herb-issues/reparse-cops-skip-html-files.md)）。0.8.2 では起きません
@@ -75,12 +75,12 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 | `<%= foo %>` | `foo` | `foo  ;` | `_ = foo;` |
 | HTML | なし（タグの外は渡さない） | 空白 | `div;` などの識別子 |
 | `Lint/Syntax` | 除外 | 有効 | 有効 |
-| 誤検知への対策 | 53 個の cop をファイル全体で除外 | 65 個の cop をファイル全体で除外 | 9 個をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)） |
+| 誤検知への対策 | 53 個の cop をファイル全体で除外 | 65 個の cop をファイル全体で除外 | 10 個をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)） |
 | autocorrect の検査 | なし | 修正範囲が 1 つのタグの Ruby に収まるか | 修正後の ERB の HTML とパース結果を比べる（`CopCorrectionGuard`。[report.md](report.md#autocorrect-の検査copcorrectionguard)） |
 | `<%# rubocop:disable … %>` | 効かない【実測】 | 効かない【実測】 | 効く【実測】 |
 | 無効化コメントの範囲 | 同じタグの中だけ【実測】 | ファイル全体。ただし Ruby のコメントだけを書いた複数行のタグか、タグの中の行末に書いたときだけ効く【実測】 | ファイル全体【実測】 |
 | `<%%= … %>`（エスケープしたタグ） | 中身を Ruby として検査し、`-a` で書き換える【実測】 | 検査しない | 検査しない |
-| 規模（`lib/`） | 466 行 | 386 行 | 約 3,200 行 |
+| 規模（`lib/`） | 466 行 | 386 行 | 約 3,000 行 |
 
 ## 既存の再現例と境界ケースでの結果【実測】
 
@@ -141,10 +141,10 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 ## 指摘の表示【実測・出典】
 
-0.8 系は、HTML を空白にした Ruby（`Herb.extract_ruby` の出力）を RuboCop に渡します。rubocop-herb は、HTML を識別子にした Ruby を渡し、表示用に HTML を書き戻したソース（hybrid code）を使います。指摘の表示に違いが出るかを確かめました。
+0.8 系は、HTML を空白にした Ruby（`Herb.extract_ruby` の出力）を RuboCop に渡します。rubocop-herb は、HTML を識別子にした Ruby を渡します。指摘の表示に違いが出るかを確かめました。
 
 - 指摘の行の表示（`--format clang` などのソースの抜粋とキャレット）は、3 つとも元の ERB の行になる。HTML やマルチバイト文字を含む行でも、HTML は空白にならず、キャレットの位置も同じ（`display/show.html.erb`）
-  - RuboCop 1.92 は、extractor が返した fragment で見つかった offense の範囲を、元のファイルのバッファに付け替えてから報告する（`RuboCop::Cop::Base#range_for_original`）。0.8 系は文字位置を元の ERB に揃えているので、付け替えた範囲がそのまま元の ERB の正しい位置になる
+  - RuboCop 1.92 は、extractor が返した fragment で見つかった offense の範囲を、元のファイルのバッファに付け替えてから報告する（`RuboCop::Cop::Base#range_for_original`）。0.8 系も rubocop-herb も文字位置を元の ERB に揃えているので、付け替えた範囲がそのまま元の ERB の正しい位置になる
 - 実際のビュー 333 ファイルで、同じ位置に出た offense のメッセージは、0.8.2 と rubocop-herb で 1 件を除いて同じだった。違ったのは rails の `syntax_error.html.erb` の `Lint/Syntax` で、0.8.2 は「unexpected ';'; expected an argument」、rubocop-herb は「unexpected end-of-input; expected a `)` to close the arguments」
 - 構文エラーのメッセージには、ERB に書かれていない `;` が出ることがある。0.8.2 も rubocop-herb もタグの終わりに `;` を補うためで、`<p><%= link_to("a", path %></p>` には両方で「unexpected ';'; expected a `)` to close the arguments」が出る（`display/unclosed_paren.html.erb`）。キャレットは、0.8.2 では `%>` の `>` を、rubocop-herb では `%>` の前の空白を指す
 - メッセージにコードを引用する cop では、変換後の Ruby が出ることがある。rubocop-herb の `Style/IdenticalConditionalBranches` は、`<%= foo %>` について「Move `_ = foo` out of the conditional.」と報告する（`display/identical_branches.html.erb`）。`_ =` は rubocop-herb が `<%=` の位置に書く印で、ERB には書かれていない。0.8 系はこの cop を除外しているので出ない
@@ -184,20 +184,21 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
-| offense の数 | 762 | 763 | 933 |
-| offense のあるファイル | 143 | 151 | 167 |
+| offense の数 | 762 | 763 | 930 |
+| offense のあるファイル | 143 | 151 | 165 |
 | `-a` で書き換わったファイル | 143 | 143 | 140 |
 | うち HTML が変わったファイル | 0 | 0 | 0 |
 | `-A` でパースエラーが増えたファイル | 2 | 0 | 0 |
-| `-A` の後に残る offense | — | 9 | 126（うち `Layout/LineLength` 94） |
-| 実行時間（`--cache false`、検出のみ） | 6.0〜7.5 秒 | 2.2 秒 | 3.3 秒 |
+| `-A` の後に残る offense | — | 9 | 123（うち `Layout/LineLength` 94） |
+| 実行時間（`--cache false`、検出のみ） | 6.0〜7.5 秒 | 2.2 秒 | 2.8 秒 |
 
 ### 0.7.2 と 0.8.2 の違い
 
 - 0.7.2 だけに出るもの: `Style/StringLiterals` 18 件は、rails の認証ジェネレーターのテンプレート（`passwords/edit.html.erb` など 3 ファイル）の `<%%= form.submit "Save" %>` の中身。`<%%=` は `<%=` という文字列を出力するエスケープで、中身は Ruby ではない。**0.7.2 は `-a` でこれを `'Save'` に書き換え、ジェネレーターが生成するコードを変える**。`html_changes.rb` は `<%%` をテキストとして比べないので、この変化を数えていない
 - 0.7.2 だけに出るもの: `Layout/ExtraSpacing` 6 件と `Layout/SpaceBeforeFirstArg` 2 件（`<%= render              "header" %>` など。0.8.2 は `Layout/ExtraSpacing` を除外）、`Style/SafeNavigation` 2 件と `Style/SymbolProc` 1 件（0.8.2 は除外）
 - 0.7.2 の `-A` は、`<% if @part && @part.mime_type %>` を `@part&&.mime_type`（構文エラー）に、`<%= !!user_bookmarks.find { … } %>` を `!user_bookmarks.find { … }.nil?.nil?`（常に `true`）に書き換える
-- 0.8.2 だけに出るもの: `Lint/AssignmentInCondition` 3 件、`Lint/LiteralAsCondition` 2 件、`Naming/VariableNumber` 2 件、`Style/HashEachMethods` 1 件、`Lint/Syntax` 1 件（rails の `syntax_error.html.erb`。わざと構文エラーにした fixture）、`Naming/FileName` 3 件。いずれもタグを跨いで読めるようになったことによるもので、rubocop-herb にも同じものが出る
+- 0.8.2 だけに出るもの: `Lint/AssignmentInCondition` 3 件、`Lint/LiteralAsCondition` 2 件、`Naming/VariableNumber` 2 件、`Style/HashEachMethods` 1 件、`Lint/Syntax` 1 件（rails の `syntax_error.html.erb`。わざと構文エラーにした fixture）。いずれもタグを跨いで読めるようになったことによるもので、rubocop-herb にも同じものが出る
+- 0.8.2 だけに出るもの: `Naming/FileName` 3 件（`_FooBar.html.erb`、`_a-in.html.erb`、`hello_world.pt-BR.html.erb`）。0.7.2 はタグ 1 つを 1 ファイルとして検査するので出ない。rubocop-herb は ERB で除外している
 - 0.8.2 だけに出るもの: `Style/SingleLineDoEndBlock` 10 件、`Style/BlockDelimiters` 8 件。下記
 
 ### 0.8.2 と rubocop-herb の違い
@@ -216,6 +217,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `Style/SingleLineDoEndBlock` | 10 | 0 | 下記 |
 | `Style/BlockDelimiters` | 8 | 0 | 下記 |
 | `Style/MethodCallWithoutArgsParentheses` | 2 | 0 | conference-app の `admin_talks_path()`。rubocop-herb の見逃し（下記） |
+| `Naming/FileName` | 3 | 0 | rubocop-herb は除外。`hello_world.pt-BR.html.erb` はロケール付きのテンプレートで、Rails はこの名前で探すので名前を変えられない。`_FooBar.html.erb` と `_a-in.html.erb` は、大文字やハイフンを含む partial 名を確かめる rails のテスト用 fixture |
 
 `Lint/Syntax` は両方に 1 件出ます（同じファイルで、報告する位置が違う）。
 
@@ -236,7 +238,7 @@ end %>
 conference-app の `admin/talks/index.html.erb` の `<%= link_to "All events talks", admin_talks_path(), class: "…" %>` に、0.7.2 と 0.8.2 は `Style/MethodCallWithoutArgsParentheses` を出しますが、rubocop-herb は出しません。
 
 - RuboCop 1.92.0 の `Style/MethodCallWithoutArgsParentheses` は、括弧を外した結果をパースし直し、AST が変わらないことを確かめてから offense を出す（`ReparsedEquivalence`）。`Style/RedundantParentheses` も同じ確認をし、`Style/TernaryParentheses` は修正の前に同じ確認をする
-- rubocop-herb は、HTML を含むファイルでは、`ProcessedSource` のバッファの中身を、HTML を戻した文字列（hybrid code）に置き換え、AST の HTML の識別子の名前も書き換える（`div` → `div__html0`）。このため、パースし直す対象が Ruby ではなくなり、確認が必ず失敗する
+- rubocop-herb は、AST の HTML の識別子の名前を書き換える（`div` → `div__html0`）。パースし直した AST は書き換えないので、元の AST と一致せず、確認が必ず失敗する
 - 結果として、HTML を 1 つでも含むテンプレートでは、`Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` の offense が消え、`Style/TernaryParentheses` は offense は出るものの修正されない。HTML を含まないテンプレートでは起きない
 - 実際のビューでは、`Style/TernaryParentheses` の `<%= (name == trace_to_show) ? 'block' : 'none' %>`（rails の `rescues/_trace.html.erb`）を、0.8.2 は `-a` で修正し、rubocop-herb は修正しない
 - 再現レポート: [rubocop-herb-issues/reparse-cops-skip-html-files.md](rubocop-herb-issues/reparse-cops-skip-html-files.md)

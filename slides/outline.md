@@ -149,7 +149,7 @@ div;
 - タグの中身は元の位置に、それ以外は空白に（改行は残す）
 - `<%=` は `_ =` に → 「出力する」意味が残るので `Lint/Void` / `Style/SymbolProc` の誤検知が出ない
 - `<%` `%>` の分の空白があるので `;` を補っても位置がずれない
-- 変換結果は rubocop-herb `96d31cf` の `bin/erb2ruby` の出力（行末の空白は省略）
+- 変換結果は rubocop-herb `4d91533` の `bin/erb2ruby` の出力（行末の空白は省略）
 
 ### 15. HTML も Ruby として見せる
 
@@ -158,7 +158,7 @@ div;
   - 空の本文の誤検知（ruumba の `Lint/EmptyConditionalBody`）
   - 入れ子の `if` を `-a` で統合して、間の HTML を消す（`Style/SoleNestedConditional`）
 - 識別子を書き込めば、RuboCop から「本文がある」ことが見える
-- エラー表示は、識別子を元の HTML に戻した `hybrid_code` で行う
+- エラー表示は、RuboCop が offense の範囲を元の ERB に付け替えるので、元の ERB の行がそのまま出る
 - ノート: 短すぎて識別子を置けないテキストは空白のままなので、HTML だけの本文に対する cop の無効化（スライド 17）も併用する
 
 ### 16. RuboCop との連携: ファイル全体を 1 fragment に
@@ -170,7 +170,7 @@ div;
 
 ### 17. 残る誤検知は ERB の構造を見て抑える
 
-- ファイル全体で除外する cop は 9 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
+- ファイル全体で除外する cop は 10 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
 - それ以外は、誤検知になる**その行だけ**で cop を無効化（31 個）
   - 本文に HTML を含む分岐・ブロック: `Lint/EmptyConditionalBody` など → 本当に空の `else` は検出できる
   - ERB タグに跨がる `<% end %>` や本文: `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中に書いた Ruby は検査される
@@ -262,7 +262,7 @@ div;
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、15 分では lint で手一杯。パート 5 で構想として触れる形でよいか。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
 - **autocorrect の課題**: 2 つの cop の修正が重なって `-a` で壊れる問題を直してから発表するか、課題として見せるか（スライド 22 の最後の項目の扱いが変わる）。HTML を含むテンプレートで `Style/MethodCallWithoutArgsParentheses` などが働かない問題（[report.md](../research/report.md#未解決の問題実測)）も、発表前に直しておきたい
-- **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 9 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
+- **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 10 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
 - **Marco Roth 氏との調整**: 氏は Rust 製 linter を RuboCop に公開する RuboCop プラグインのプロトタイプも作っていて、herb#475 で「調整が必要」と述べている。rubygems の `rubocop-herb` / `herb-linter` 0.0.1 もこの計画のためと思われる（[herb-rust.md](../research/herb-rust.md)）。スライド 20 で氏の計画に触れる前に、役割分担（Ruby パートはこちら、HTML パートは Rust 製 linter）と gem 名について話しておきたい
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく
 - **デモ**: ライブか録画か。15 分ならスライド 18 の Before / After を録画で見せるのが安全
