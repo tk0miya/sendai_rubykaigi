@@ -13,7 +13,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 - herb 0.11.1（rubygems のビルド済み gem）/ rubocop 1.92.1 / ruby 4.0.5。3 つとも揃えた
 - 設定は 3 つとも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/tools/](repro/tools/)）
 - 入力
-  - 検証用 ERB（[repro/cases/](repro/cases/)、80 ファイル）。無効化コメントの書き方ごとの例（`rubocop_disable/`、6 ファイル）を含む
+  - 検証用 ERB（[repro/cases/](repro/cases/)、76 ファイル）。無効化コメントの書き方ごとの例（`rubocop_disable/`、6 ファイル）を含む
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -81,15 +81,15 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 ## 検証用 ERB での結果【実測】
 
-[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint rubocop-erb-0.7`、`bin/lint rubocop-erb-0.8`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
+[repro/cases/](repro/cases/) の 76 ファイルにかけた結果です（`bin/lint rubocop-erb-0.7`、`bin/lint rubocop-erb-0.8`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
 
 | | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
-| offense の数 | 53 | 73 | 88 |
+| offense の数 | 49 | 68 | 83 |
 
 0.7.2 だけに出るもの、出ないもの:
 
-- `Lint/AmbiguousOperator`（3 件）、`Lint/RedundantSplatExpansion`（1 件）: `<% count = items.size %>` の後の `<%= count -1 %>` など。前のタグの変数が見えないための誤検知（[existing-erb-linters.md](existing-erb-linters.md#rubocop-erb)）。0.8.2 と rubocop-herb は `Layout/SpaceAroundOperators` を出す
+- `Lint/AmbiguousOperator`（2 件）、`Lint/RedundantSplatExpansion`（1 件）: `<% count = items.size %>` の後の `<%= count -1 %>` など。前のタグの変数が見えないための誤検知（[existing-erb-linters.md](existing-erb-linters.md#rubocop-erb)）。0.8.2 と rubocop-herb は `Layout/SpaceAroundOperators` を出す
 - `Style/NegatedIf`、`Style/NegatedUnless`、`Style/MultilineIfThen`、`Style/UnlessElse`、`Lint/UselessAssignment`、`Lint/Syntax` は 0.7.2 では出ない（タグ単位で `if` を削る、または除外しているため）。`if` を削った後の条件式は検査するので、`<% if foo == nil %>` の `Style/NilComparison` は 0.7.2 でも出る
 
 0.8.2 と rubocop-herb の違い:
@@ -148,16 +148,16 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 ## autocorrect の結果【実測】
 
-検証用 ERB（80 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
+検証用 ERB（76 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
 
 | | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
 |---|---|---|---|
-| 0.7.2 `-a` | 29 | 0 | 0 |
-| 0.7.2 `-A` | 31 | 0 | 1 |
-| 0.8.2 `-a` | 30 | 0 | 0 |
-| 0.8.2 `-A` | 30 | 0 | 0 |
-| rubocop-herb `-a` | 30 | 0 | 1 |
-| rubocop-herb `-A` | 35 | 0 | 1 |
+| 0.7.2 `-a` | 26 | 0 | 0 |
+| 0.7.2 `-A` | 28 | 0 | 1 |
+| 0.8.2 `-a` | 27 | 0 | 0 |
+| 0.8.2 `-A` | 27 | 0 | 0 |
+| rubocop-herb `-a` | 27 | 0 | 1 |
+| rubocop-herb `-A` | 32 | 0 | 1 |
 
 0.7.2 の `-A` でパースエラーが増えたのは `control_flow/safe_navigation`（`user&&.admin?`）、rubocop-herb でパースエラーが増えたのは `output/empty_tag_after_output_tag`（出力タグの `%>` が消える。[report.md](report.md#未解決の問題実測)）です。
 

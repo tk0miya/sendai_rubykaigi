@@ -100,11 +100,6 @@
  <%# 日本語のコメント %>
 -<%= y=2 %>
 +<%= 2 %>
---- cases/multibyte/multibyte_html.html.erb
-+++ cases/multibyte/multibyte_html.html.erb
-@@ -1 +1 @@
--<p>日本語 <%= x=1 %></p>
-+<p>日本語 <%= 1 %></p>
 --- cases/multibyte/show.html.erb
 +++ cases/multibyte/show.html.erb
 @@ -1,7 +1,7 @@
@@ -207,17 +202,3 @@
  <% items.each do |item| %>
    <li><%= item.name %></li>
  <% end %>
---- cases/variables/output_concat.html.erb
-+++ cases/variables/output_concat.html.erb
-@@ -1,3 +1,3 @@
--<% name = "Alice" %>
-+<% name = 'Alice' %>
- <% count = items.size %>
--<p><%= name %>: <%= count -1 %></p>
-+<p><%= name %>: <%= count - 1 %></p>
---- cases/variables/useless_assignment.html.erb
-+++ cases/variables/useless_assignment.html.erb
-@@ -1,2 +1,2 @@
--<% name = "Alice" %>
-+<% name = 'Alice' %>
- <p><%= name %></p>

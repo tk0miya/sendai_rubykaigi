@@ -187,17 +187,17 @@ rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個（[rubocop-erb-0.8.md](rub
 | `then` / `elsif bar == nil` / `unless !x` | erb_lint: 見逃す | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/NegatedUnless` を検出し、正しく修正 |
 | 本当に空の `<% else %>` / `<% unless !x %><% end %>` | erb_lint: 見逃す | `Style/EmptyElse`, `Lint/EmptyConditionalBody` を検出し、`<% else %>` を削除 |
 | `<% items.each do \|i\| %>`（`i` 未使用、本文は HTML だけ） | erb_lint: 見逃す | `Lint/UnusedBlockArgument` を検出し、`_i` に修正 |
-| `<% name = "Alice" %>` + `<%= name %>` | erb_lint: `Lint/UselessAssignment`（誤検知） | 出ない |
+| `<% total = items.sum(&:price) %>` + `<%= total %>` | erb_lint: `Lint/UselessAssignment`（誤検知） | 出ない |
 | 本当に未使用の `<% unused = 1 %>` | Herb: 検出する | `Lint/UselessAssignment` を検出する。`-a` で `Lint/UselessAssignment`、`Lint/Void`、`Herb/EmptyErbTag` が順に修正し、行ごと消える |
 | `<% count = items.size %>` + `<%= count -1 %>` | erb_lint / rubocop-erb 0.7 系: `count(-1)` に書き換える | ローカル変数と認識し、`Layout/SpaceAroundOperators` で `count - 1` に修正 |
 | `<% items.each do \|item\| %>` + `<%= item *2 %>` | erb_lint / rubocop-erb 0.7 系: `item(2)` に書き換える | `item * 2` に修正 |
 | `<% if user && user.admin? %>` | rubocop-erb 0.7 系: `user&&.admin?`（構文エラー） | `user&.admin?` に正しく修正（`-A`） |
 | `<% end.join(", ") %>`、`<% result = if foo %>` | erb_lint / rubocop-erb 0.7 系: 黙って無視する | 解析でき、`", "` は `', '` に正しく修正される。使われていない `result` には `Lint/UselessAssignment` が出て、`-A` で代入が消える |
-| `<p><%= name %>: <%= count -1 %></p>` | ruumba: `name` に `Lint/Void` | 出ない |
+| `<p><%= total %></p>` | ruumba: `total` に `Lint/Void` | 出ない |
 | `<% items.each do \|item\| %>` + `<%= item.name %>` | ruumba: `Style/SymbolProc`（誤った提案） | 出ない |
 | 本文が HTML だけの `if` | ruumba: `Lint/EmptyConditionalBody` | 出ない |
 | `<%= a %><%= b %>` | ruumba: 補った `;` に `Style/Semicolon` | 出ない（cop を除外） |
-| `Layout/TrailingWhitespace`, `Layout/InitialIndentation` など | ruumba: 80 ファイル中 75 ファイルで 330 件 | 出ない |
+| `Layout/TrailingWhitespace`, `Layout/InitialIndentation` など | ruumba: 76 ファイル中 71 ファイルで 317 件 | 出ない |
 | `Style/FrozenStringLiteralComment` | erb_lint: タグごとに出る | 出ない（cop を除外） |
 | `<%= link_to "x", path, class: 'btn' %>` の autocorrect | erb_lint: `<%=` が消え、マジックコメントが入る | `'x'` だけが修正される |
 | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` の autocorrect | erb_lint: `<%` が消える | 変更なし |

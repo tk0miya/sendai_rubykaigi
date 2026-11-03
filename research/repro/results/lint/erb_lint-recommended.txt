@@ -9,7 +9,6 @@ cases/marker/sole_nested_conditional_ok.html.erb:4:16: Style/StringLiterals: Pre
 cases/multibyte/emoji.html.erb:1:21: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/multibyte/emoji.html.erb:1:39: Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
 cases/multibyte/multibyte_comment.html.erb:2:5: Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
-cases/multibyte/multibyte_html.html.erb:1:12: Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
 cases/multibyte/show.html.erb:2:23: Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/multibyte/show.html.erb:2:24: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/multibyte/show.html.erb:2:29: Layout/SpaceAfterComma: Space missing after comma.
@@ -45,6 +44,3 @@ cases/style/ruby_style.html.erb:2:21: Style/StringLiterals: Prefer single-quoted
 cases/variables/ambiguous_operator.html.erb:2:13: Lint/AmbiguousOperator: Ambiguous negative number operator. Parenthesize the method arguments if it's surely a negative number operator, or add a whitespace to the right of the `-` if it should be a subtraction.
 cases/variables/ambiguous_operator.html.erb:4:11: Lint/AmbiguousOperator: Ambiguous splat operator. Parenthesize the method arguments if it's surely a splat operator, or add a whitespace to the right of the `*` if it should be a multiplication.
 cases/variables/ambiguous_operator.html.erb:4:11: Lint/RedundantSplatExpansion: Replace splat expansion with comma separated values.
-cases/variables/output_concat.html.erb:1:10: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/variables/output_concat.html.erb:3:26: Lint/AmbiguousOperator: Ambiguous negative number operator. Parenthesize the method arguments if it's surely a negative number operator, or add a whitespace to the right of the `-` if it should be a subtraction.
-cases/variables/useless_assignment.html.erb:1:10: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

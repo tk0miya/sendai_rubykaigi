@@ -357,10 +357,6 @@ cases/multibyte/multibyte_comment.html.erb:2:5: C: [Correctable] Layout/InitialI
 cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
 cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
 cases/multibyte/multibyte_comment.html.erb:2:8: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/multibyte/multibyte_html.html.erb:1:12: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
-cases/multibyte/multibyte_html.html.erb:1:12: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
-cases/multibyte/multibyte_html.html.erb:1:13: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
-cases/multibyte/multibyte_html.html.erb:1:15: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/multibyte/show.html.erb:1:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/multibyte/show.html.erb:2:16: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/multibyte/show.html.erb:2:16: C: [Correctable] Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
@@ -420,11 +416,6 @@ cases/output/symbol_proc_map.html.erb:1:14: C: [Correctable] Style/SymbolProc: P
 cases/output/symbol_proc_map.html.erb:1:43: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/output/symbol_proc_map.html.erb:2:11: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/output/symbol_proc_map.html.erb:3:7: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/output/symbol_proc.html.erb:1:4: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
-cases/output/symbol_proc.html.erb:1:15: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
-cases/output/symbol_proc.html.erb:1:24: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/output/symbol_proc.html.erb:2:16: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/output/symbol_proc.html.erb:3:7: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/output/two_tags_line.html.erb:1:9: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/two_tags_line.html.erb:1:18: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
 cases/output/two_tags_line.html.erb:1:19: C: [Correctable] Style/Semicolon: Do not use semicolons to terminate expressions.
@@ -542,19 +533,3 @@ cases/variables/cross_tag_variables.html.erb:4:15: C: [Correctable] Style/Symbol
 cases/variables/cross_tag_variables.html.erb:4:24: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/variables/cross_tag_variables.html.erb:5:20: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/variables/cross_tag_variables.html.erb:6:7: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/variables/output_concat.html.erb:1:4: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
-cases/variables/output_concat.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/variables/output_concat.html.erb:1:18: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/variables/output_concat.html.erb:2:22: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/variables/output_concat.html.erb:3:8: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
-cases/variables/output_concat.html.erb:3:8: W: [Correctable] Lint/Void: Variable `name` used in void context.
-cases/variables/output_concat.html.erb:3:12: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/variables/output_concat.html.erb:3:13: C: [Correctable] Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/variables/output_concat.html.erb:3:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/variables/output_concat.html.erb:3:28: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
-cases/variables/output_concat.html.erb:3:30: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/variables/useless_assignment.html.erb:1:4: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
-cases/variables/useless_assignment.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/variables/useless_assignment.html.erb:1:18: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/variables/useless_assignment.html.erb:2:8: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
-cases/variables/useless_assignment.html.erb:2:12: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.

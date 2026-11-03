@@ -31,8 +31,6 @@ cases/multibyte/emoji.html.erb:1:40: C: [Correctable] Layout/SpaceAroundOperator
 cases/multibyte/emoji.html.erb:2:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
 cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
 cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
-cases/multibyte/multibyte_html.html.erb:1:12: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
-cases/multibyte/multibyte_html.html.erb:1:13: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
 cases/multibyte/show.html.erb:2:24: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/multibyte/show.html.erb:2:25: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/multibyte/show.html.erb:2:30: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
@@ -68,6 +66,3 @@ cases/syntax/unclosed_paren.html.erb:1:27: F: Lint/Syntax: unexpected ';'; expec
 cases/variables/ambiguous_operator.html.erb:2:14: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
 cases/variables/ambiguous_operator.html.erb:4:12: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `*`.
 cases/variables/cross_tag_variables.html.erb:3:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `unused`.
-cases/variables/output_concat.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/variables/output_concat.html.erb:3:27: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
-cases/variables/useless_assignment.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

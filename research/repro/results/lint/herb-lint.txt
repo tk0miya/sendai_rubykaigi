@@ -23,7 +23,6 @@ cases/marker/symbol_proc_ng.html.erb:3:7: error: [erb-no-unused-expressions] Avo
 cases/marker/void_ng.html.erb:2:6: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% count + 1 %>` is evaluated but its return value is discarded. Use `<%= count + 1 %>` to output the value or remove the expression.
 cases/multibyte/emoji.html.erb:1:39: error: [erb-no-unused-local-variable] Local variable `x` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_x` to show it is intentionally unused.
 cases/multibyte/multibyte_comment.html.erb:2:4: error: [erb-no-unused-local-variable] Local variable `y` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_y` to show it is intentionally unused.
-cases/multibyte/multibyte_html.html.erb:1:11: error: [erb-no-unused-local-variable] Local variable `x` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_x` to show it is intentionally unused.
 cases/multibyte/show.html.erb:8:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/multibyte/show.html.erb:10:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/output/empty_tag_after_output_tag.html.erb:1:0: error: [erb-no-empty-tags] ERB tag should not be empty. Remove empty ERB tags or add content.

@@ -7,7 +7,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 
 | パス | 内容 |
 |---|---|
-| `cases/` | 検証用 ERB（79 ファイル）。[ケースの一覧](#ケースの一覧) |
+| `cases/` | 検証用 ERB（76 ファイル）。[ケースの一覧](#ケースの一覧) |
 | `plain_ruby/` | 比較用の Ruby。`cases/control_flow/` のいくつかのケースと同じ内容を、普通の Ruby として書いたもの |
 | `tools/TOOL/` | ツールごとの `Gemfile` と設定 |
 | `package.json`, `.herb.yml` | herb-lint / herb-format（`@herb-tools/linter`、`@herb-tools/formatter`） |
@@ -140,16 +140,13 @@ $ bin/fetch-views && bin/record-views
 
 | ファイル | 内容 | 確かめること |
 |---|---|---|
-| `useless_assignment` | `<% name = "Alice" %>` を次のタグで使う | タグ単位の方式の `Lint/UselessAssignment` の誤検知。erb_lint の autocorrect が代入を消す |
-| `cross_tag_variables` | 使う変数と、本当に未使用の `unused` | 本当に未使用の変数だけを検出するか |
+| `cross_tag_variables` | 次のタグで使う `total` と、本当に未使用の `unused` | 本当に未使用の変数だけを検出するか。タグ単位の方式は `total` に `Lint/UselessAssignment` を出し（誤検知）、erb_lint の autocorrect が代入を消す |
 | `ambiguous_operator` | `<%= count -1 %>`、`<%= item *2 %>`（`count`、`item` は前のタグの変数） | タグ単位の方式は変数が見えず、`count(-1)` に書き換える |
-| `output_concat` | `<p><%= name %>: <%= count -1 %></p>` | 出力タグを連結すると `name` に `Lint/Void` が出る |
 
 ### `output/`: 出力タグと同じ行のタグ
 
 | ファイル | 内容 | 確かめること |
 |---|---|---|
-| `symbol_proc` | `<% items.each do \|item\| %><%= item.name %><% end %>` | 出力の意味が消えると `Style/SymbolProc` が出て、従うと出力がなくなる |
 | `symbol_proc_map` | `<% users.map { \|u\| u.name }.each do \|name\| %>` | 1 つのタグの中の、妥当な `Style/SymbolProc` |
 | `string_literal` | `<%= "hello" %>` | タグごとに出るファイル単位の cop（erb_lint）。autocorrect でマジックコメントが入る |
 | `link_to_class` | `<%= link_to "x", path, class: 'btn' %>` | erb_lint の autocorrect で `<%=` が消える |
@@ -182,9 +179,8 @@ $ bin/fetch-views && bin/record-views
 
 | ファイル | 内容 | 確かめること |
 |---|---|---|
-| `multibyte_html` | `<p>日本語 <%= x=1 %></p>` | HTML のマルチバイト文字の後ろでも、offense と修正の位置がずれないか |
+| `emoji` | 絵文字と日本語を HTML と Ruby の両方に含む | マルチバイト文字の後ろでも、offense と修正の位置がずれないか |
 | `multibyte_comment` | `<%# 日本語のコメント %>` の次の行 | 同上（ERB のコメント） |
-| `emoji` | 絵文字と日本語を HTML と Ruby の両方に含む | 同上 |
 | `show` | HTML と日本語を含む行の `link_to( "ホーム",root_path )` など | 指摘の行が元の ERB のまま表示されるか（`--format clang`） |
 
 ### `comment/`: タグの中の Ruby のコメント

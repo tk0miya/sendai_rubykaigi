@@ -68,9 +68,6 @@ cases/multibyte/emoji.html.erb:2:11: C: [Correctable] Style/NilComparison: Prefe
 cases/multibyte/multibyte_comment.html.erb:2:5: E: Herb/Linting: [erb-no-unused-local-variable] Local variable `y` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_y` to show it is intentionally unused.
 cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
 cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
-cases/multibyte/multibyte_html.html.erb:1:12: E: Herb/Linting: [erb-no-unused-local-variable] Local variable `x` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_x` to show it is intentionally unused.
-cases/multibyte/multibyte_html.html.erb:1:12: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
-cases/multibyte/multibyte_html.html.erb:1:13: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
 cases/multibyte/show.html.erb:2:24: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/multibyte/show.html.erb:2:25: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/multibyte/show.html.erb:2:30: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
@@ -123,6 +120,3 @@ cases/variables/ambiguous_operator.html.erb:2:14: C: [Correctable] Layout/SpaceA
 cases/variables/ambiguous_operator.html.erb:4:12: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `*`.
 cases/variables/cross_tag_variables.html.erb:3:4: E: Herb/Linting: [erb-no-unused-local-variable] Local variable `unused` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_unused` to show it is intentionally unused.
 cases/variables/cross_tag_variables.html.erb:3:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `unused`.
-cases/variables/output_concat.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/variables/output_concat.html.erb:3:27: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
-cases/variables/useless_assignment.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

@@ -68,9 +68,9 @@ return unless source.valid_syntax?
 | ERB | 結果 |
 |---|---|
 | `<%= "hello" %>`（`cases/output/string_literal`） | `Layout/InitialIndentation`、`Layout/TrailingEmptyLines`、`Style/FrozenStringLiteralComment` が**タグごとに**出る |
-| `<% name = "Alice" %>` + `<p><%= name %></p>`（`cases/variables/useless_assignment`） | `Lint/UselessAssignment` が出る。次のタグで使っているので誤検知 |
+| `<% total = items.sum(&:price) %>` + `<p><%= total %></p>`（`cases/variables/cross_tag_variables`） | `Lint/UselessAssignment` が出る。次のタグで使っているので誤検知 |
 
-`cases/` の 80 ファイルでは、`Style/FrozenStringLiteralComment` が 107 件、`Layout/TrailingEmptyLines` が 104 件、`Layout/InitialIndentation` が 102 件、`Lint/UselessAssignment` が 19 件出ます。
+`cases/` の 76 ファイルでは、`Style/FrozenStringLiteralComment` が 98 件、`Layout/TrailingEmptyLines` が 95 件、`Layout/InitialIndentation` が 93 件、`Lint/UselessAssignment` が 15 件出ます。
 
 README はこれらの cop を無効化するよう推奨しています（InitialIndentation, LineLength, TrailingEmptyLines, TrailingWhitespace, FileName, FrozenStringLiteralComment, UselessAssignment, Rails/OutputSafety）。issue [#126](https://github.com/Shopify/erb_lint/issues/126) ではメンテナが UselessAssignment について「this is normal … Consider disabling this cop」と回答しています。
 
@@ -92,12 +92,12 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 | 設定 | 修正前 | `erb_lint -a` 後 |
 |---|---|---|
 | 全 cop | `<%= link_to "x", path, class: 'btn' %>` | `# frozen_string_literal: true`⏎`link_to 'x', path, class: 'btn'`⏎` %>` |
-| 全 cop | `<% name = "Alice" %>` | `# frozen_string_literal: true`⏎`'Alice'`⏎` %>` |
+| 全 cop | `<% total = items.sum(&:price) %>` | `# frozen_string_literal: true`⏎`items.sum(&:price)`⏎` %>` |
 | 推奨設定 | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | `x = 1`⏎`  y = 2`⏎`%>` |
 | 推奨設定 | `<% count = items.size %>`⏎`<p><%= count -1 %></p>` | `<%= count(-1) %>`（前のタグの変数が見えず、メソッド呼び出しと解釈する。rubocop-erb 0.7 系と同じ） |
 
 - `<%=` や `<%` が消え、マジックコメントが HTML 本文に挿入される
-- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える。`cases/` の 80 ファイルでは、推奨設定の `-a` で 6 ファイル（`<%` の直後で改行する複数行のタグと、`<% # … %>` のタグ）の `<%` が消え、全 cop の設定では書き換えた 54 ファイルすべてで HTML が変わる
+- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える。`cases/` の 76 ファイルでは、推奨設定の `-a` で 6 ファイル（`<%` の直後で改行する複数行のタグと、`<% # … %>` のタグ）の `<%` が消え、全 cop の設定では書き換えた 50 ファイルすべてで HTML が変わる
 - 同系統の issue: [#142](https://github.com/Shopify/erb_lint/issues/142)（2019 年から open）, [#228](https://github.com/Shopify/erb_lint/issues/228), [#326](https://github.com/Shopify/erb_lint/issues/326), [#331](https://github.com/Shopify/erb_lint/issues/331), [#383](https://github.com/Shopify/erb_lint/issues/383), [#461](https://github.com/Shopify/erb_lint/issues/461)。修正 PR [#413](https://github.com/Shopify/erb_lint/pull/413) も open のまま
 
 ### その他【出典】
@@ -181,7 +181,7 @@ erb_lint / rubocop-erb 0.7 系と同じ `cases/` の ERB にかけた結果で�
 | `<% if foo == nil %>…<% end %>` | 見逃し（erb_lint） | `Style/NilComparison` を検出し、`foo.nil?` に修正 |
 | `<% if !user.nil? %>…<% end %>` | 見逃し | `Style/NegatedIf` を検出し、`unless user.nil?` に修正 |
 | `then` / `elsif bar == nil` / 空の `else` / `unless !x` | 見逃し | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/EmptyElse`, `Style/NegatedUnless` を検出 |
-| `<% name = "Alice" %>` + `<%= name %>` | `Lint/UselessAssignment`（誤検知） | 出ない |
+| `<% total = items.sum(&:price) %>` + `<%= total %>` | `Lint/UselessAssignment`（誤検知） | 出ない |
 | `<% count = items.size %>` + `<%= count -1 %>` | `count(-1)` に書き換え | ローカル変数と認識され、`Lint/AmbiguousOperator` は出ない |
 | `<% end.join(", ") %>` など | 黙って無視 | 正しく解析される |
 | `Style/FrozenStringLiteralComment` など | タグごとに出る | ファイルに 1 回だけ |
@@ -196,7 +196,7 @@ README の推奨設定（`bin/lint ruumba`）を使った結果です。
 
 | ERB | 結果 |
 |---|---|
-| `<p><%= name %>: <%= count -1 %></p>` | `name; count -1` と連結され、`name` に `Lint/Void` が出る |
+| `<p><%= total %></p>` | `total` に `Lint/Void` が出る |
 | `<p><%= count -1 %></p>`（後ろにもタグが続く） | `-` に `Lint/Void` が出る |
 | `<% items.each do \|item\| %>`⏎`<%= item.name %>`⏎`<% end %>` | `Style/SymbolProc` が `items.each(&:name)` を提案する。従うと出力がなくなるので、提案自体が誤り |
 
@@ -211,7 +211,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 **空白で埋めたことによる Layout 系の誤検知**
 
-- `cases/` の 80 ファイルのうち 75 ファイルで、`Layout/TrailingWhitespace` が計 259 件、`Layout/InitialIndentation` が計 71 件出た
+- `cases/` の 76 ファイルのうち 71 ファイルで、`Layout/TrailingWhitespace` が計 250 件、`Layout/InitialIndentation` が計 67 件出た
 - ほかに `Layout/IndentationConsistency`, `Layout/ExtraSpacing`, `Layout/SpaceBeforeSemicolon`, `Layout/BlockAlignment`, `Layout/EndAlignment` なども出る
 - `<%= a %><%= b %>` に補った `;` にも `Style/Semicolon` が出る
 - `<%%= link_to "a", a_path %>`（エスケープしたタグ。中身は Ruby ではない）も正規表現でタグとして取り出すので、`Lint/Syntax` が出る
@@ -219,7 +219,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 **autocorrect が当てにならない**
 
-- 推奨設定のまま `--auto-correct` すると、`cases/` の 80 ファイルで「1220 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
+- 推奨設定のまま `--auto-correct` すると、`cases/` の 76 ファイルで「1154 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
 - ソースにも "auto-correct is still experimental and can cause invalid ruby to be generated when extracting ruby from ERBs" というコメントがある
 - `--only` で Style 系の cop に絞ると修正は反映される。ただし、関係のない `<%== raw_html %>` が `<%= raw raw_html %>` に書き換わる。解析前の `<%==` → `<%= raw` の置換がそのまま書き戻されるため
 - autocorrect のときはマーカー行を挿入したコードを検査するので、lint のときとは結果が変わる。例えば `Style/SymbolProc` は autocorrect のときには検出されない（ブロックの中身にマーカー行が入るため）

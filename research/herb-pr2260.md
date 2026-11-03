@@ -12,7 +12,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 - rubocop 1.92.1 / ruby 4.0.5。herb は、PR 版が 0.11.0（gemspec で固定。rubygems のビルド済み gem）、rubocop-herb が 0.11.1
 - 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/tools/](repro/tools/)）
 - 入力
-  - 検証用 ERB（[repro/cases/](repro/cases/)、80 ファイル）
+  - 検証用 ERB（[repro/cases/](repro/cases/)、76 ファイル）
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -94,12 +94,12 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 ## 検証用 ERB での結果【実測】
 
-[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint herb-rubocop-herb`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
+[repro/cases/](repro/cases/) の 76 ファイルにかけた結果です（`bin/lint herb-rubocop-herb`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
 
 | | PR 版 | rubocop-herb |
 |---|---|---|
-| offense の数 | 309 | 88 |
-| `Layout/ExtraSpacing` | 202 | 0 |
+| offense の数 | 292 | 83 |
+| `Layout/ExtraSpacing` | 192 | 0 |
 
 `Layout/ExtraSpacing` を除くと、次の offense が片方にだけ出ます。
 
@@ -107,9 +107,9 @@ PR 版だけに出るもの:
 
 | cop | 例 | 理由 |
 |---|---|---|
-| `Layout/ExtraSpacing`（202 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
-| `Lint/Void`（9 ファイル） | `<p><%= total %></p>`、`<%= name %>: <%= count -1 %>`、`<%= user.name.nil? ? "anon" : user.name %>`、`<p><%= count + 1 %> items</p>` | 出力する式が、ただの式文になる |
-| `Style/SymbolProc`（5 ファイル） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
+| `Layout/ExtraSpacing`（192 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
+| `Lint/Void`（8 ファイル） | `<p><%= total %></p>`、`<%= user.name.nil? ? "anon" : user.name %>`、`<p><%= count + 1 %> items</p>` | 出力する式が、ただの式文になる |
+| `Style/SymbolProc`（4 ファイル） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
 | `Lint/EmptyBlock`（3 ファイル） | `<% items.each do \|i\| %><li>item</li><% end %>`、1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 本文の HTML が空白になる |
 | `Lint/EmptyWhen`（2 件） | `case` / `when` の本文が HTML だけ（`control_flow/case_when`） | 同上 |
 | `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 同上 |
@@ -185,14 +185,14 @@ PR 版は、`-a` でも次のようにテンプレートを壊します。ファ
 - 修正対象ではないタグでも、`%>` の前の空白が `Layout/ExtraSpacing` で削除される（`<% end %>` → `<% end%>`）
 - `-A` では、さらに `Style/SymbolProc` で、`cross_tag_variables.html.erb` の出力するブロックが `<% items.each(&:name)%>` になり、出力がなくなる
 
-検証用 ERB（80 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
+検証用 ERB（76 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
 
 | | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
 |---|---|---|---|
-| PR 版 `-a` | 73 | 24 | 19 |
-| PR 版 `-A` | 73 | 27 | 19 |
-| rubocop-herb `-a` | 30 | 0 | 1 |
-| rubocop-herb `-A` | 35 | 0 | 1 |
+| PR 版 `-a` | 69 | 23 | 18 |
+| PR 版 `-A` | 69 | 26 | 18 |
+| rubocop-herb `-a` | 27 | 0 | 1 |
+| rubocop-herb `-A` | 32 | 0 | 1 |
 
 rubocop-herb でパースエラーが増えた 1 ファイルは、`output/empty_tag_after_output_tag`（`<% %>`⏎`<%= b %><% %>`）です。2 つの cop の修正が重なって、出力タグの `%>` が消えます（[report.md](report.md#未解決の問題実測)）。
 
