@@ -124,7 +124,7 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
 | `combinable_loops.html.erb` | 2 つのループが `<% items.each(&:name)%>` と `<% items.each(&:price)%>` になる（出力がなくなる） | 変わらない |
 
 - 0.8.2 は、除外を外しても、内容の修正は修正範囲の検査（1 つのタグの中に収まるか）で捨てる。`-A` で変わるのは、`%>` の前の空白などの `Layout` の修正と `Style/StringLiterals` の修正だけだった
-- PR 版の詳細は [herb-pr2260.md](herb-pr2260.md#autocorrect-の結果実測)
+- PR 版の詳細は [herb-rubocop-herb.md](herb-rubocop-herb.md#autocorrect-の結果実測)
 
 ## 除外で何が消えているか（実際のビュー）【実測】
 
@@ -152,7 +152,7 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
   - `Style/SafeNavigation`: `<% if @part && @part.mime_type %>`
   - `Style/RescueModifier`: `corrections = exception_wrapper.corrections rescue []`
   - `Lint/EmptyBlock`: `<%= check_box_tag "save_and_assign", …, class: "w-4 h-4 rounded-sm" do %>`⏎`<% end %>` など
-  - `Style/IfUnlessModifier`: HTML を含めて 121 桁の行（[herb-pr2260.md](herb-pr2260.md#実際のビューでの結果実測)）
+  - `Style/IfUnlessModifier`: HTML を含めて 121 桁の行（[herb-rubocop-herb.md](herb-rubocop-herb.md#実際のビューでの結果実測)）
 - `Style/SafeNavigation` の妥当な 2 件のうち、`<%= @request.parameters["controller"].camelize if @request.parameters["controller"] %>` は rubocop-herb では出ない（下記「マーカーの限界」）
 - 内容に関わらない cop では、0.8.2 の除外を外すと、`Style/Semicolon` が 1,554 件、`Style/FrozenStringLiteralComment` が 254 件、`Style/IfWithSemicolon` が 62 件、`Layout` の 15 個の cop が計 7,308 件出る。どれも、タグの終わりに補った `;` や、空白にした HTML と ERB の区切りから生じる。rubocop-herb は、このうち `Style/Semicolon`、`Style/FrozenStringLiteralComment` と `Layout` の 6 個を除外し、残りの多くは誤検知になる行だけで無効にしている。`Layout/LineLength`（162 件）と `Layout/HashAlignment`（3 件）は rubocop-herb でも出る（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)）
 

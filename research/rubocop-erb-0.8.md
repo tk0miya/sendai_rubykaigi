@@ -18,7 +18,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 ## まとめ
 
-- 0.8 系は、marcoroth/herb#2260（[herb-pr2260.md](herb-pr2260.md)）と同じく `Herb.extract_ruby` で文書全体を 1 本の Ruby にします。0.7 系の見逃し（`Style/NegatedIf` など）、`Lint/Syntax` の除外、`count -1` を `count(-1)` にするような意味を壊す autocorrect は、いずれも解消しています
+- 0.8 系は、marcoroth/herb#2260（[herb-rubocop-herb.md](herb-rubocop-herb.md)）と同じく `Herb.extract_ruby` で文書全体を 1 本の Ruby にします。0.7 系の見逃し（`Style/NegatedIf` など）、`Lint/Syntax` の除外、`count -1` を `count(-1)` にするような意味を壊す autocorrect は、いずれも解消しています
 - herb#2260 との大きな違いは、**autocorrect の修正範囲を検査する仕組みがある**ことです。修正の範囲が 1 つの ERB タグの Ruby の中に収まらなければ、その offense の修正をまるごと捨てます。実際のビュー 333 ファイルで `-a`、`-A` とも HTML が変わったファイル、パースエラーが増えたファイルは 0 でした。0.7 系は `-A` で 2 ファイルを構文エラーにしました
 - 誤検知への対策は、cop をファイル全体で除外することです。除外は 65 個（0.7 系は 53 個、rubocop-herb は 10 個）で、`Lint/Void`、`Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation`、`Layout/LineLength` なども除外しています。このため、ERB でも妥当な指摘（本当に空のブロック、`map { |k| k.to_s }` など）も出ません
 - 除外していない cop には、HTML が空白になることによる誤検知が残ります。実際のビューでは、`<%= cache "x" do %>…<% end %>` のように 1 行に書いたブロックに `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出て、`-a` で `do`⏎` %>…<% `⏎`end %>` のようにタグの中に改行が入ります（8 ファイル。出力は変わらない）
@@ -39,7 +39,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 `lib/rubocop/erb/ruby_extractor.rb`（`lib/` 全体で 386 行）。
 
-- `.erb` のファイルで `Herb.extract_ruby` を呼び、ファイル全体を 1 つの fragment（`offset: 0`）として返す。変換の結果は herb#2260 と同じで、`<%= foo %>` は `foo  ;`、HTML は空白、`<%# … %>` と `<% # … %>` の中身も空白になる（[herb-pr2260.md の変換の例](herb-pr2260.md#ruby-の取り出し)）
+- `.erb` のファイルで `Herb.extract_ruby` を呼び、ファイル全体を 1 つの fragment（`offset: 0`）として返す。変換の結果は herb#2260 と同じで、`<%= foo %>` は `foo  ;`、HTML は空白、`<%# … %>` と `<% # … %>` の中身も空白になる（[herb-rubocop-herb.md の変換の例](herb-rubocop-herb.md#ruby-の取り出し)）
 - HTML のマルチバイト文字は、`extract_ruby` が出すバイト数の空白を 1 文字の空白に戻し、文字位置を元の ERB と揃える
 - `ERBSource`（`ProcessedSource` のサブクラス）が、元の ERB と `Herb.parse` の結果を持ち、各 ERB タグの範囲を引けるようにする
 
@@ -204,9 +204,9 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | cop | 0.8.2 | rubocop-herb | 内容 |
 |---|---|---|---|
-| `Layout/LineLength` | 0 | 162 | 0.8.2 は除外。rubocop-herb の指摘の内容は [herb-pr2260.md](herb-pr2260.md#layoutlinelength) |
+| `Layout/LineLength` | 0 | 162 | 0.8.2 は除外。rubocop-herb の指摘の内容は [herb-rubocop-herb.md](herb-rubocop-herb.md#layoutlinelength) |
 | `Lint/EmptyFile` | 0 | 16 | 0.8.2 は除外。0 バイトのテンプレート |
-| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | `<%# encoding: utf-8 -%>` の次の行。0.8.2 では `<%# … %>` が空白になるので出ない。rubocop-herb は `-a` で空行を挿入し、テンプレートの出力が変わる（[herb-pr2260.md](herb-pr2260.md#layoutemptylineaftermagiccomment)） |
+| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | `<%# encoding: utf-8 -%>` の次の行。0.8.2 では `<%# … %>` が空白になるので出ない。rubocop-herb は `-a` で空行を挿入し、テンプレートの出力が変わる（[herb-rubocop-herb.md](herb-rubocop-herb.md#layoutemptylineaftermagiccomment)） |
 | `Layout/HashAlignment` | 0 | 3 | 0.8.2 は除外。複数行に渡る `link_to` の引数の揃え |
 | `Lint/EmptyBlock` | 0 | 2 | 0.8.2 は除外。2 件とも本当に空のブロック（`<%= check_box_tag … do %>`⏎`<% end %>` など） |
 | `Style/SymbolProc` | 0 | 1 | 0.8.2 は除外。`<%= local_assigns.keys.map {\|k\| k.to_s }.sort.join(",") -%>` で、妥当な指摘 |

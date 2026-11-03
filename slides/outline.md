@@ -107,7 +107,7 @@
   - `<p><%= total %></p>` → `total` に `Lint/Void`
   - `<% items.each do |item| %><%= item.name %><% end %>` → `Style/SymbolProc`（従うと出力が消える）
   - 本文が HTML だけの `if` → `Lint/EmptyConditionalBody`
-- autocorrect は「88 offenses corrected」と表示して 1 ファイルも書き換えない
+- autocorrect は「1154 offenses corrected」と表示して 1 ファイルも書き換えない（検証用 ERB 76 ファイル）
 - 2021 年からメンテ停止
 
 ### 12. パート 2 のまとめ
