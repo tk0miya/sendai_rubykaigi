@@ -994,7 +994,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 | rubygems に未公開。gem 名が Marco Roth 氏の `rubocop-herb` 0.0.1 と衝突している。README の Installation が雛形のまま | Gemfile に git で指定するしかない。業務のプロジェクトでは導入しにくい | gem 名を決めて公開すれば解消 |
 | herb-lint の autocorrect に対応していない（README） | HTML 側の修正には `herb-lint --fix` を別に実行する必要がある | 実装すれば解消 |
 
-autocorrect については、壊す修正を捨てる仕組みがあり、検証用 ERB でも実際のビューでも `-a`・`-A` ともテンプレートを壊しませんでした。ただし、ガードは複数の cop の修正をまとめた結果を検査せず、`Layout/EmptyLineAfterMagicComment` のように出力を変える修正も残っている（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）ので、「autocorrect は常に安全」とまでは言えません。
+autocorrect については、壊す修正を捨てる仕組みがあり、検証用 ERB でも実際のビューでも `-a`・`-A` ともテンプレートを壊しませんでした。ただし、これは見つかった問題にひとつずつ対処した結果で、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とまでは言えません。ガードは複数の cop の修正をまとめた結果を検査せず、`Layout/EmptyLineAfterMagicComment` のように出力を変える修正も残っています（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）。
 
 **利用者の環境や資産によるもの**
 
@@ -1021,7 +1021,7 @@ autocorrect については、壊す修正を捨てる仕組みがあり、検�
 
 ### 発表に向けて
 
-- 提案では「チェックできる範囲、auto correct できる範囲が広がっています」と書いている。範囲が広がったことは検証用 ERB で示せ、テンプレートを壊す修正を捨てる仕組みも説明できる。ただし出力を変える修正が残っている（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）ので、「autocorrect は常に安全」とは言わないほうがよい
+- 提案では「チェックできる範囲、auto correct できる範囲が広がっています」と書いている。範囲が広がったことは検証用 ERB で示せ、テンプレートを壊す修正を捨てる仕組みも説明できる。ただし、見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とは言わないほうがよい。出力を変える修正も残っている（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）
 - rubocop-erb 0.8 系が同じ方式（文書全体の変換と修正範囲の検査）なので、比べる相手は 0.7 系だけでなく 0.8 系も含める。0.8 系との違いは、除外する cop の数と、`<%=` と HTML の意味を残す変換にある
 - 「切り替えられない理由」のうち、tk0miya-rubocop-herb 側で解消できるもの（rubygems への公開）は、発表までに片付けておきたい
 - 利用者の環境によるもの（Node.js、erb_lint の独自 linter）は、「erb_lint と併用できる」「herb-lint を Ruby から使える」という形で、移行の道筋として示せる

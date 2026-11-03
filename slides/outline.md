@@ -9,7 +9,7 @@
 - 15 分なので、**lint（RuboCop × ERB）に絞る**。フォーマット・型チェック・LSP は最後に「この基盤の先」として 1〜2 枚で触れる
 - 話の軸は「Ruby だけを取り出すと、分割しても連結しても文脈が失われる → HTML と Ruby の両方を理解して解析する」
 - 既存ツールの問題は、どれも検証用 ERB（`research/repro/cases/`）で実測したものだけを見せる
-- `Layout/EmptyLineAfterMagicComment` の空行の挿入のように出力を変える修正が残っているので、「autocorrect は常に安全」とは言わない（[comparison.md](../research/comparison.md#発表に向けて)）
+- 「autocorrect は常に安全」とは言わない。見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えない。出力を変える修正（`Layout/EmptyLineAfterMagicComment` の空行の挿入など）も残っている（[comparison.md](../research/comparison.md#発表に向けて)）
 
 ## 時間配分
 
