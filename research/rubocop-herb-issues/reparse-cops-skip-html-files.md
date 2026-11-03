@@ -13,9 +13,9 @@ Templates without HTML are not affected. rubocop-erb 0.8.2, which passes the out
 
 ## Environment
 
-- rubocop-herb `96d31cf8dff39109dbe4506b808e19693a92b2e2`
-- rubocop 1.92.0
-- herb 0.11.0
+- rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e`
+- rubocop 1.92.1
+- herb 0.11.1
 - ruby 4.0.5
 
 ## Steps to reproduce
@@ -59,18 +59,16 @@ In real views, `<%= link_to "All events talks", admin_talks_path(), class: "…"
 
 ## Analysis
 
-`ReparsedEquivalence#corrections_verify?` (rubocop 1.92.0, `lib/rubocop/cop/mixin/reparsed_equivalence.rb`) applies the corrections with `Corrector.new(processed_source)`, parses `corrector.process`, and compares the result with `processed_source.ast`.
+`ReparsedEquivalence#corrections_verify?` (rubocop 1.92.1, `lib/rubocop/cop/mixin/reparsed_equivalence.rb`) applies the corrections with `Corrector.new(processed_source)`, parses `corrector.process`, and compares the result with `processed_source.ast` (`parses_equivalently?`).
 
-When the template has HTML tags, `RuboCop::Herb::ProcessedSource#transform_ast` changes both sides of this comparison:
+`RuboCop::Herb::ProcessedSource#parse` transforms the AST with `RuboCopASTTransformer`, which renames the method of each node rendered from HTML (`div` → `div__html0`), so that the HTML at different positions never compares equal (e.g. in `Lint/DuplicateBranch` and `Style/IdenticalConditionalBranches`). The reparsed AST is not transformed, so it has `(send nil :div)` where `processed_source.ast` has `(send nil :div__html0)`, and the comparison always fails.
 
-1. `replace_buffer_source(hybrid_code)` replaces the buffer source with the hybrid code, in which the HTML is restored (`"<div>\n  _ = link_to root_path();  \n</div>\n"`). The corrected source is therefore not Ruby, and the reparse fails.
-2. `RuboCopASTTransformer#uniquify_html_method_name` renames the method of each HTML node (`div` → `div__html0`). Even if the reparse succeeded, the new AST (`(send nil :div)`) would not be equal to the original one (`(send nil :div__html0)`).
+With `uniquify_html_method_name` turned into a no-op (diagnostic only; this breaks the cops above), the three offenses are reported and marked as correctable.
 
-Disabling only one of the two is not enough. With both `replace_buffer_source` and `uniquify_html_method_name` turned into no-ops (diagnostic only; this breaks other features), the three offenses are reported and marked as correctable.
-
-The other cops that use `ReparsedEquivalence` in rubocop 1.92.0 are `Layout/RedundantLineBreak`, `Style/RedundantLineContinuation`, `Style/SoleNestedConditional`, `Style/ConditionalAssignment` and `Style/MethodCallWithArgsParentheses` (`omit_parentheses` style). They are likely affected in the same way.
+The other cops that use `ReparsedEquivalence` in rubocop 1.92.1 are `Layout/RedundantLineBreak`, `Style/RedundantLineContinuation`, `Style/SoleNestedConditional`, `Style/ConditionalAssignment` and `Style/MethodCallWithArgsParentheses` (`omit_parentheses` style). They are likely affected in the same way.
 
 ## Possible directions
 
-- Let the reparse in `ReparsedEquivalence` work on the converted Ruby code instead of the hybrid code, and compare it with the AST before the transformation. For example, override `parse` or `normalize_reparsed_ast` for ERB sources, or keep the untransformed AST for this comparison.
+- Apply the same transformation to the reparsed AST. `ReparsedEquivalence` has a hook for it, `normalize_reparsed_ast(node)`, but it is called on both sides, and the original side is already transformed. Prepending a module that transforms the reparsed AST for `RuboCop::Herb::ProcessedSource` would make both sides equal.
+- Keep the untransformed AST and compare the reparsed AST with it.
 - Add a spec with HTML around the ERB tags for each of the cops above, so that a future RuboCop release that moves another cop to `ReparsedEquivalence` is caught.

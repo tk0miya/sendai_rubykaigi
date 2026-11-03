@@ -134,7 +134,7 @@ $ npx herb-lint app/views/samples
 
 ```console
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 96d31cf8dff39109dbe4506b808e19693a92b2e2 && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 4d915335e559aa93b7e3ec82adbbe203054e631e && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 $ alias rubocop-herb='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$RUBOCOP_HERB/config/develop/rubocop.yml"'
 ```
@@ -212,15 +212,13 @@ PR 版の gem（`gems/rubocop-herb`）は Ruby だけでできているので、
 ```console
 $ cd research/repro
 $ (cd herb-pr2260 && BUNDLE_FROZEN=true bundle install)
-$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-24ec034"
-$ (cd "$TMPDIR/rubocop-herb-24ec034" && git checkout 24ec03477642aa4c8162d2d7d075aa623c72d062 && bundle install)
-$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb-24ec034"
+$ export PR2260="$PWD/herb-pr2260" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 $ alias pr2260='BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec rubocop --cache false -c "$PR2260/pr.yml"'
 $ alias rubocop-herb-head='BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$PR2260/tk.yml"'
 ```
 
 - `pr.yml` は PR 版を読み込む設定、`tk.yml` は `$RUBOCOP_HERB/config/develop/rubocop.yml` を継承する設定。どちらも `NewCops: enable` と `TargetRubyVersion: 3.4` に揃えてある
-- 比べる対象の rubocop-herb のコミットが「rubocop-herb」の節と違うので、別のディレクトリに clone する
+- rubocop-herb は「rubocop-herb」の節で clone したものを使う
 
 ### 再現例と境界ケースにかける
 
@@ -270,7 +268,7 @@ $ (cd "$V/pr" && pr2260 -a .) ; (cd "$V/tk" && rubocop-herb-head -a .)
 $ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr2260/html_changes.rb "$V/orig" "$V/$t"; done
 ```
 
-- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 935 件
+- 333 ファイルで、PR 版は 2,455 件（うち `Layout/ExtraSpacing` 1,606 件、`Lint/Void` 50 件）、rubocop-herb は 930 件
 - `-a` で HTML が変わるファイルは、PR 版が 63、rubocop-herb が 0
 
 ## rubocop-erb 0.8
@@ -279,15 +277,13 @@ $ for t in pr tk; do BUNDLE_GEMFILE="$PR2260/Gemfile" bundle exec ruby herb-pr22
 
 ### セットアップ
 
-`rubocop-erb-0.8/v0.7.2/` と `rubocop-erb-0.8/v0.8.2/` に、それぞれの版の `Gemfile` があります。herb はビルド済みの gem を使うので、「herb PR #2260」の節と同じく `BUNDLE_FROZEN=true` を付けて `bundle install` します。rubocop と herb のバージョンは、比べる rubocop-herb の `Gemfile.lock`（rubocop 1.92.0、herb 0.11.0）に揃えてあります。
+`rubocop-erb-0.8/v0.7.2/` と `rubocop-erb-0.8/v0.8.2/` に、それぞれの版の `Gemfile` があります。herb はビルド済みの gem を使うので、「herb PR #2260」の節と同じく `BUNDLE_FROZEN=true` を付けて `bundle install` します。rubocop は 1.92.0、herb は 0.11.0 で固定してあります。rubocop-herb は「rubocop-herb」の節で clone したものを使います。
 
 ```console
 $ cd research/repro
 $ (cd rubocop-erb-0.8/v0.7.2 && BUNDLE_FROZEN=true bundle install)
 $ (cd rubocop-erb-0.8/v0.8.2 && BUNDLE_FROZEN=true bundle install)
-$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-96d31cf"
-$ (cd "$TMPDIR/rubocop-herb-96d31cf" && git checkout 96d31cf8dff39109dbe4506b808e19693a92b2e2 && bundle install)
-$ export R="$PWD/rubocop-erb-0.8" RUBOCOP_HERB="$TMPDIR/rubocop-herb-96d31cf"
+$ export R="$PWD/rubocop-erb-0.8" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 $ erb072() { BUNDLE_GEMFILE="$R/v0.7.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
 $ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
 $ tkherb() { BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false --except Herb/Linting -c "$R/tk.yml" "$@"; }
@@ -370,14 +366,14 @@ $ (cd "$V/n-all" && erb082 --format offenses .) ; (cd "$V/tk-all" && tkherb --fo
 $ diff -r "$V/orig/rails/railties/lib/rails/generators" "$V/o-safe/rails/railties/lib/rails/generators"
 ```
 
-- 333 ファイルで、0.7.2 は 762 件、0.8.2 は 763 件、rubocop-herb は 933 件
+- 333 ファイルで、0.7.2 は 762 件、0.8.2 は 763 件、rubocop-herb は 930 件
 - `-a`・`-A` で HTML が変わるファイルは、3 つとも 0。`-A` でパースエラーが増えるファイルは、0.7.2 が 2、ほかの 2 つは 0
-- `-A` の後に残る offense は、0.8.2 が 9 件、rubocop-herb が 126 件
+- `-A` の後に残る offense は、0.8.2 が 9 件、rubocop-herb が 123 件
 - 0.7.2 の `-a` は、rails の認証ジェネレーターのテンプレートの `<%%= … %>` の中身を書き換える（`html_changes.rb` では数えられない）
 
 ## ERB コメントの無効化コメント
 
-[../erb-comment-directive.md](../erb-comment-directive.md) の再現手順です。「rubocop-erb 0.8」の節の `erb072`、`erb082`、`tkherb` と、「herb PR #2260」の節の `pr2260` を使います。`tkherb` が使う `RUBOCOP_HERB` は、「rubocop-erb 0.8」の節の `$TMPDIR/rubocop-herb-96d31cf` にしておきます（「herb PR #2260」の節は別のコミットを指す）。
+[../erb-comment-directive.md](../erb-comment-directive.md) の再現手順です。「rubocop-erb 0.8」の節の `erb072`、`erb082`、`tkherb` と、「herb PR #2260」の節の `pr2260` を使います。
 
 ### 各 linter で無効化が効くか
 
@@ -431,9 +427,7 @@ $ for d in orig fmt fmtfix; do for f in $d/*.html.erb; do echo "== $f"; erb082 -
 
 ```console
 $ cd research/repro
-$ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb-bcd6ee5"
-$ (cd "$TMPDIR/rubocop-herb-bcd6ee5" && git checkout bcd6ee5a2420b931df6af89b3ed74bfc2a19cf1a && bundle install)
-$ export R="$PWD/rubocop-erb-0.8" P="$PWD/herb-pr2260" M="$PWD/marker" RUBOCOP_HERB="$TMPDIR/rubocop-herb-bcd6ee5"
+$ export R="$PWD/rubocop-erb-0.8" P="$PWD/herb-pr2260" M="$PWD/marker" RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 $ erb082() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$R/erb.yml" "$@"; }
 $ erb082x() { BUNDLE_GEMFILE="$R/v0.8.2/Gemfile" bundle exec rubocop --cache false -c "$M/erb-noexclude.yml" "$@"; }
 $ pr2260() { BUNDLE_GEMFILE="$P/Gemfile" bundle exec rubocop --cache false -c "$P/pr.yml" "$@"; }

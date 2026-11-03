@@ -1,6 +1,6 @@
 # `<%#` に書いた rubocop:disable と herb-format の整形
 
-調査日: 2026-10-31
+調査日: 2026-11-03
 
 ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと同じ行やブロックの中に書いたときに、各 linter で無効化が効くかを調べました。あわせて、herb-lint と herb-format がこのコメントの行をどうインデントするか、整形した後も無効化が同じ範囲に効くかを調べました。比較のため、herb-lint の無効化コメント `<%# herb:disable … %>` を herb-format がどう扱うかも調べました。
 【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#erb-コメントの無効化コメント)）、【出典】はドキュメントで確かめたこと、【推測】は解釈です。
@@ -11,7 +11,7 @@ ERB のコメント `<%# rubocop:disable … %>` を、ほかの ERB タグと�
 - rubocop-erb 0.7.2 / 0.8.2（rubocop 1.92.0、herb 0.11.0）
 - marcoroth/herb#2260 の rubocop-herb（`d0323df`。以下「herb#2260」）
 - ruumba 0.1.17（README の推奨設定）
-- tk0miya/rubocop-herb `96d31cf8dff39109dbe4506b808e19693a92b2e2`（以下「rubocop-herb」。`Herb/Linting` は無効）
+- tk0miya/rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e`（以下「rubocop-herb」。`Herb/Linting` は無効。rubocop 1.92.1、herb 0.11.1）
 - @herb-tools/linter 0.11.0（herb-lint）/ @herb-tools/formatter 0.11.0（herb-format）
 - 入力は [repro/erb-comment/](repro/erb-comment/) の 9 ファイル。`empty_if.html.erb` 以外は、`Lint/LiteralAsCondition` を無効にするコメントと、その対象になる `<% if 'hello' %>` を含む。`herb:disable` の入力は [repro/erb-comment/herb-disable/](repro/erb-comment/herb-disable/) の 4 ファイル（[herb:disable と herb-format](#herbdisable-と-herb-format実測出典)）
 

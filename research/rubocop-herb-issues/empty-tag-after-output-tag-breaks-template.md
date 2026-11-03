@@ -8,9 +8,9 @@ The corrections come from two cops, both enabled by default: `Layout/SpaceBefore
 
 ## Environment
 
-- rubocop-herb `96d31cf8dff39109dbe4506b808e19693a92b2e2`
-- rubocop 1.92.0
-- herb 0.11.0
+- rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e`
+- rubocop 1.92.1
+- herb 0.11.1
 - ruby 4.0.5
 
 ## Steps to reproduce

@@ -10,7 +10,7 @@ rubocop-erb 0.8 系と herb 公式の rubocop-herb（[marcoroth/herb#2260](https
 
 - rubocop-erb 0.8.2（rubocop 1.92.0 / herb 0.11.0）
 - PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head）の `gems/rubocop-herb`（rubocop 1.91.0 / herb 0.11.0）
-- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `bcd6ee5a2420b931df6af89b3ed74bfc2a19cf1a`（2026-11-02 時点の main。rubocop 1.92.1 / herb 0.11.1）
+- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main。rubocop 1.92.1 / herb 0.11.1）
 - ruby 4.0.5。設定はどれも `NewCops: enable`、`TargetRubyVersion: 3.4`
 - 入力
   - 組にしたサンプル（[repro/marker/](repro/marker/) の `ok/` と `ng/`、18 ファイル）。cop ごとに、ERB として正しいもの（`ok/`）と、同じ形で本当に直すべきもの（`ng/`）を 1 つずつ置いた
