@@ -1,9 +1,9 @@
-# 第 2 部 rubocop-herb の実装
+# 第 2 部 tk0miya-rubocop-herb の実装
 
-tk0miya/rubocop-herb（以下「rubocop-herb」）が、ERB をどう Ruby にし、RuboCop の誤検知と壊れる autocorrect をどう防いでいるかを説明します。
+tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ruby にし、RuboCop の誤検知と壊れる autocorrect をどう防いでいるかを説明します。
 対象の版と凡例は [README.md](README.md) にあります。既存ツールとの比較の結果は [第 1 部](comparison.md) にあります。
 
-- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
+- tk0miya-rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
 - rubocop 1.92.1 / herb 0.11.1（同リポジトリの `Gemfile.lock`）/ ruby 4.0.5
 - 設定はリポジトリの `config/develop/rubocop.yml`（`bin/lint tk0miya-rubocop-herb`）。特に断りがない限り、`Herb/Linting` cop（herb-lint の実行）は外して、RuboCop の結果だけを見た
 
@@ -15,7 +15,7 @@ tk0miya/rubocop-herb（以下「rubocop-herb」）が、ERB をどう Ruby に�
 4. [RuboCop との連携](#4-rubocop-との連携出典)
 5. [除外している cop と、行単位で無効にしている cop](#5-除外している-cop-と行単位で無効にしている-cop出典)
 6. [autocorrect の検査（CopCorrectionGuard）](#6-autocorrect-の検査copcorrectionguard)
-7. [rubocop-herb の cop](#7-rubocop-herb-の-cop)
+7. [tk0miya-rubocop-herb の cop](#7-tk0miya-rubocop-herb-の-cop)
 8. [未解決の問題](#8-未解決の問題)
 9. [その他](#9-その他出典)
 
@@ -28,7 +28,7 @@ tk0miya/rubocop-herb（以下「rubocop-herb」）が、ERB をどう Ruby に�
 - 文を消す修正で空になったタグは、`Herb/EmptyErbTag` cop が行ごと消す。`<% unused = 1 %>` は、通常の Ruby ファイルと同じく `-a` でタグごと消える
 - `Herb/Linting` cop で herb-lint も同時に実行でき、HTML の構造の誤りも RuboCop の出力に並ぶ（Node.js と `@herb-tools/linter` が必要）
 - 未解決の問題が 2 件ある。2 つの cop の修正が重なると `-a` でテンプレートが壊れる問題と、HTML を含むテンプレートで修正をパースし直して確かめる cop が働かない問題（[8 章](#8-未解決の問題)）
-- 規模は `lib/` 全体で 3,004 行（herb#2260 は 74 行、rubocop-erb 0.8.2 は 386 行）
+- 規模は `lib/` 全体で 3,004 行（herb-rubocop-herb は 74 行、rubocop-erb 0.8.2 は 386 行）
 
 ## 2. ERB から Ruby への変換
 
@@ -41,13 +41,13 @@ tk0miya/rubocop-herb（以下「rubocop-herb」）が、ERB をどう Ruby に�
 - `<%=` と `<%==` は常に `_ =` に置き換える
 - `<%%`（エスケープしたタグ）はテキストとして扱い、HTML のテキストと同じく `_a;` などにする
 - `<%# … %>` は、右側に別のタグや HTML がない場合だけ Ruby のコメントにする
-- タグの中の行末の Ruby のコメント（`<% x # comment %>`）は、そのまま書き込む。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、このコメントは同じ行の後ろのタグや HTML までコメントにする。rubocop-herb もそれに合わせ、後ろのコードを検査しない（`Herb/CommentedOutCode` cop が報告する。[7 章](#7-rubocop-herb-の-cop)）
+- タグの中の行末の Ruby のコメント（`<% x # comment %>`）は、そのまま書き込む。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、このコメントは同じ行の後ろのタグや HTML までコメントにする。tk0miya-rubocop-herb もそれに合わせ、後ろのコードを検査しない（`Herb/CommentedOutCode` cop が報告する。[7 章](#7-tk0miya-rubocop-herb-の-cop)）
 - HTML のタグやテキストも、元の位置に Ruby の識別子として書き込む。要素の開始タグ・終了タグは `div;` などのタグ名に、本文のテキストは `_a;` などになる。要素は入れ子のブロックにせず平坦に並べる。識別子を置けないほど短いテキストは空白のままになる（[3.3 節](#33-マーカーの限界実測出典)）
 - 正規表現ではなく Herb の AST で ERB の構造を読むので、`<%-` / `-%>` や属性値の中のタグも扱える
 
 ### 2.2 変換の例【実測】
 
-`bin/erb2ruby`（rubocop-herb のリポジトリにある。標準入力の ERB を変換して出力する）の出力です。行末の空白は省略しています。
+`bin/erb2ruby`（tk0miya-rubocop-herb のリポジトリにある。標準入力の ERB を変換して出力する）の出力です。行末の空白は省略しています。
 
 ```erb
 <div class="user">
@@ -73,7 +73,7 @@ div;
    end;
 ```
 
-同じ ERB の `Herb.extract_ruby`（rubocop-erb 0.8 系、herb#2260）の出力は次のとおりで、HTML と `<%=` が空白になります。
+同じ ERB の `Herb.extract_ruby`（rubocop-erb 0.8 系、herb-rubocop-herb）の出力は次のとおりで、HTML と `<%=` が空白になります。
 
 ```ruby
 
@@ -97,9 +97,9 @@ div;
 
 ### 3.1 空白にすると、正しい ERB と直すべき ERB が同じ Ruby になる
 
-ERB は、テキストと `<%=` を `_erbout` への追記という文にコンパイルします。`Herb.extract_ruby` はこの文を落とし、rubocop-herb は短い文で置き換えます（[第 1 部 1 章](comparison.md#1-erb-から-ruby-を取り出す-2-つの方式)）。
+ERB は、テキストと `<%=` を `_erbout` への追記という文にコンパイルします。`Herb.extract_ruby` はこの文を落とし、tk0miya-rubocop-herb は短い文で置き換えます（[第 1 部 1 章](comparison.md#1-erb-から-ruby-を取り出す-2-つの方式)）。
 
-| ERB | ERB のコンパイル結果 | `Herb.extract_ruby` | rubocop-herb |
+| ERB | ERB のコンパイル結果 | `Herb.extract_ruby` | tk0miya-rubocop-herb |
 |---|---|---|---|
 | `<%= expr %>` | `_erbout << (expr).to_s` | `expr  ;`（値を捨てる式） | `_ = expr;`（値を使う文） |
 | `<% expr %>` | `expr` | `expr  ;` | `expr;` |
@@ -113,21 +113,21 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 組にしたサンプル 9 組（[repro/cases/marker/](repro/cases/marker/)）では、次のようになりました【実測】（詳しくは [第 1 部 5.2 節](comparison.md#52-erb-として正しいものと直すべきものの区別)）。
 
 - rubocop-erb 0.8.2 の除外を外すと、9 組すべてで正しい側にも直すべき側にも同じ指摘が出る
-- herb#2260 は 48 個の cop を除外し、残りは両方を報告する。9 組中 7 組で正しい側にも指摘が出て、`-A` で正しい側の 5 ファイルの HTML や出力タグを消す
+- herb-rubocop-herb は 48 個の cop を除外し、残りは両方を報告する。9 組中 7 組で正しい側にも指摘が出て、`-A` で正しい側の 5 ファイルの HTML や出力タグを消す
 - rubocop-erb 0.8.2 は 65 個の cop を除外する。直すべき側 9 件のうち 8 件を見逃し、除外しなかった `Style/CombinableLoops` では正しい側にも指摘が出る
-- rubocop-herb は、**直すべき側の 9 件をすべて検出し、正しい側には誤検知を出さない**。`-A` でも正しい側は 1 つも変えない（`Style/StringLiterals` の修正を除く）
+- tk0miya-rubocop-herb は、**直すべき側の 9 件をすべて検出し、正しい側には誤検知を出さない**。`-A` でも正しい側は 1 つも変えない（`Style/StringLiterals` の修正を除く）
 
-直すべき側に `-A` をかけると、rubocop-herb は ERB の構造を保ったまま修正します【実測】。`<% if user %>`⏎`  <% user.touch %>`⏎`<% end %>` は `<% user&.touch %>` に、連続した 2 つの `items.each` は 1 つのループにまとまります（`Style/CombinableLoops`。間のタグは `Herb/EmptyErbTag` が消し、`<%  end %>` のように空白が 2 つ残る）。`<p><% count + 1 %> items</p>` は `<p> items</p>` になります（`Lint/Void` で値を捨てる式が消える）。
+直すべき側に `-A` をかけると、tk0miya-rubocop-herb は ERB の構造を保ったまま修正します【実測】。`<% if user %>`⏎`  <% user.touch %>`⏎`<% end %>` は `<% user&.touch %>` に、連続した 2 つの `items.each` は 1 つのループにまとまります（`Style/CombinableLoops`。間のタグは `Herb/EmptyErbTag` が消し、`<%  end %>` のように空白が 2 つ残る）。`<p><% count + 1 %> items</p>` は `<p> items</p>` になります（`Lint/Void` で値を捨てる式が消える）。
 
-実際のビュー 333 ファイルでは、0.8.2 が除外している内容の指摘 131 件のうち、妥当な指摘は 23 件でした。rubocop-herb は同じ cop で 22 件を報告し、すべて妥当な指摘でした（[第 1 部 5.4 節](comparison.md#54-実際のビュー実測)）。
+実際のビュー 333 ファイルでは、0.8.2 が除外している内容の指摘 131 件のうち、妥当な指摘は 23 件でした。tk0miya-rubocop-herb は同じ cop で 22 件を報告し、すべて妥当な指摘でした（[第 1 部 5.4 節](comparison.md#54-実際のビュー実測)）。
 
 ### 3.2 実装の規模【出典】
 
 | | Ruby の取り出し | 誤検知への対策 | 規模（`lib/`） |
 |---|---|---|---|
-| herb#2260 | `Herb.extract_ruby` | 48 個の cop をファイル全体で除外 | 74 行（`plugin.rb`） |
+| herb-rubocop-herb | `Herb.extract_ruby` | 48 個の cop をファイル全体で除外 | 74 行（`plugin.rb`） |
 | rubocop-erb 0.8.2 | `Herb.extract_ruby` | 65 個の cop をファイル全体で除外 | 386 行 |
-| rubocop-herb | 独自（`RubyRenderer`、312 行） | 10 個の cop をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする | 3,004 行 |
+| tk0miya-rubocop-herb | 独自（`RubyRenderer`、312 行） | 10 個の cop をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする | 3,004 行 |
 
 - ファイル全体で除外する 10 個は、どれも ERB のファイルとしての性質（どの位置からでも書き始められる、マジックコメントを置かない、ファイル名にロケールが入るなど）から ERB に合わない cop で、マーカーでは解決しない（[5 章](#5-除外している-cop-と行単位で無効にしている-cop出典)）
 - 行単位の無効化（`lib/rubocop/herb/erb_parser/` と `*_collector.rb`、計 870 行）は、ERB タグに跨がる `if` や `<% end %>` の位置合わせなど、Ruby として書けない ERB の構造を扱う。HTML を本文に持つ分岐やブロックを空とみなす cop の無効化は、主にマーカーを置けない短いテキストのためにある
@@ -135,15 +135,15 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 
 ### 3.3 マーカーの限界【実測・出典】
 
-- **短いテキストにはマーカーを置けない**。`_a;` は、テキストの中に 3 文字と後ろの空白か改行、または 2 文字と改行がないと置けない（`TEXT_MARKER_POSITION`）。`|` 1 文字などは空白のままになり、空白にする方式と同じ誤検知が起きる。[repro/cases/marker/safe_navigation_short.html.erb](repro/cases/marker/safe_navigation_short.html.erb)（`<% if user %>` の本文が `|<% user.touch %>`）には、rubocop-herb でも `Style/SafeNavigation` が出る。行単位の無効化は、`Lint/EmptyBlock` などについてこの穴を塞いでいるが、`Style/SafeNavigation` などは塞いでいない
+- **短いテキストにはマーカーを置けない**。`_a;` は、テキストの中に 3 文字と後ろの空白か改行、または 2 文字と改行がないと置けない（`TEXT_MARKER_POSITION`）。`|` 1 文字などは空白のままになり、空白にする方式と同じ誤検知が起きる。[repro/cases/marker/safe_navigation_short.html.erb](repro/cases/marker/safe_navigation_short.html.erb)（`<% if user %>` の本文が `|<% user.touch %>`）には、tk0miya-rubocop-herb でも `Style/SafeNavigation` が出る。行単位の無効化は、`Lint/EmptyBlock` などについてこの穴を塞いでいるが、`Style/SafeNavigation` などは塞いでいない
 - **`_ =` が隠す指摘がある**。`<%= x.camelize if x %>` は `_ = x.camelize if x` になり、`Style/SafeNavigation` の対象にならない。実際のビューでは 1 件あり、0.8.2 の除外を外すと出る
 - **メッセージに `_ =` が出る**。`Style/IdenticalConditionalBranches` は「Move `_ = user.name` out of the conditional.」と報告する
 
 ### 3.4 評価【推測】
 
 - `Herb.extract_ruby` で生じる誤検知は、cop の側の問題ではなく、変換で ERB の意味（出力する、HTML がある）を落としたことの帰結。落とした情報は cop からは取り戻せないので、ERB として正しいものと直すべきものは原理的に区別できない。除外は「誤検知を消す」ことではなく、「その cop が見つけるはずの問題ごと捨てる」ことになる
-- rubocop-herb は、ERB のコンパイル結果にある文を `_ =` と `_a;` で残し、Ruby の上で ERB と同じ文の数と値の使われ方を再現している。誤検知の原因が変換の段階で消えるので、cop を除外せずに済み、妥当な指摘が残る。autocorrect も、ERB の構造を変える修正が提案されなくなる
-- 実装の規模は、herb#2260 の約 40 倍、0.8.2 の約 8 倍。それでも、除外で済ませる方式では、除外の一覧が「ERB で誤検知になる cop」をすべて把握している必要があり、RuboCop に cop が増えるたびに追いかけることになる。`NewCops: enable` の利用者には、除外の一覧に入る前の新しい cop の誤検知がそのまま届く。変換で意味を残す方式は、未知の cop にも同じ Ruby を見せるので、この追いかけっこが小さくなる
+- tk0miya-rubocop-herb は、ERB のコンパイル結果にある文を `_ =` と `_a;` で残し、Ruby の上で ERB と同じ文の数と値の使われ方を再現している。誤検知の原因が変換の段階で消えるので、cop を除外せずに済み、妥当な指摘が残る。autocorrect も、ERB の構造を変える修正が提案されなくなる
+- 実装の規模は、herb-rubocop-herb の約 40 倍、0.8.2 の約 8 倍。それでも、除外で済ませる方式では、除外の一覧が「ERB で誤検知になる cop」をすべて把握している必要があり、RuboCop に cop が増えるたびに追いかけることになる。`NewCops: enable` の利用者には、除外の一覧に入る前の新しい cop の誤検知がそのまま届く。変換で意味を残す方式は、未知の cop にも同じ Ruby を見せるので、この追いかけっこが小さくなる
 - 一方で、変換が複雑なぶん、`ReparsedEquivalence` のような RuboCop 側の仕組みと噛み合わない箇所がある（[8.2 節](#82-パースし直して確かめる-cop-が働かない出典実測)）。0.8 系は `Herb.extract_ruby` の結果をそのまま RuboCop に渡すので、この種の問題は起きにくい
 - マーカーは万能ではない。短いテキストの穴と、`_ =` が隠す指摘があり、それぞれ行単位の無効化と見逃しとして残っている
 
@@ -152,7 +152,7 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 - LintRoller プラグインとして読み込まれ、RuboCop の ruby_extractors API に `Extractor` を登録する（`lib/rubocop/herb/plugin.rb`）
 - `Extractor` は `[{ offset: 0, processed_source: … }]`、つまり **ファイル全体を 1 つの fragment** として返す（`lib/rubocop/herb/extractor.rb`）
 - 文字位置が元の ERB と一致しているので、offense の位置も autocorrect の修正範囲も、変換せずに元のファイルに適用できる
-- ruby_extractors API では 1 つの fragment が元ファイル上の連続した 1 区間でなければならない（[第 1 部 3.2 節](comparison.md#32-rubocop-erb-07-系)）。rubocop-herb はファイル全体を 1 区間にすることで、タグを跨いだ構文を 1 つの AST にしている
+- ruby_extractors API では 1 つの fragment が元ファイル上の連続した 1 区間でなければならない（[第 1 部 3.2 節](comparison.md#32-rubocop-erb-07-系)）。tk0miya-rubocop-herb はファイル全体を 1 区間にすることで、タグを跨いだ構文を 1 つの AST にしている
 - エラーの表示は、変換後の Ruby ではなく元の ERB の行になる。RuboCop は、extractor が返した fragment で見つかった offense の範囲を、元のファイルのバッファに付け替えてから報告する（`RuboCop::Cop::Base#range_for_original`。[第 1 部 5.5 節](comparison.md#55-指摘の表示実測出典)）
 - RuboCop と同じプロセス内で動く。ruumba のように一時ファイルや子プロセスを使わない
 - ERB では `--disable-uncorrectable` も無効にする（挿入される `# rubocop:todo` コメントがテンプレートを壊すため）
@@ -163,7 +163,7 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 
 `Layout/CommentIndentation`, `Layout/ExtraSpacing`, `Layout/IndentationConsistency`, `Layout/InitialIndentation`, `Layout/LeadingEmptyLines`, `Layout/TrailingEmptyLines`, `Metrics/BlockLength`, `Naming/FileName`, `Style/FrozenStringLiteralComment`, `Style/Semicolon`
 
-`Naming/FileName` は、ロケールなどを含むテンプレートの名前（`show.pt-BR.html.erb` など）を snake_case でないと報告するため除外しています。rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個、herb#2260 は 48 個、ruumba の推奨設定は 5 個です。`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void` は除外していません。
+`Naming/FileName` は、ロケールなどを含むテンプレートの名前（`show.pt-BR.html.erb` など）を snake_case でないと報告するため除外しています。rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個、herb-rubocop-herb は 48 個、ruumba の推奨設定は 5 個です。`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void` は除外していません。
 
 さらに、ERB の構造を見て、誤検知になる行でだけ cop を無効にしています（`<%# rubocop:disable %>` と同じ仕組み。`RuboCop::Herb::ProcessedSource#comment_config`）。対象は 31 個です。
 
@@ -203,7 +203,7 @@ ERB タグに跨がる構造では Layout 系の cop を無効にしているの
   - Herb のパースエラーが増えていない
 - 検査に通らなかった修正は捨て、その offense は「autocorrect できない」（`[Correctable]` が付かない）として報告する
 - HTML の両端の空白は無視するので、ERB タグをインデントや改行ごと削除する修正（`else` + `if` → `elsif` など）は通る
-- `Herb/` で始まる rubocop-herb の cop は、ERB を直接書き換えるので検査しない
+- `Herb/` で始まる tk0miya-rubocop-herb の cop は、ERB を直接書き換えるので検査しない
 - 検査は cop ごとの修正に対して行う。RuboCop が複数の cop の修正を 1 つにまとめた結果は検査しない（[8.1 節](#81-2-つの-cop-の修正が重なって--が消える出典推測)）
 - ERB タグの中身は比べていないので、HTML と出力タグの数とパースエラーが変わらなければ、2 つのタグを 1 つにつなげる修正も通る（`<%= b %><% %>` の間の `%><%` を `Layout/SpaceBeforeSemicolon` が消して `<%= b  %>` にする、など）
 
@@ -228,7 +228,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 
 検証用 ERB（76 ファイル）では、`-a` で 27 ファイル、`-A` で 32 ファイルが書き換わり、HTML が変わったファイルは 0、パースエラーが増えたのは 1 ファイル（[8.1 節](#81-2-つの-cop-の修正が重なって--が消える出典推測)）でした。実際のビュー 333 ファイルでは、`-a`、`-A` とも HTML が変わったファイルもパースエラーが増えたファイルも 0 でした（[第 1 部 5.3 節](comparison.md#53-autocorrect実測)）。
 
-## 7. rubocop-herb の cop
+## 7. tk0miya-rubocop-herb の cop
 
 ### 7.1 Herb/Linting
 
@@ -274,7 +274,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 
 - タグの中の行末の Ruby のコメントは、ERB では同じ行の後ろのタグや HTML までコメントにする。`<% name = user.name # the full name %><%= name %>` では `<%= name %>` が出力されず、`<% if admin? # only for admins %><p>admin</p><% end %>` は `end` がコメントになって構文エラーになる（`cases/comment/commented_out_*`）
 - `Herb/CommentedOutCode`（`lib/rubocop/cop/herb/commented_out_code.rb`。既定で有効）は、後ろに ERB のコメント以外のタグや HTML が続く行末の Ruby のコメントを報告する。構文エラーのあるファイルでも報告する
-- rubocop-herb は ERB と同じくこのコメントで後ろのコードを隠すので、隠れたコードは検査されない。上の例の `name` には `Lint/UselessAssignment` が出る【実測】
+- tk0miya-rubocop-herb は ERB と同じくこのコメントで後ろのコードを隠すので、隠れたコードは検査されない。上の例の `name` には `Lint/UselessAssignment` が出る【実測】
 - `<% x = "a" # rubocop:disable Style/StringLiterals %><%= y %>` では、無効化は効くが、後ろの `<%= y %>` の分（`_ = y;`）がコメントに入るので `Lint/CopDirectiveSyntax` も出る【実測】
 - autocorrect はしない（改行を入れると出力される空白が変わるため。README に記載）
 
@@ -290,7 +290,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 ### 8.1 2 つの cop の修正が重なって `%>` が消える【出典・推測】
 
 - `Layout/SpaceBeforeSemicolon` は、`_ = b;    ;` の 2 つ目の `;` の前の空白、つまり元の ERB の `%><%` を消す。HTML、出力タグの数、パースエラーは変わらないので、ガードは通す（2 つのタグが 1 つにつながる）
-- `Herb/EmptyErbTag` は、2 つ目のタグ `<% %>` を消す。rubocop-herb の cop なので、ガードは検査しない
+- `Herb/EmptyErbTag` は、2 つ目のタグ `<% %>` を消す。tk0miya-rubocop-herb の cop なので、ガードは検査しない
 - RuboCop は、交差する削除をまとめることを許す（`crossing_deletions: :accept`）ので、2 つの削除が `%><% %>` の削除になり、出力タグの `%>` も消える。ガードは cop ごとの修正しか見ていない
 - 空のタグが 1 つ目の行にないとき（`<%= b %><% %>` だけのとき）は、まとめた修正が空のタグの削除だけになり、壊れない。違いが生じる理由は調べていない
 
@@ -299,7 +299,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 ### 8.2 パースし直して確かめる cop が働かない【出典・実測】
 
 - RuboCop 1.92 の `Style/MethodCallWithoutArgsParentheses`、`Style/RedundantParentheses`、`Style/TernaryParentheses` などは、修正を当てたコードをパースし直し、AST が元と同じときだけ offense を出す（または修正する）（`ReparsedEquivalence`）
-- rubocop-herb は、パースした AST の HTML の識別子のメソッド名を `div__html0` のように書き換える（[2.3 節](#23-ast-の書き換え出典)）。パースし直した AST は書き換えないので `(send nil :div)` のままで、元の AST の `(send nil :div__html0)` と一致せず、確認が必ず失敗する
+- tk0miya-rubocop-herb は、パースした AST の HTML の識別子のメソッド名を `div__html0` のように書き換える（[2.3 節](#23-ast-の書き換え出典)）。パースし直した AST は書き換えないので `(send nil :div)` のままで、元の AST の `(send nil :div__html0)` と一致せず、確認が必ず失敗する
 - 名前の書き換えを無効にすると、3 つの cop の offense が出て `[Correctable]` が付くことを確かめた（診断のためだけの変更）【実測】
 - 結果として、HTML を 1 つでも含むテンプレートでは、`Style/MethodCallWithoutArgsParentheses` と `Style/RedundantParentheses` の offense が消え、`Style/TernaryParentheses` は offense は出るものの修正されない。HTML を含まないテンプレートでは起きない
 - 実際のビューでは、conference-app の `admin/talks/index.html.erb` の `admin_talks_path()` などに `Style/MethodCallWithoutArgsParentheses` が出ず、rails の `rescues/_trace.html.erb` の `<%= (name == trace_to_show) ? 'block' : 'none' %>` が修正されない。rubocop-erb 0.8.2 は両方とも検出し、修正する
@@ -309,7 +309,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 
 ### 8.3 ERB に合わない修正と誤検知【実測・推測】
 
-実際のビューと検証用 ERB で、rubocop-herb だけに出る指摘のうち、ERB では扱いを考える必要があるものです。指摘の内容は [第 1 部 5.4 節](comparison.md#54-実際のビュー実測) にあります。
+実際のビューと検証用 ERB で、tk0miya-rubocop-herb だけに出る指摘のうち、ERB では扱いを考える必要があるものです。指摘の内容は [第 1 部 5.4 節](comparison.md#54-実際のビュー実測) にあります。
 
 - **`Layout/LineLength`**: 行全体の長さを測るので、HTML が原因の長い行も指摘する。テンプレートも読むためのソースファイルなので、どれも改行で短くすべき行と言える。違いは直す道具で、ERB タグの中は RuboCop、タグの外の HTML は `herb-format` が直す。両方を使うなら、`Layout/LineLength` の `Max` と `herb-format` の `maxLineLength` を揃えないと、基準が食い違う。autocorrect は、ERB では `%>` の位置が崩れ、行の長さも収まらないことがある。修正を ERB に合う形にできないなら、ガードで拒否して指摘だけを残すほうがよい
 - **`Lint/EmptyFile`**: 作りかけの空のテンプレートを見つけられる。わざと空にしたテンプレートは、`<%# … %>` を置けば指摘されない

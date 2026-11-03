@@ -2,7 +2,7 @@
 
 - トーク: Building a Unified Ecosystem for ERB Development Experience（[proposal.md](../proposal.md)）
 - 枠: 15 分
-- 材料: [research/README.md](../research/README.md)。ツールの比較は [comparison.md](../research/comparison.md)、rubocop-herb の実装は [rubocop-herb.md](../research/rubocop-herb.md)（3 章がスライド 15 の裏付け）
+- 材料: [research/README.md](../research/README.md)。ツールの比較は [comparison.md](../research/comparison.md)、rubocop-herb の実装は [tk0miya-rubocop-herb.md](../research/tk0miya-rubocop-herb.md)（3 章がスライド 15 の裏付け）
 
 ## 方針
 
@@ -237,7 +237,7 @@ div;
   - ERB の区切りまで消す修正は、タグの中身に収まるよう切り詰めてから検査する。`<% 1 %>` は `<% %>` になり、空のタグを `Herb/EmptyErbTag` が行ごと消す（Ruby ファイルで文が消えるのと同じ結果）
   - 捨てた offense は「autocorrect できない」として報告する
   - cop を個別に除外しなくても、未知の cop の壊れ方も止められる
-- 残っている課題（正直に）: ガードは cop ごとの修正しか見ていない。`<% %>`⏎`<%= b %><% %>` は、`Layout/SpaceBeforeSemicolon` と `Herb/EmptyErbTag` の修正が重なって `-a` で `<%= b ` になる（[rubocop-herb.md](../research/rubocop-herb.md#8-未解決の問題)）
+- 残っている課題（正直に）: ガードは cop ごとの修正しか見ていない。`<% %>`⏎`<%= b %><% %>` は、`Layout/SpaceBeforeSemicolon` と `Herb/EmptyErbTag` の修正が重なって `-a` で `<%= b ` になる（[tk0miya-rubocop-herb.md](../research/tk0miya-rubocop-herb.md#8-未解決の問題)）
 - ノート: rubocop-erb 0.8 系も、修正範囲が 1 つのタグの Ruby に収まらない修正を捨てる仕組みを入れた。比べられたら、こちらは HTML・出力タグ・パースエラーで結果を検査する点が違う、と答える
 - ノート: 発表までに直せていれば、残っている課題の項目を削る
 
@@ -261,7 +261,7 @@ div;
 ## 発表までに決めること・確かめること
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、15 分では lint で手一杯。パート 5 で構想として触れる形でよいか。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
-- **autocorrect の課題**: 2 つの cop の修正が重なって `-a` で壊れる問題を直してから発表するか、課題として見せるか（スライド 22 の最後の項目の扱いが変わる）。HTML を含むテンプレートで `Style/MethodCallWithoutArgsParentheses` などが働かない問題（[rubocop-herb.md](../research/rubocop-herb.md#8-未解決の問題)）も、発表前に直しておきたい
+- **autocorrect の課題**: 2 つの cop の修正が重なって `-a` で壊れる問題を直してから発表するか、課題として見せるか（スライド 22 の最後の項目の扱いが変わる）。HTML を含むテンプレートで `Style/MethodCallWithoutArgsParentheses` などが働かない問題（[tk0miya-rubocop-herb.md](../research/tk0miya-rubocop-herb.md#8-未解決の問題)）も、発表前に直しておきたい
 - **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 10 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
 - **Marco Roth 氏との調整**: 氏は Rust 製 linter を RuboCop に公開する RuboCop プラグインのプロトタイプも作っていて、herb#475 で「調整が必要」と述べている。rubygems の `rubocop-herb` / `herb-linter` 0.0.1 もこの計画のためと思われる（[comparison.md](../research/comparison.md#8-herb-の今後rust-化)）。スライド 20 で氏の計画に触れる前に、役割分担（Ruby パートはこちら、HTML パートは Rust 製 linter）と gem 名について話しておきたい
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく

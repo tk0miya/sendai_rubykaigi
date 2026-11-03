@@ -59,7 +59,7 @@ $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 - herb はビルド済みの gem（`herb-0.11.1-arm64-darwin` など）を使う。`Gemfile.lock` からは `ruby` プラットフォーム（ソースからビルドする gem）を外してある
 - `bundle install` は必ず `BUNDLE_FROZEN=true` を付けて実行する。付けないと、`Gemfile.lock` にないプラットフォームでは Bundler がそのプラットフォームを足して解決し直し、ビルド済み gem がなければソースの gem を選んでビルドを始める。付けると「Add the current platform to the lockfile」というエラーで止まる
 - `herb-rubocop-herb` は、PR の head の `gems/rubocop-herb/*.gemspec` だけを Bundler の git ソースで読む。herb のリポジトリで `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）。実行すると `already initialized constant Herb::VERSION` という警告が出るが、影響はない
-- rubocop-herb は rubygems に公開されていないので、clone して、その `Gemfile` で実行する
+- tk0miya-rubocop-herb は rubygems に公開されていないので、clone して、その `Gemfile` で実行する
 
 ## 使い方
 
@@ -156,7 +156,7 @@ $ bin/fetch-views && bin/record-views
 | `one_tag_line` | `<li><%= link_to "a", a_path %></li>` | 行に 1 つだけのタグ |
 | `attr` | 属性値の中のタグ | 属性値の中のタグも位置がずれないか |
 | `escaped_tag` | `<%%= link_to "a", a_path %>` | エスケープしたタグの中身は Ruby ではない |
-| `empty_tag_after_output_tag` | `<% %>`⏎`<%= b %><% %>` | rubocop-herb の `-a` で、出力タグの `%>` が消える |
+| `empty_tag_after_output_tag` | `<% %>`⏎`<%= b %><% %>` | tk0miya-rubocop-herb の `-a` で、出力タグの `%>` が消える |
 
 ### `style/`: スタイル
 
@@ -164,7 +164,7 @@ $ bin/fetch-views && bin/record-views
 |---|---|---|
 | `ruby_style` | `<%= link_to( 'Home',root_path ) %>` など | herb-lint はスタイル違反を見ない |
 | `multiline_tag` | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | erb_lint の推奨設定でも、`Layout/LeadingEmptyLines` の修正で `<%` が消える |
-| `reparse_cops_in_html` | `<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)` | HTML を含むテンプレートで、修正をパースし直して確かめる cop が rubocop-herb で働かない |
+| `reparse_cops_in_html` | `<div>` の中の `root_path()`、`(a == b) ? …`、`(foo)` | HTML を含むテンプレートで、修正をパースし直して確かめる cop が tk0miya-rubocop-herb で働かない |
 | `empty_lines` | タグの間に空行を含む HTML | `Layout/EmptyLines` |
 
 ### `syntax/`: 構文エラー
@@ -187,7 +187,7 @@ $ bin/fetch-views && bin/record-views
 
 | ファイル | 内容 | 確かめること |
 |---|---|---|
-| `ruby_comment` | `<% # note %>` | `Herb.extract_ruby` は空白にする。rubocop-herb は Ruby のコメントとして扱う |
+| `ruby_comment` | `<% # note %>` | `Herb.extract_ruby` は空白にする。tk0miya-rubocop-herb は Ruby のコメントとして扱う |
 | `commented_out_output` | `<% name = user.name # the full name %><%= name %>` | ERB では行末のコメントが後ろの出力タグまでコメントにする（`Herb/CommentedOutCode`） |
 | `commented_out_end` | `<% if admin? # only for admins %><p>admin</p><% end %>` | 同上。`<% end %>` がコメントになって構文エラーになる |
 
@@ -247,7 +247,7 @@ cop ごとに、ERB として正しいテンプレート（`*_ok`）と、同じ
 | `Lint/DuplicateBranch`（`duplicate_branch`） | `Good morning, <%= user.name %>` と `Hello, <%= user.name %>` | `<%= user.name %>` と `<%= user.name %>` |
 | `Style/CombinableLoops`（`combinable_loops`） | 2 つの `items.each` の間に `Prices:` | 2 つの `items.each` が連続 |
 
-`safe_navigation_short` は、`<% if user %>` の本文が `|<% user.touch %>` のものです。テキストが短くて rubocop-herb がマーカーを置けない例です。
+`safe_navigation_short` は、`<% if user %>` の本文が `|<% user.touch %>` のものです。テキストが短くて tk0miya-rubocop-herb がマーカーを置けない例です。
 
 組にした比較では、内容に関わらない cop を外して実行します。
 
