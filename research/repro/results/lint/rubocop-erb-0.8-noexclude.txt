@@ -758,14 +758,6 @@ cases/output/attr.html.erb:1:38: C: [Correctable] Layout/ExtraSpacing: Unnecessa
 cases/output/attr.html.erb:1:38: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
 cases/output/attr.html.erb:1:40: C: Style/Semicolon: Do not use semicolons to terminate expressions.
 cases/output/attr.html.erb:1:41: C: Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/output/empty_tag_after_output_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
-cases/output/empty_tag_after_output_tag.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
-cases/output/empty_tag_after_output_tag.html.erb:1:5: C: Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/output/empty_tag_after_output_tag.html.erb:2:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/output/empty_tag_after_output_tag.html.erb:2:6: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/output/empty_tag_after_output_tag.html.erb:2:9: C: Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/output/empty_tag_after_output_tag.html.erb:2:9: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/output/empty_tag_after_output_tag.html.erb:2:13: C: Style/Semicolon: Do not use semicolons to terminate expressions.
 cases/output/escaped_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/output/escaped_tag.html.erb:1:27: C: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/escaped_tag.html.erb:1:27: C: Style/Semicolon: Do not use semicolons to terminate expressions.
@@ -916,25 +908,6 @@ cases/style/multiline_tag.html.erb:5:5: C: Layout/IndentationConsistency: Incons
 cases/style/multiline_tag.html.erb:5:10: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/multiline_tag.html.erb:5:10: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
 cases/style/multiline_tag.html.erb:5:12: C: Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/style/reparse_cops_in_html.html.erb:1:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
-cases/style/reparse_cops_in_html.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
-cases/style/reparse_cops_in_html.html.erb:2:7: C: Layout/InitialIndentation: Indentation of first line in file detected.
-cases/style/reparse_cops_in_html.html.erb:2:7: C: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
-cases/style/reparse_cops_in_html.html.erb:2:24: C: [Correctable] Style/MethodCallWithoutArgsParentheses: Do not use parentheses for method calls with no arguments.
-cases/style/reparse_cops_in_html.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/style/reparse_cops_in_html.html.erb:2:26: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/style/reparse_cops_in_html.html.erb:2:28: C: Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/style/reparse_cops_in_html.html.erb:3:7: C: [Correctable] Style/TernaryParentheses: Omit parentheses for ternary conditions.
-cases/style/reparse_cops_in_html.html.erb:3:18: W: Lint/Void: Literal `1` used in void context.
-cases/style/reparse_cops_in_html.html.erb:3:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/style/reparse_cops_in_html.html.erb:3:23: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/style/reparse_cops_in_html.html.erb:3:25: C: Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/style/reparse_cops_in_html.html.erb:4:7: C: [Correctable] Style/RedundantParentheses: Don't use parentheses around a method call.
-cases/style/reparse_cops_in_html.html.erb:4:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/style/reparse_cops_in_html.html.erb:4:12: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/style/reparse_cops_in_html.html.erb:4:14: C: Style/Semicolon: Do not use semicolons to terminate expressions.
-cases/style/reparse_cops_in_html.html.erb:5:1: C: Layout/TrailingEmptyLines: 1 trailing blank lines detected.
-cases/style/reparse_cops_in_html.html.erb:5:1: C: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/ruby_style.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/ruby_style.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.

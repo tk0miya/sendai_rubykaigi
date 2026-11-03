@@ -117,12 +117,6 @@
 @@ -1 +1 @@
 -<div class="<%= active ? "on" : "off" %>">x</div>
 +<div class="<%= active ? 'on' : 'off' %>">x</div>
---- cases/output/empty_tag_after_output_tag.html.erb
-+++ cases/output/empty_tag_after_output_tag.html.erb
-@@ -1,2 +1 @@
--<% %>
--<%= b %><% %>
-+<%= b
 --- cases/output/escaped_tag.html.erb
 +++ cases/output/escaped_tag.html.erb
 @@ -1,2 +1,2 @@

@@ -10,10 +10,12 @@
 3    Layout/EmptyLineAfterMagicComment [Safe Correctable]
 3    Layout/HashAlignment [Safe Correctable]
 3    Lint/AssignmentInCondition [Unsafe Correctable]
+2    Herb/TrailingRubyComment
 2    Layout/SpaceBeforeFirstArg [Safe Correctable]
 2    Lint/EmptyBlock
 2    Lint/LiteralAsCondition [Safe Correctable]
 2    Naming/VariableNumber
+2    Style/MethodCallWithoutArgsParentheses [Safe Correctable]
 2    Style/RegexpLiteral [Safe Correctable]
 1    Layout/SpaceAroundOperators [Safe Correctable]
 1    Layout/SpaceInsideParens [Safe Correctable]
@@ -30,4 +32,4 @@
 1    Style/StringConcatenation [Unsafe Correctable]
 1    Style/SymbolProc [Unsafe Correctable]
 1    Style/TernaryParentheses [Safe Correctable]
-930  Total in 165 files
+934  Total in 166 files
