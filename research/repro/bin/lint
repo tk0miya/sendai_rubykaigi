@@ -13,9 +13,9 @@
 #   rubocop-erb-0.8       rubocop-erb 0.8.2（Herb.extract_ruby で文書全体）
 #   rubocop-erb-0.8-noexclude
 #                         rubocop-erb 0.8.2 から、ERB で除外している cop の除外を外したもの
-#   herb-pr2260           marcoroth/herb#2260 の rubocop-herb（d0323df）
+#   herb-rubocop-herb     marcoroth/herb#2260 の rubocop-herb（d0323df）
 #   ruumba                ruumba 0.1.17（README の推奨設定）
-#   rubocop-herb          tk0miya/rubocop-herb（$RUBOCOP_HERB に clone したもの）
+#   tk0miya-rubocop-herb  tk0miya/rubocop-herb（$RUBOCOP_HERB に clone したもの）
 #   herb-lint             @herb-tools/linter（npx herb-lint）
 #   herb-format           @herb-tools/formatter（npx herb-format）
 #   plain-ruby            比較用の Ruby（plain_ruby/）に rubocop 1.92.1 をかける
@@ -76,16 +76,16 @@ case "$tool" in
   rubocop-erb-0.8-noexclude)
     rubocop "$TOOLS/rubocop-erb-0.8/Gemfile" "$TOOLS/rubocop-erb-0.8/erb-noexclude.yml" "${args[@]}"
     ;;
-  herb-pr2260)
-    rubocop "$TOOLS/herb-pr2260/Gemfile" "$TOOLS/herb-pr2260/pr.yml" "${args[@]}"
+  herb-rubocop-herb)
+    rubocop "$TOOLS/herb-rubocop-herb/Gemfile" "$TOOLS/herb-rubocop-herb/pr.yml" "${args[@]}"
     ;;
   ruumba)
     BUNDLE_GEMFILE="$TOOLS/ruumba/Gemfile" bundle exec ruumba -D -e -c "$TOOLS/ruumba/.ruumba.yml" "${args[@]}"
     ;;
-  rubocop-herb)
+  tk0miya-rubocop-herb)
     : "${RUBOCOP_HERB:?set RUBOCOP_HERB to the directory of tk0miya/rubocop-herb}"
     export RUBOCOP_HERB
-    rubocop "$RUBOCOP_HERB/Gemfile" "$TOOLS/rubocop-herb/tk.yml" "${args[@]}"
+    rubocop "$RUBOCOP_HERB/Gemfile" "$TOOLS/tk0miya-rubocop-herb/tk.yml" "${args[@]}"
     ;;
   herb-lint)
     npx herb-lint "${args[@]}"

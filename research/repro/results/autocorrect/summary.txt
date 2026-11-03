@@ -4,9 +4,9 @@ rubocop-erb-0.7-safe         rewritten=29 html_changed=0 parse_errors_increased=
 rubocop-erb-0.7-all          rewritten=31 html_changed=0 parse_errors_increased=1
 rubocop-erb-0.8-safe         rewritten=30 html_changed=0 parse_errors_increased=0
 rubocop-erb-0.8-all          rewritten=30 html_changed=0 parse_errors_increased=0
-herb-pr2260-safe             rewritten=73 html_changed=24 parse_errors_increased=19
-herb-pr2260-all              rewritten=73 html_changed=27 parse_errors_increased=19
-rubocop-herb-safe            rewritten=30 html_changed=0 parse_errors_increased=1
-rubocop-herb-all             rewritten=35 html_changed=0 parse_errors_increased=1
+herb-rubocop-herb-safe       rewritten=73 html_changed=24 parse_errors_increased=19
+herb-rubocop-herb-all        rewritten=73 html_changed=27 parse_errors_increased=19
+tk0miya-rubocop-herb-safe    rewritten=30 html_changed=0 parse_errors_increased=1
+tk0miya-rubocop-herb-all     rewritten=35 html_changed=0 parse_errors_increased=1
 ruumba-auto-correct          rewritten=0 html_changed=0 parse_errors_increased=0
 ruumba-auto-correct-style    rewritten=21 html_changed=0 parse_errors_increased=0

@@ -36,9 +36,9 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `rubocop-erb-0.7` | rubocop-erb 0.7.2（タグ単位） | `tools/rubocop-erb-0.7/erb.yml` |
 | `rubocop-erb-0.8` | rubocop-erb 0.8.2（`Herb.extract_ruby` で文書全体） | `tools/rubocop-erb-0.8/erb.yml` |
 | `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
-| `herb-pr2260` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-pr2260/pr.yml` |
+| `herb-rubocop-herb` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-rubocop-herb/pr.yml` |
 | `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
-| `rubocop-herb` | tk0miya/rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/rubocop-herb/tk.yml`） |
+| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `4d915335e559aa93b7e3ec82adbbe203054e631e` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
 | `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
 | `herb-format` | @herb-tools/formatter | 同上 |
 | `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
@@ -58,7 +58,7 @@ $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 
 - herb はビルド済みの gem（`herb-0.11.1-arm64-darwin` など）を使う。`Gemfile.lock` からは `ruby` プラットフォーム（ソースからビルドする gem）を外してある
 - `bundle install` は必ず `BUNDLE_FROZEN=true` を付けて実行する。付けないと、`Gemfile.lock` にないプラットフォームでは Bundler がそのプラットフォームを足して解決し直し、ビルド済み gem がなければソースの gem を選んでビルドを始める。付けると「Add the current platform to the lockfile」というエラーで止まる
-- `herb-pr2260` は、PR の head の `gems/rubocop-herb/*.gemspec` だけを Bundler の git ソースで読む。herb のリポジトリで `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）。実行すると `already initialized constant Herb::VERSION` という警告が出るが、影響はない
+- `herb-rubocop-herb` は、PR の head の `gems/rubocop-herb/*.gemspec` だけを Bundler の git ソースで読む。herb のリポジトリで `rake compile` をする必要はない（`Herb.extract_ruby` の C 実装は、v0.11.0 と PR の head で同じ）。実行すると `already initialized constant Herb::VERSION` という警告が出るが、影響はない
 - rubocop-herb は rubygems に公開されていないので、clone して、その `Gemfile` で実行する
 
 ## 使い方
@@ -66,15 +66,15 @@ $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 コマンドはすべて `research/repro` で実行します。
 
 ```console
-$ bin/lint rubocop-herb                              # cases/ 全体
-$ bin/lint herb-pr2260 --format emacs cases/marker   # オプションとパスを渡す
-$ bin/lint rubocop-herb --except Herb/Linting,Layout cases/marker
+$ bin/lint tk0miya-rubocop-herb                           # cases/ 全体
+$ bin/lint herb-rubocop-herb --format emacs cases/marker  # オプションとパスを渡す
+$ bin/lint tk0miya-rubocop-herb --except Herb/Linting,Layout cases/marker
 $ bin/lint herb-lint cases/erb_comment
 $ bin/lint plain-ruby
 ```
 
 - オプションは各ツールにそのまま渡す。パスを省略すると `cases/` 全体を検査する
-- `rubocop-herb` は `Herb/Linting` cop で herb-lint も実行する。RuboCop の結果だけを見るときは `--except Herb/Linting` を付ける。`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる
+- `tk0miya-rubocop-herb` は `Herb/Linting` cop で herb-lint も実行する。RuboCop の結果だけを見るときは `--except Herb/Linting` を付ける。`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる
 - `Herb/Linting` は、`@herb-tools/linter` を RuboCop のプロジェクトのルート（上へたどって最初に見つかる `Gemfile` のディレクトリ。なければカレントディレクトリ）の `node_modules` から読み込む。`research/repro` とその上には `Gemfile` がないので、`research/repro/node_modules` が使われる。`research/` に空の `Gemfile` を置くと、`research/` がルートになり、「`@herb-tools/linter is not installed in …/research`」というエラーになる
 
 ### autocorrect
@@ -82,8 +82,8 @@ $ bin/lint plain-ruby
 autocorrect はファイルを書き換えるので、`bin/autocorrect` でコピーに対して実行します。
 
 ```console
-$ bin/autocorrect rubocop-herb -a
-$ bin/autocorrect herb-pr2260 -A -- cases/marker
+$ bin/autocorrect tk0miya-rubocop-herb -a
+$ bin/autocorrect herb-rubocop-herb -A -- cases/marker
 $ bin/autocorrect ruumba --auto-correct --only Style/NilComparison,Style/NegatedIf,Style/StringLiterals
 $ bin/autocorrect herb-format --force -- cases/erb_comment cases/herb_disable
 $ bin/autocorrect herb-lint --fix -- cases/erb_comment
@@ -257,8 +257,8 @@ cop ごとに、ERB として正しいテンプレート（`*_ok`）と、同じ
 
 ```console
 $ X=Layout,Style/FrozenStringLiteralComment,Style/Semicolon,Style/StringLiterals
-$ for t in rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-pr2260; do bin/lint $t --except $X --format emacs cases/marker; done
-$ bin/lint rubocop-herb --except Herb/Linting,$X --format emacs cases/marker
+$ for t in rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-rubocop-herb; do bin/lint $t --except $X --format emacs cases/marker; done
+$ bin/lint tk0miya-rubocop-herb --except Herb/Linting,$X --format emacs cases/marker
 ```
 
 ## 実際のビュー
@@ -267,7 +267,7 @@ rails/rails `0f591639b864de6bf3fd760a6921f5eda17b2905` と kaigionrails/conferen
 
 ```console
 $ bin/fetch-views
-$ bin/lint rubocop-herb --except Herb/Linting --format offenses work/views
-$ bin/autocorrect herb-pr2260 -a -- work/views
+$ bin/lint tk0miya-rubocop-herb --except Herb/Linting --format offenses work/views
+$ bin/autocorrect herb-rubocop-herb -a -- work/views
 $ bin/record-views
 ```

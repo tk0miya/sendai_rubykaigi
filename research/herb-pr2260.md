@@ -94,7 +94,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 ## 検証用 ERB での結果【実測】
 
-[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint herb-pr2260`、`bin/lint rubocop-herb --except Herb/Linting`）。
+[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint herb-rubocop-herb`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
 
 | | PR 版 | rubocop-herb |
 |---|---|---|

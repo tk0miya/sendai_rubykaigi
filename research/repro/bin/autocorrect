@@ -3,8 +3,8 @@
 #
 #   bin/autocorrect TOOL OPTIONS... [-- PATHS...]
 #
-#   bin/autocorrect rubocop-herb -a
-#   bin/autocorrect herb-pr2260 -A -- cases/marker
+#   bin/autocorrect tk0miya-rubocop-herb -a
+#   bin/autocorrect herb-rubocop-herb -A -- cases/marker
 #   bin/autocorrect ruumba --auto-correct --only Style/NilComparison
 #
 # PATHS（既定は cases）を work/TOOL/ にコピーし、そこで bin/lint TOOL OPTIONS... を実行する。

@@ -24,7 +24,7 @@ normalize() {
   sed -e "s|$PWD/||g" -e "s|work/[^/]*/corrected/||g" | grep -E '^(cases|plain_ruby)/|^[a-z_]+\.rb:' | sort -t: -k1,1 -k2,2n -k3,3n
 }
 
-rubocop_tools=(rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-pr2260 ruumba rubocop-herb)
+rubocop_tools=(rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-rubocop-herb ruumba tk0miya-rubocop-herb)
 
 for tool in "${rubocop_tools[@]}"; do
   bin/lint "$tool" --format emacs 2>/dev/null | normalize > "results/lint/$tool.txt"
@@ -50,7 +50,7 @@ record_autocorrect() {
 for tool in erb_lint-all erb_lint-recommended; do
   record_autocorrect "$tool-safe" "$tool" -a
 done
-for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-pr2260 rubocop-herb; do
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-rubocop-herb tk0miya-rubocop-herb; do
   record_autocorrect "$tool-safe" "$tool" -a
   record_autocorrect "$tool-all" "$tool" -A
 done

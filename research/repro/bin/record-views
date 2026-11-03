@@ -22,17 +22,17 @@ mkdir -p results/views
 : > results/views/summary.txt
 
 options_for() {
-  [[ "$1" == rubocop-herb ]] && echo "--except Herb/Linting"
+  [[ "$1" == tk0miya-rubocop-herb ]] && echo "--except Herb/Linting"
   return 0
 }
 
-for tool in rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-pr2260 rubocop-herb; do
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-rubocop-herb tk0miya-rubocop-herb; do
   # shellcheck disable=SC2046
   bin/lint "$tool" $(options_for "$tool") --format offenses work/views 2>/dev/null \
     | grep -E '^[0-9]' > "results/views/$tool.txt"
 done
 
-for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-pr2260 rubocop-herb; do
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-rubocop-herb tk0miya-rubocop-herb; do
   for mode in safe all; do
     option=$([[ "$mode" == safe ]] && echo -a || echo -A)
     # shellcheck disable=SC2046
@@ -48,5 +48,5 @@ done
 only=$(grep -E '^[A-Z][a-zA-Z]+/[A-Za-z]+:$' tools/rubocop-erb-0.8/erb-noexclude.yml | tr -d : | paste -sd, -)
 bin/lint rubocop-erb-0.8-noexclude --only "$only" --format offenses work/views 2>/dev/null \
   | grep -E '^[0-9]' > results/views/rubocop-erb-0.8-noexclude-excluded-cops.txt
-bin/lint rubocop-herb --only "$only" --format offenses work/views 2>/dev/null \
-  | grep -E '^[0-9]' > results/views/rubocop-herb-excluded-cops.txt
+bin/lint tk0miya-rubocop-herb --only "$only" --format offenses work/views 2>/dev/null \
+  | grep -E '^[0-9]' > results/views/tk0miya-rubocop-herb-excluded-cops.txt

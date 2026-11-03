@@ -3,7 +3,7 @@
 調査日: 2026-11-03
 
 [existing-erb-linters.md](existing-erb-linters.md) で調べた既存の ERB linter と、tk0miya/rubocop-herb を比較した結果です。
-【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)。`bin/lint rubocop-herb --except Herb/Linting`）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)。`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
 
 ## 対象
 

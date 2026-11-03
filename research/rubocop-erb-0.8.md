@@ -81,7 +81,7 @@ rubocop-erb は 0.8.0 で、ERB から Ruby を取り出す方式をタグ単位
 
 ## 検証用 ERB での結果【実測】
 
-[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint rubocop-erb-0.7`、`bin/lint rubocop-erb-0.8`、`bin/lint rubocop-herb --except Herb/Linting`）。
+[repro/cases/](repro/cases/) の 80 ファイルにかけた結果です（`bin/lint rubocop-erb-0.7`、`bin/lint rubocop-erb-0.8`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
 
 | | 0.7.2 | 0.8.2 | rubocop-herb |
 |---|---|---|---|
