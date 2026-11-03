@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# 実際のビュー（rails/rails と kaigionrails/conference-app の *.html.erb）を、コミットを固定して取得する
+#
+#   bin/fetch-views
+#
+# work/views/ に 333 ファイルを置く。bin/lint TOOL work/views、bin/autocorrect TOOL -a -- work/views で検査する。
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+src="work/views-src"
+rm -rf "$src" work/views
+mkdir -p "$src/rails" "$src/conference-app"
+
+fetch() {
+  local dir="$1" url="$2" commit="$3"
+  git -C "$dir" init -q
+  git -C "$dir" fetch -q --depth 1 "$url" "$commit"
+  git -C "$dir" checkout -q FETCH_HEAD
+}
+fetch "$src/rails" https://github.com/rails/rails.git 0f591639b864de6bf3fd760a6921f5eda17b2905
+fetch "$src/conference-app" https://github.com/kaigionrails/conference-app.git 25a02cc871861dd94d76a4af983fad7b08008333
+
+rsync -a --prune-empty-dirs --exclude node_modules --exclude vendor --exclude tmp --exclude .git \
+  --include '*/' --include '*.html.erb' --exclude '*' "$src/" work/views/
+find work/views -name '*.html.erb' | wc -l

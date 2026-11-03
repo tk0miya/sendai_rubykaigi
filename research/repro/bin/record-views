@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# 実際のビュー（bin/fetch-views で取得した work/views）に各ツールをかけ、結果を results/views/ に書き出す
+#
+#   bin/record-views
+#
+# - results/views/TOOL.txt: cop ごとの offense の数（--format offenses）
+# - results/views/TOOL-safe.txt、TOOL-all.txt: -a、-A の後に残る offense の数
+# - results/views/summary.txt: autocorrect で書き換わったファイル、HTML が変わったファイル、
+#   Herb のパースエラーが増えたファイルの数
+#
+# - results/views/TOOL-excluded-cops.txt: rubocop-erb 0.8.2 が ERB から除外している cop だけをかけた結果
+#
+# rubocop-herb は Herb/Linting（herb-lint）を外して、RuboCop の結果だけを比べる。
+
+set -uo pipefail
+
+cd "$(dirname "$0")/.."
+: "${RUBOCOP_HERB:?set RUBOCOP_HERB to the directory of tk0miya/rubocop-herb}"
+export RUBOCOP_HERB
+
+mkdir -p results/views
+: > results/views/summary.txt
+
+options_for() {
+  [[ "$1" == tk0miya-rubocop-herb ]] && echo "--except Herb/Linting"
+  return 0
+}
+
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-rubocop-herb tk0miya-rubocop-herb; do
+  # shellcheck disable=SC2046
+  bin/lint "$tool" $(options_for "$tool") --format offenses work/views 2>/dev/null \
+    | grep -E '^[0-9]' > "results/views/$tool.txt"
+done
+
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-rubocop-herb tk0miya-rubocop-herb; do
+  for mode in safe all; do
+    option=$([[ "$mode" == safe ]] && echo -a || echo -A)
+    # shellcheck disable=SC2046
+    summary=$(bin/autocorrect "$tool" $(options_for "$tool") "$option" -- work/views 2>/dev/null | tail -1)
+    printf '%-28s %s\n' "$tool-$mode" "$summary" >> results/views/summary.txt
+    # shellcheck disable=SC2046
+    bin/lint "$tool" $(options_for "$tool") --format offenses "work/$tool/corrected" 2>/dev/null \
+      | grep -E '^[0-9]' > "results/views/$tool-$mode.txt"
+  done
+done
+
+# rubocop-erb 0.8.2 が ERB から除外している cop（Rails/Presence を除く 64 個）だけをかける
+only=$(grep -E '^[A-Z][a-zA-Z]+/[A-Za-z]+:$' tools/rubocop-erb-0.8/erb-noexclude.yml | tr -d : | paste -sd, -)
+bin/lint rubocop-erb-0.8-noexclude --only "$only" --format offenses work/views 2>/dev/null \
+  | grep -E '^[0-9]' > results/views/rubocop-erb-0.8-noexclude-excluded-cops.txt
+bin/lint tk0miya-rubocop-herb --only "$only" --format offenses work/views 2>/dev/null \
+  | grep -E '^[0-9]' > results/views/tk0miya-rubocop-herb-excluded-cops.txt

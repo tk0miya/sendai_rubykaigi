@@ -4,16 +4,16 @@
 
 rubocop-erb 0.8 系と herb 公式の rubocop-herb（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)、以下「PR 版」）は、`Herb.extract_ruby` で ERB から Ruby を取り出します。tk0miya/rubocop-herb（以下「rubocop-herb」）は、Herb の AST から独自に Ruby を組み立てます。`<%=` を `_ =` に、HTML のタグを `div;` に、テキストを `_a;` にして、ERB の意味を Ruby の上に残します。
 この違いが誤検知と、cop の除外による見逃しにどう効くかを比べた結果です。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#マーカーの比較)）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
 
 ## 対象
 
-- rubocop-erb 0.8.2（rubocop 1.92.0 / herb 0.11.0）
-- PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head）の `gems/rubocop-herb`（rubocop 1.91.0 / herb 0.11.0）
+- rubocop-erb 0.8.2（herb 0.11.1）
+- PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head）の `gems/rubocop-herb`（herb 0.11.0）
 - rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main。rubocop 1.92.1 / herb 0.11.1）
-- ruby 4.0.5。設定はどれも `NewCops: enable`、`TargetRubyVersion: 3.4`
+- rubocop 1.92.1 / ruby 4.0.5。設定はどれも `NewCops: enable`、`TargetRubyVersion: 3.4`
 - 入力
-  - 組にしたサンプル（[repro/marker/](repro/marker/) の `ok/` と `ng/`、18 ファイル）。cop ごとに、ERB として正しいもの（`ok/`）と、同じ形で本当に直すべきもの（`ng/`）を 1 つずつ置いた
+  - 組にしたサンプル（[repro/cases/marker/](repro/cases/marker/) の `*_ok` と `*_ng`、18 ファイル）。cop ごとに、ERB として正しいもの（`*_ok`）と、同じ形で本当に直すべきもの（`*_ng`）を 1 つずつ置いた
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
@@ -76,9 +76,9 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
 
 ## 空白にすると、正しい ERB と直すべき ERB が同じ Ruby になる【実測】
 
-[repro/marker/](repro/marker/) の 9 組です。`ok/` は ERB として正しいテンプレート、`ng/` は同じ形で本当に直すべきテンプレートです。
+[repro/cases/marker/](repro/cases/marker/) の 9 組です。`*_ok` は ERB として正しいテンプレート、`*_ng` は同じ形で本当に直すべきテンプレートです。
 
-| cop | `ok/`（ERB として正しい） | `ng/`（直すべき） |
+| cop | `*_ok`（ERB として正しい） | `*_ng`（直すべき） |
 |---|---|---|
 | `Lint/Void` | `<p><%= count + 1 %> items</p>` | `<p><% count + 1 %> items</p>`（`=` の書き忘れ） |
 | `Style/SymbolProc` | `<% items.each do \|item\| %>` `<li><%= item.name %></li>` `<% end %>` | `<% items.each do \|item\| %>` `<% item.touch %>` `<% end %>` |
@@ -90,29 +90,30 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
 | `Lint/DuplicateBranch` | `Good morning, <%= user.name %>` と `Hello, <%= user.name %>` | `<%= user.name %>` と `<%= user.name %>` |
 | `Style/CombinableLoops` | 2 つの `items.each` の間に `Prices:` | 2 つの `items.each` が連続 |
 
-各ツールで、その cop が `ok/` と `ng/` のどちらに出たかです（`Layout` と、`Style/FrozenStringLiteralComment`、`Style/Semicolon`、`Style/StringLiterals` を除いて実行した）。
+各ツールで、その cop が `*_ok` と `*_ng` のどちらに出たかです（`Layout` と、`Style/FrozenStringLiteralComment`、`Style/Semicolon`、`Style/StringLiterals` を除いて実行した）。
 
 | cop | 0.8.2 | 0.8.2（除外を外す） | PR 版 | rubocop-herb |
 |---|---|---|---|---|
-| `Lint/Void` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Style/SymbolProc` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Lint/EmptyBlock` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Lint/EmptyConditionalBody` | 出ない（除外） | 両方 | 出ない（除外） | `ng/` だけ |
-| `Style/EmptyElse` | 出ない（除外） | 両方 | 出ない（除外） | `ng/` だけ |
-| `Style/SafeNavigation` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Style/SoleNestedConditional` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Lint/DuplicateBranch` | 出ない（除外） | 両方 | 両方 | `ng/` だけ |
-| `Style/CombinableLoops` | 両方 | 両方 | 両方 | `ng/` だけ |
+| `Lint/Void` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Style/SymbolProc` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Lint/EmptyBlock` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Lint/EmptyConditionalBody` | 出ない（除外） | 両方 | 出ない（除外） | `*_ng` だけ |
+| `Style/EmptyElse` | 出ない（除外） | 両方 | 出ない（除外） | `*_ng` だけ |
+| `Style/SafeNavigation` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Style/SoleNestedConditional` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Lint/DuplicateBranch` | 出ない（除外） | 両方 | 両方 | `*_ng` だけ |
+| `Style/CombinableLoops` | 両方 | 両方 | 両方 | `*_ng` だけ |
 
-- 0.8.2 の除外を外すと、9 組すべてで `ok/` と `ng/` に同じ cop が出る。変換後の Ruby が同じなので、cop には区別する手がかりがない
-- 0.8.2 は 8 個を除外しているので、`ng/` の 8 件を見逃す。除外していない `Style/CombinableLoops` は `ok/` にも出る（`-a` では修正されない）
-- PR 版は `Lint/EmptyConditionalBody` と `Style/EmptyElse` を除外し、ほかの 7 組では `ok/` にも出る
-- rubocop-herb は 9 組すべてで `ng/` だけに出る。このほか、`ok/duplicate_branch.html.erb` の 2 つの `<%= user.name %>` に `Style/IdenticalConditionalBranches` が出る。どちらの分岐も最後が同じ出力タグなので、分岐の後ろに 1 つにまとめられる。妥当な指摘で、autocorrect はされない
-- 0.8.2 の除外を外したときは、このほかに `Style/IfWithSemicolon`（`if user;` を三項演算子にせよ）と `Style/IfUnlessModifier` も `ok/` と `ng/` の両方に出る。どちらも、タグの終わりに補った `;` や、空白にした本文から生じる
+- 0.8.2 の除外を外すと、9 組すべてで `*_ok` と `*_ng` に同じ cop が出る。変換後の Ruby が同じなので、cop には区別する手がかりがない
+- 0.8.2 は 8 個を除外しているので、`*_ng` の 8 件を見逃す。除外していない `Style/CombinableLoops` は `*_ok` にも出る（`-a` では修正されない）
+- PR 版は `Lint/EmptyConditionalBody` と `Style/EmptyElse` を除外し、ほかの 7 組では `*_ok` にも出る
+- rubocop-herb は 9 組すべてで `*_ng` だけに出る。このほか、`duplicate_branch_ok` の 2 つの `<%= user.name %>` に `Style/IdenticalConditionalBranches` が出る。どちらの分岐も最後が同じ出力タグなので、分岐の後ろに 1 つにまとめられる。妥当な指摘で、autocorrect はされない
+- RuboCop ではない herb-lint（`bin/lint herb-lint cases/marker`）は、HTML を空白にせずに ERB の構造を見るので、ルールのある組では `*_ng` だけに出る。`erb-no-empty-control-flow` が空のブロック・`if`・`else` の 3 組、`erb-no-unused-expressions` が `<% count + 1 %>` と `<% item.touch %>`、`erb-no-duplicate-branch-elements` が同じ内容の分岐に出る。ただし `erb-no-unused-expressions` は、値を使わない `<% user.touch %>` を `safe_navigation_ok` でも指摘する
+- 0.8.2 の除外を外したときは、このほかに `Style/IfWithSemicolon`（`if user;` を三項演算子にせよ）と `Style/IfUnlessModifier` も `*_ok` と `*_ng` の両方に出る。どちらも、タグの終わりに補った `;` や、空白にした本文から生じる
 
-### `-A` の結果（`ok/`）
+### `-A` の結果（`*_ok`）
 
-`ok/` のコピーに `-A` をかけた結果です（`Style/StringLiterals` の修正は省略）。
+`*_ok` のコピーに `-A` をかけた結果です（`Style/StringLiterals` の修正は省略）。
 
 | ファイル | PR 版 | rubocop-herb |
 |---|---|---|
@@ -123,11 +124,11 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
 | `combinable_loops.html.erb` | 2 つのループが `<% items.each(&:name)%>` と `<% items.each(&:price)%>` になる（出力がなくなる） | 変わらない |
 
 - 0.8.2 は、除外を外しても、内容の修正は修正範囲の検査（1 つのタグの中に収まるか）で捨てる。`-A` で変わるのは、`%>` の前の空白などの `Layout` の修正と `Style/StringLiterals` の修正だけだった
-- PR 版の詳細は [herb-pr2260.md](herb-pr2260.md#autocorrect-の結果実測)
+- PR 版の詳細は [herb-rubocop-herb.md](herb-rubocop-herb.md#autocorrect-の結果実測)
 
 ## 除外で何が消えているか（実際のビュー）【実測】
 
-実際のビュー 333 ファイルに、0.8.2 が `**/*.erb` から除外している 65 個の cop のうち 64 個（`Rails/Presence` は rubocop-rails を入れていないので除く）だけをかけました。0.8.2 は除外を外した設定（[repro/marker/erb-noexclude.yml](repro/marker/erb-noexclude.yml)）で実行しています。
+実際のビュー 333 ファイルに、0.8.2 が `**/*.erb` から除外している 65 個の cop のうち 64 個（`Rails/Presence` は rubocop-rails を入れていないので除く）だけをかけました。0.8.2 は除外を外した設定（[repro/tools/rubocop-erb-0.8/erb-noexclude.yml](repro/tools/rubocop-erb-0.8/erb-noexclude.yml)。`bin/lint rubocop-erb-0.8-noexclude`）で実行しています。
 
 内容に関わる cop の結果です。妥当かどうかは、1 件ずつテンプレートを見て判断しました。
 
@@ -151,7 +152,7 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
   - `Style/SafeNavigation`: `<% if @part && @part.mime_type %>`
   - `Style/RescueModifier`: `corrections = exception_wrapper.corrections rescue []`
   - `Lint/EmptyBlock`: `<%= check_box_tag "save_and_assign", …, class: "w-4 h-4 rounded-sm" do %>`⏎`<% end %>` など
-  - `Style/IfUnlessModifier`: HTML を含めて 121 桁の行（[herb-pr2260.md](herb-pr2260.md#実際のビューでの結果実測)）
+  - `Style/IfUnlessModifier`: HTML を含めて 121 桁の行（[herb-rubocop-herb.md](herb-rubocop-herb.md#実際のビューでの結果実測)）
 - `Style/SafeNavigation` の妥当な 2 件のうち、`<%= @request.parameters["controller"].camelize if @request.parameters["controller"] %>` は rubocop-herb では出ない（下記「マーカーの限界」）
 - 内容に関わらない cop では、0.8.2 の除外を外すと、`Style/Semicolon` が 1,554 件、`Style/FrozenStringLiteralComment` が 254 件、`Style/IfWithSemicolon` が 62 件、`Layout` の 15 個の cop が計 7,308 件出る。どれも、タグの終わりに補った `;` や、空白にした HTML と ERB の区切りから生じる。rubocop-herb は、このうち `Style/Semicolon`、`Style/FrozenStringLiteralComment` と `Layout` の 6 個を除外し、残りの多くは誤検知になる行だけで無効にしている。`Layout/LineLength`（162 件）と `Layout/HashAlignment`（3 件）は rubocop-herb でも出る（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)）
 
@@ -169,7 +170,7 @@ rubocop-herb（`bin/erb2ruby`。行末の空白は省略）:
 
 ## マーカーの限界【実測・出典】
 
-- **短いテキストにはマーカーを置けない**。`_a;` は、テキストの中に 3 文字と後ろの空白か改行、または 2 文字と改行がないと置けない（`TEXT_MARKER_POSITION`）。`|` 1 文字などは空白のままになり、空白にする方式と同じ誤検知が起きる。[repro/marker/short/safe_navigation.html.erb](repro/marker/short/safe_navigation.html.erb)（`<% if user %>` の本文が `|<% user.touch %>`）には、rubocop-herb でも `Style/SafeNavigation` が出る。行単位の無効化は、`Lint/EmptyBlock` などについてこの穴を塞いでいるが、`Style/SafeNavigation` などは塞いでいない
+- **短いテキストにはマーカーを置けない**。`_a;` は、テキストの中に 3 文字と後ろの空白か改行、または 2 文字と改行がないと置けない（`TEXT_MARKER_POSITION`）。`|` 1 文字などは空白のままになり、空白にする方式と同じ誤検知が起きる。[repro/cases/marker/safe_navigation_short.html.erb](repro/cases/marker/safe_navigation_short.html.erb)（`<% if user %>` の本文が `|<% user.touch %>`）には、rubocop-herb でも `Style/SafeNavigation` が出る。行単位の無効化は、`Lint/EmptyBlock` などについてこの穴を塞いでいるが、`Style/SafeNavigation` などは塞いでいない
 - **`_ =` が隠す指摘がある**。`<%= x.camelize if x %>` は `_ = x.camelize if x` になり、`Style/SafeNavigation` の対象にならない。実際のビューでは 1 件あり、0.8.2 の除外を外すと出る
 - **メッセージに `_ =` が出る**。`Style/IdenticalConditionalBranches` は「Move `_ = user.name` out of the conditional.」と報告する
 

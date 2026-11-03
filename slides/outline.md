@@ -81,7 +81,7 @@
 | ERB | 結果 |
 |---|---|
 | `<% if foo == nil %>` / `<% if !user.nil? %>` | 見逃す（条件式が検査されない） |
-| `<% name = "Alice" %>` + `<%= name %>` | `Lint/UselessAssignment`（誤検知） |
+| `<% total = items.sum(&:price) %>` + `<%= total %>` | `Lint/UselessAssignment`（誤検知） |
 | `<%= "hello" %>` | `Style/FrozenStringLiteralComment` がタグごとに出る |
 
 - ノート: README は誤検知になる cop の無効化を推奨。rubocop-erb 0.7 系は 53 cop を除外している
@@ -104,10 +104,10 @@
 
 - 制御構造・変数スコープは保たれ、パート 2 の見逃し・誤検知は解消する
 - しかし `<%=` の「出力する」という意味と HTML 本文が失われる
-  - `<p><%= name %>: <%= count -1 %></p>` → `name` に `Lint/Void`
+  - `<p><%= total %></p>` → `total` に `Lint/Void`
   - `<% items.each do |item| %><%= item.name %><% end %>` → `Style/SymbolProc`（従うと出力が消える）
   - 本文が HTML だけの `if` → `Lint/EmptyConditionalBody`
-- autocorrect は「88 offenses corrected」と表示して 1 ファイルも書き換えない
+- autocorrect は「1154 offenses corrected」と表示して 1 ファイルも書き換えない（検証用 ERB 76 ファイル）
 - 2021 年からメンテ停止
 
 ### 12. パート 2 のまとめ
@@ -182,7 +182,7 @@ div;
 |---|---|---|
 | `<% if foo == nil %>` | 見逃す | `foo.nil?` に修正 |
 | `<% if !user.nil? %>` | 見逃す | `unless user.nil?` に修正 |
-| `<% name = "Alice" %>` + `<%= name %>` | `Lint/UselessAssignment` | 出ない |
+| `<% total = items.sum(&:price) %>` + `<%= total %>` | `Lint/UselessAssignment` | 出ない |
 | `<%= count -1 %>` | `count(-1)` に書き換え | `count - 1` に修正 |
 | `<% if user && user.admin? %>` | `user&&.admin?` | `user&.admin?` に修正 |
 | `<%= item.name %>` in `each` | `Style/SymbolProc` | 出ない |

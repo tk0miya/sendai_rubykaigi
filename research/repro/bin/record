@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+# すべてのツールを cases/ にかけ、結果を results/ に書き出す
+#
+#   bin/record
+#
+# - results/lint/TOOL.txt: 検出した offense（パスは research/repro からの相対パス。行順に並べ替える）
+# - results/autocorrect/TOOL-safe.diff、TOOL-all.diff: -a、-A の前後の diff（macOS では -a と -A を
+#   ファイル名で区別できないので、safe と all と呼ぶ）
+# - results/autocorrect/summary.txt: autocorrect で書き換わったファイル、HTML が変わったファイル、
+#   Herb のパースエラーが増えたファイルの数
+#
+# ツールの版やケースを変えたら、実行し直して git diff で結果の変化を確かめる。
+
+set -uo pipefail
+
+cd "$(dirname "$0")/.."
+: "${RUBOCOP_HERB:?set RUBOCOP_HERB to the directory of tk0miya/rubocop-herb}"
+export RUBOCOP_HERB
+
+mkdir -p results/lint results/autocorrect
+
+# 絶対パスを相対パスにし、ツールごとの見出しや集計の行を落として並べ替える
+normalize() {
+  sed -e "s|$PWD/||g" -e "s|work/[^/]*/corrected/||g" | grep -E '^(cases|plain_ruby)/|^[a-z_]+\.rb:' | sort -t: -k1,1 -k2,2n -k3,3n
+}
+
+rubocop_tools=(rubocop-erb-0.7 rubocop-erb-0.8 rubocop-erb-0.8-noexclude herb-rubocop-herb ruumba tk0miya-rubocop-herb)
+
+for tool in "${rubocop_tools[@]}"; do
+  bin/lint "$tool" --format emacs 2>/dev/null | normalize > "results/lint/$tool.txt"
+done
+for tool in erb_lint-all erb_lint-recommended; do
+  bin/lint "$tool" --format compact 2>/dev/null | normalize > "results/lint/$tool.txt"
+done
+bin/lint herb-lint --json 2>/dev/null | ruby bin/herb_lint_offenses.rb > "results/lint/herb-lint.txt"
+bin/lint plain-ruby --format emacs 2>/dev/null | sed "s|$PWD/plain_ruby/||" | normalize > "results/lint/plain-ruby.txt"
+
+: > results/autocorrect/summary.txt
+record_autocorrect() {
+  local name="$1" tool="$2"
+  shift 2
+  bin/autocorrect "$tool" "$@" > "results/autocorrect/$name.log" 2>/dev/null
+  # diff の部分と、最後の行（html_changes.rb の集計）に分ける
+  sed '$d' "results/autocorrect/$name.log" | sed -e "s|work/$tool/orig/||g" -e "s|work/$tool/corrected/||g" \
+    | grep -v '^diff -ru' | sed -E 's/^(---|\+\+\+) ([^	]+)	.*/\1 \2/' > "results/autocorrect/$name.diff"
+  printf '%-28s %s\n' "$name" "$(tail -1 "results/autocorrect/$name.log")" >> results/autocorrect/summary.txt
+  rm "results/autocorrect/$name.log"
+}
+
+for tool in erb_lint-all erb_lint-recommended; do
+  record_autocorrect "$tool-safe" "$tool" -a
+done
+for tool in rubocop-erb-0.7 rubocop-erb-0.8 herb-rubocop-herb tk0miya-rubocop-herb; do
+  record_autocorrect "$tool-safe" "$tool" -a
+  record_autocorrect "$tool-all" "$tool" -A
+done
+record_autocorrect ruumba-auto-correct ruumba --auto-correct
+# Layout 系の修正を外すと、ruumba の書き戻しが働く
+record_autocorrect ruumba-auto-correct-style ruumba --auto-correct --only Style/NilComparison,Style/NegatedIf,Style/StringLiterals

@@ -1,0 +1,2 @@
+1  Style/SafeNavigationChainLength
+1  Total in 1 file

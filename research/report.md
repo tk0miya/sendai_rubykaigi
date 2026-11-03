@@ -3,7 +3,7 @@
 調査日: 2026-11-03
 
 [existing-erb-linters.md](existing-erb-linters.md) で調べた既存の ERB linter と、tk0miya/rubocop-herb を比較した結果です。
-【実測】は手元で実行して確かめたこと（再現手順は [repro/README.md](repro/README.md#rubocop-herb)）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)。`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）、【出典】はソースコードで確かめたこと、【推測】は解釈です。
 
 ## 対象
 
@@ -11,7 +11,7 @@
 - rubocop 1.92.1 / herb 0.11.1（同リポジトリの `Gemfile.lock`）
 - ruby 4.0.5
 - 設定はリポジトリの `config/develop/rubocop.yml`
-- 特に断りがない限り、`Herb/Linting` cop（herb-lint の実行）は無効にして、RuboCop の結果だけを比べた。`Herb/Linting` は「Herb/Linting cop」の節で、`@herb-tools/linter` 0.11.0 を入れて別に確かめた
+- 特に断りがない限り、`Herb/Linting` cop（herb-lint の実行）は無効にして、RuboCop の結果だけを比べた。`Herb/Linting` は「Herb/Linting cop」の節で、`@herb-tools/linter` 0.11.1 を入れて別に確かめた
 
 ## まとめ
 
@@ -139,19 +139,19 @@ rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個（[rubocop-erb-0.8.md](rub
 - herb-lint の autocorrect には対応していない（README に記載）
 - herb-lint の `erb-no-empty-tags` は報告しない。同じ内容を `Herb/EmptyErbTag` cop が報告し、autocorrect する（README に記載）
 
-`repro/herb/app` の再現例に閉じタグ漏れの例と `repro/rubocop-herb` の例を加え、herb-lint 単体（`npx herb-lint`）の結果と比べました（`@herb-tools/linter` 0.11.0、node v26.9.0）【実測】。
+`repro/cases/` の 5 ファイルで、herb-lint 単体（`bin/lint herb-lint`）の結果と比べました（`@herb-tools/linter` 0.11.1、node v26.9.0）【実測】。
 
 | ERB | herb-lint 単体 | `Herb/Linting` |
 |---|---|---|
-| `<div><span></div>` | `parser-no-errors`（`MISSING_CLOSING_TAG_ERROR`） | 同じ。``E: Herb/Linting: [parser-no-errors] Opening tag `<span>` at (1:6) doesn't have a matching closing tag `</span>` in the same scope. (`MISSING_CLOSING_TAG_ERROR`)`` |
-| `cross_tag_variables.html.erb`（本当に未使用の `unused`） | `erb-no-unused-local-variable` | 同じ。RuboCop の `Lint/UselessAssignment` と同じ位置に並ぶ |
-| `empty_tag_after_output_tag.html.erb`（空の `<% %>` が 2 つ） | `erb-no-empty-tags` が 2 件 | 出ない。`Herb/EmptyErbTag` が 2 件出る |
-| `missing_end.html.erb`（`end` の抜け） | `parser-no-errors` が 3 件（`RUBY_PARSE_ERROR` ×2、`MISSING_ERB_END_TAG_ERROR`） | 出ない（Ruby の構文エラーがあるファイルでは herb-lint を実行しない。README に記載）。RuboCop の `Lint/Syntax` は出る |
-| `ruby_style.html.erb` | 出ない | 出ない（RuboCop の Layout / Style は出る） |
+| `syntax/missing_close`（`<div><span></div>`） | `parser-no-errors`（`MISSING_CLOSING_TAG_ERROR`） | 同じ。``E: Herb/Linting: [parser-no-errors] Opening tag `<span>` at (1:6) doesn't have a matching closing tag `</span>` in the same scope. (`MISSING_CLOSING_TAG_ERROR`)`` |
+| `variables/cross_tag_variables`（本当に未使用の `unused`） | `erb-no-unused-local-variable` | 同じ。RuboCop の `Lint/UselessAssignment` と同じ位置に並ぶ |
+| `output/empty_tag_after_output_tag`（空の `<% %>` が 2 つ） | `erb-no-empty-tags` が 2 件 | 出ない。`Herb/EmptyErbTag` が 2 件出る |
+| `syntax/missing_end`（`end` の抜け） | `parser-no-errors` が 3 件（`RUBY_PARSE_ERROR` ×2、`MISSING_ERB_END_TAG_ERROR`） | 出ない（Ruby の構文エラーがあるファイルでは herb-lint を実行しない。README に記載）。RuboCop の `Lint/Syntax` は出る |
+| `style/ruby_style` | 出ない | 出ない（RuboCop の Layout / Style は出る） |
 
-- 6 ファイルで `rubocop` 全体の実行時間は約 1.6 秒（Node.js の起動を含む）
+- 5 ファイルで `rubocop` 全体の実行時間は約 1.3 秒（Node.js の起動を含む）
 - `@herb-tools/linter` と `.herb.yml` は、RuboCop のプロジェクトのルート（`RuboCop::ConfigFinder.project_root`。カレントディレクトリから上へたどって最初に見つかった `Gemfile` / `gems.rb` のディレクトリ。なければカレントディレクトリ）から読み込む【出典: `lib/rubocop/cop/herb/linting.rb`】
-- そのため、`Gemfile` と `package.json` が別のディレクトリにあると使えない。`repro/herb/node_modules` に入れて `repro/herb` で実行すると、`repro/Gemfile` のある `repro` がルートになり、「`@herb-tools/linter is not installed in …/research/repro`」というエラーになった【実測】。上の比較は、`repro/herb` を `Gemfile` のないディレクトリにコピーして実行した
+- そのため、`Gemfile` と `package.json` が別のディレクトリにあると使えない。`repro/node_modules` に入れたまま、上の `research/` に空の `Gemfile` を置いて `repro` で実行すると、`research/` がルートになり、「`@herb-tools/linter is not installed in …/research`」というエラーになった【実測】。上の比較は、上のどのディレクトリにも `Gemfile` がない `repro` で実行した
 - 設定で読み込み先を変える方法は見当たらない（`Herb/Linting` の設定は `NodeCommand` のみ）【出典】。フロントエンドを別ディレクトリ（`frontend/` など）に分けているプロジェクトでは困る可能性がある【推測】
 
 ### Herb/EmptyErbTag cop
@@ -178,31 +178,31 @@ rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個（[rubocop-erb-0.8.md](rub
 
 ## 既存ツールの問題に対する結果【実測】
 
-research の再現例（`repro/erb_lint`, `repro/rubocop-erb`, `repro/ruumba`, `repro/herb/app`）にかけた結果です。
+既存ツールと同じ `repro/cases/` の ERB にかけた結果です。
 
 | ERB | 既存ツールの結果 | rubocop-herb |
 |---|---|---|
-| `<% if foo == nil %>…<% end %>` | erb_lint / rubocop-erb: 見逃す | `Style/NilComparison` を検出し、`foo.nil?` に修正 |
-| `<% if !user.nil? %>…<% end %>` | erb_lint / rubocop-erb: 見逃す | `Style/NegatedIf` を検出し、`unless user.nil?` に修正 |
+| `<% if foo == nil %>…<% end %>` | erb_lint: 見逃す | `Style/NilComparison` を検出し、`foo.nil?` に修正 |
+| `<% if !user.nil? %>…<% end %>` | erb_lint / rubocop-erb 0.7 系: 見逃す | `Style/NegatedIf` を検出し、`unless user.nil?` に修正 |
 | `then` / `elsif bar == nil` / `unless !x` | erb_lint: 見逃す | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/NegatedUnless` を検出し、正しく修正 |
 | 本当に空の `<% else %>` / `<% unless !x %><% end %>` | erb_lint: 見逃す | `Style/EmptyElse`, `Lint/EmptyConditionalBody` を検出し、`<% else %>` を削除 |
 | `<% items.each do \|i\| %>`（`i` 未使用、本文は HTML だけ） | erb_lint: 見逃す | `Lint/UnusedBlockArgument` を検出し、`_i` に修正 |
-| `<% name = "Alice" %>` + `<%= name %>` | erb_lint: `Lint/UselessAssignment`（誤検知） | 出ない |
+| `<% total = items.sum(&:price) %>` + `<%= total %>` | erb_lint: `Lint/UselessAssignment`（誤検知） | 出ない |
 | 本当に未使用の `<% unused = 1 %>` | Herb: 検出する | `Lint/UselessAssignment` を検出する。`-a` で `Lint/UselessAssignment`、`Lint/Void`、`Herb/EmptyErbTag` が順に修正し、行ごと消える |
-| `<% count = items.size %>` + `<%= count -1 %>` | rubocop-erb: `count(-1)` に書き換える | ローカル変数と認識し、`Layout/SpaceAroundOperators` で `count - 1` に修正 |
-| `<% items.each do \|item\| %>` + `<%= item *2 %>` | rubocop-erb: `item(2)` に書き換える | `item * 2` に修正 |
-| `<% if user && user.admin? %>` | rubocop-erb: `user&&.admin?`（構文エラー） | `user&.admin?` に正しく修正（`-A`） |
-| `<% end.join(", ") %>`、`<% result = if foo %>` | rubocop-erb: 黙って無視する | 解析でき、`", "` は `', '` に正しく修正される。使われていない `result` には `Lint/UselessAssignment` が出て、`-A` で代入が消える |
-| `<p><%= name %>: <%= count -1 %></p>` | ruumba: `name` に `Lint/Void` | 出ない |
+| `<% count = items.size %>` + `<%= count -1 %>` | erb_lint / rubocop-erb 0.7 系: `count(-1)` に書き換える | ローカル変数と認識し、`Layout/SpaceAroundOperators` で `count - 1` に修正 |
+| `<% items.each do \|item\| %>` + `<%= item *2 %>` | erb_lint / rubocop-erb 0.7 系: `item(2)` に書き換える | `item * 2` に修正 |
+| `<% if user && user.admin? %>` | rubocop-erb 0.7 系: `user&&.admin?`（構文エラー） | `user&.admin?` に正しく修正（`-A`） |
+| `<% end.join(", ") %>`、`<% result = if foo %>` | erb_lint / rubocop-erb 0.7 系: 黙って無視する | 解析でき、`", "` は `', '` に正しく修正される。使われていない `result` には `Lint/UselessAssignment` が出て、`-A` で代入が消える |
+| `<p><%= total %></p>` | ruumba: `total` に `Lint/Void` | 出ない |
 | `<% items.each do \|item\| %>` + `<%= item.name %>` | ruumba: `Style/SymbolProc`（誤った提案） | 出ない |
 | 本文が HTML だけの `if` | ruumba: `Lint/EmptyConditionalBody` | 出ない |
 | `<%= a %><%= b %>` | ruumba: 補った `;` に `Style/Semicolon` | 出ない（cop を除外） |
-| `Layout/TrailingWhitespace`, `Layout/InitialIndentation` など | ruumba: 17 ファイルで 71 件 | 出ない |
+| `Layout/TrailingWhitespace`, `Layout/InitialIndentation` など | ruumba: 76 ファイル中 71 ファイルで 317 件 | 出ない |
 | `Style/FrozenStringLiteralComment` | erb_lint: タグごとに出る | 出ない（cop を除外） |
 | `<%= link_to "x", path, class: 'btn' %>` の autocorrect | erb_lint: `<%=` が消え、マジックコメントが入る | `'x'` だけが修正される |
 | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` の autocorrect | erb_lint: `<%` が消える | 変更なし |
 | `<%== raw_html %>` | ruumba: `<%= raw raw_html %>` に書き換える | 変更なし |
-| `end` の抜け | Herb: 検出する / rubocop-erb: `Lint/Syntax` を除外 | `Lint/Syntax` を検出する |
+| `end` の抜け | Herb: 検出する / rubocop-erb 0.7 系: `Lint/Syntax` を除外 | `Lint/Syntax` を検出する |
 | `<%= link_to( 'Home',root_path ) %>` | Herb: 検出しない | `Layout/SpaceInsideParens`, `Layout/SpaceAfterComma` を検出し、修正 |
 
 このほか、次のケースも位置がずれずに修正できることを確認しました。

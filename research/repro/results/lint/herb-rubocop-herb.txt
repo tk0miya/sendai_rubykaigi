@@ -1,0 +1,292 @@
+cases/comment/commented_out_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_end.html.erb:1:55: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/comment/commented_out_output.html.erb:1:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `name`.
+cases/comment/ruby_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:2:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
+cases/control_flow/case_when.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/case_when.html.erb:4:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
+cases/control_flow/case_when.html.erb:4:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:1:4: C: [Correctable] Style/ConditionalAssignment: Use the return of the conditional for variable assignment and comparison.
+cases/control_flow/cond_assign.html.erb:1:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:4:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/cond_assign.html.erb:6:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:2:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/form_block.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:1:17: C: [Correctable] Style/MultilineIfThen: Do not use `then` for multi-line `if`.
+cases/control_flow/if_then_elsif_else.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:3:14: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/if_then_elsif_else.html.erb:3:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:7:4: C: [Correctable] Style/NegatedUnless: Favor `if` over `unless` for negative conditions.
+cases/control_flow/if_then_elsif_else.html.erb:7:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/if_then_elsif_else.html.erb:8:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/inline_if.html.erb:1:29: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/negated_if.html.erb:1:4: C: [Correctable] Style/NegatedIf: Favor `unless` over `if` for negative conditions.
+cases/control_flow/negated_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/negated_if.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/control_flow/nil_comparison.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/nil_comparison.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:7: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/control_flow/safe_navigation.html.erb:1:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:29: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/safe_navigation.html.erb:1:37: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block.html.erb:1:5: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block.html.erb:1:51: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:1:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/trim.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:1:4: C: [Correctable] Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/control_flow/unless_else.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unless_else.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/unused_block_arg.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/after_if.html.erb:2:9: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/after_if.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/after_if.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/empty_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/empty_if.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/indent.html.erb:4:11: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/indent.html.erb:4:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/indent.html.erb:7:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:53: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/leading.html.erb:1:60: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:63: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/leading.html.erb:1:74: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_comment.html.erb:5:9: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/multiline_comment.html.erb:5:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_comment.html.erb:7:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_tag.html.erb:3:5: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.
+cases/erb_comment/multiline_tag.html.erb:5:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/multiline_tag.html.erb:7:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:7: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/not_erb_tag.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/not_erb_tag.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing_in_tag.html.erb:2:17: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/erb_comment/trailing_in_tag.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:7: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
+cases/erb_comment/trailing.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/erb_comment/trailing.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/empty_if.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/empty_if.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/herb_disable/if_sibling.html.erb:2:73: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:1:15: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ng.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:4:4: C: [Correctable] Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/combinable_loops_ng.html.erb:4:15: C: [Correctable] Style/SymbolProc: Pass `&:price` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ng.html.erb:4:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:5:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ng.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:1:15: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ok.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:5:4: C: [Correctable] Style/CombinableLoops: Combine this loop with the previous loop.
+cases/marker/combinable_loops_ok.html.erb:5:15: C: [Correctable] Style/SymbolProc: Pass `&:price` as an argument to `each` instead of a block.
+cases/marker/combinable_loops_ok.html.erb:5:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:6:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/combinable_loops_ok.html.erb:7:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:3:4: W: Lint/DuplicateBranch: Duplicate branch body detected.
+cases/marker/duplicate_branch_ng.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:4:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ng.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:2:30: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:3:4: W: Lint/DuplicateBranch: Duplicate branch body detected.
+cases/marker/duplicate_branch_ok.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:4:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/duplicate_branch_ok.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ng.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/marker/empty_block_ng.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ng.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ok.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
+cases/marker/empty_block_ok.html.erb:1:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_block_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ng.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ng.html.erb:2:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ok.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_conditional_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/empty_else_ng.html.erb:2:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ng.html.erb:4:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:2:15: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/empty_else_ok.html.erb:2:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/empty_else_ok.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:1:4: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_ng.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ng.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:1:4: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_ok.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:2:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:1:4: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
+cases/marker/safe_navigation_short.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:2:6: C: [Correctable] Style/SoleNestedConditional: Consider merging nested conditions into outer `if` conditions.
+cases/marker/sole_nested_conditional_ng.html.erb:2:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:3:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ng.html.erb:3:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ng.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:3:6: C: [Correctable] Style/SoleNestedConditional: Consider merging nested conditions into outer `if` conditions.
+cases/marker/sole_nested_conditional_ok.html.erb:3:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:4:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/marker/sole_nested_conditional_ok.html.erb:4:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:5:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/sole_nested_conditional_ok.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ng.html.erb:2:17: C: [Correctable] Style/SymbolProc: Pass `&:touch` as an argument to `each` instead of a block.
+cases/marker/symbol_proc_ng.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ng.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:2:17: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/marker/symbol_proc_ok.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:3:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/symbol_proc_ok.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ng.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ng.html.erb:2:13: W: [Correctable] Lint/Void: Operator `+` used in void context.
+cases/marker/void_ng.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:2:14: W: [Correctable] Lint/Void: Operator `+` used in void context.
+cases/marker/void_ok.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/void_ok.html.erb:3:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/emoji.html.erb:1:31: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:1:39: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `x`.
+cases/multibyte/emoji.html.erb:1:40: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/emoji.html.erb:1:42: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/emoji.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/emoji.html.erb:2:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/multibyte_comment.html.erb:2:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `y`.
+cases/multibyte/multibyte_comment.html.erb:2:6: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `=`.
+cases/multibyte/multibyte_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:2:24: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:2:25: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/multibyte/show.html.erb:2:30: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/multibyte/show.html.erb:2:40: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/multibyte/show.html.erb:2:42: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:4:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
+cases/multibyte/show.html.erb:4:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:7:4: C: [Correctable] Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
+cases/multibyte/show.html.erb:7:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:9:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/multibyte/show.html.erb:11:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/attr.html.erb:1:26: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/attr.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/attr.html.erb:1:38: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/empty_tag_after_output_tag.html.erb:2:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/empty_tag_after_output_tag.html.erb:2:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/escaped_tag.html.erb:2:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/escaped_tag.html.erb:2:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/link_to_class.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/link_to_class.html.erb:1:36: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/one_tag_line.html.erb:1:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/one_tag_line.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/raw_output.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/raw_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/raw_output.html.erb:2:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/same_line_tags.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/string_literal.html.erb:1:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:1:14: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `map` instead of a block.
+cases/output/symbol_proc_map.html.erb:1:43: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/symbol_proc_map.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/two_tags_line.html.erb:1:44: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/erb_comment.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/erb_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_range.html.erb:4:5: W: [Correctable] Lint/Void: Literal `"a"` used in void context.
+cases/rubocop_disable/multiline_range.html.erb:4:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_range.html.erb:8:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/multiline_range.html.erb:8:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_tag.html.erb:2:3: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
+cases/rubocop_disable/multiline_tag.html.erb:5:5: W: [Correctable] Lint/Void: Variable `x` used in void context.
+cases/rubocop_disable/multiline_tag.html.erb:5:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/multiline_tag.html.erb:6:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:5: W: [Correctable] Lint/Void: Literal `"a"` used in void context.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/style/empty_lines.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/empty_lines.html.erb:4:1: C: [Correctable] Layout/EmptyLines: Extra blank line detected.
+cases/style/multiline_tag.html.erb:5:10: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:2:24: C: [Correctable] Style/MethodCallWithoutArgsParentheses: Do not use parentheses for method calls with no arguments.
+cases/style/reparse_cops_in_html.html.erb:2:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:3:7: C: [Correctable] Style/TernaryParentheses: Omit parentheses for ternary conditions.
+cases/style/reparse_cops_in_html.html.erb:3:18: W: Lint/Void: Literal `1` used in void context.
+cases/style/reparse_cops_in_html.html.erb:3:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/reparse_cops_in_html.html.erb:4:7: C: [Correctable] Style/RedundantParentheses: Don't use parentheses around a method call.
+cases/style/reparse_cops_in_html.html.erb:4:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+cases/style/ruby_style.html.erb:1:32: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:2:22: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/ruby_style.html.erb:2:22: W: Lint/Void: Literal `"anon"` used in void context.
+cases/style/ruby_style.html.erb:2:40: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/ruby_style.html.erb:3:32: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/missing_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/missing_end.html.erb:2:15: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/syntax/syntax_errors_ignored.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:3:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/syntax/syntax_errors_ignored.html.erb:3:18: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:4:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `result`.
+cases/syntax/syntax_errors_ignored.html.erb:4:19: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/syntax_errors_ignored.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/syntax/unclosed_paren.html.erb:1:27: F: Lint/Syntax: unexpected ';'; expected a `)` to close the arguments (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
+cases/variables/ambiguous_operator.html.erb:1:22: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:2:14: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `-`.
+cases/variables/ambiguous_operator.html.erb:2:14: W: [Correctable] Lint/Void: Operator `-` used in void context.
+cases/variables/ambiguous_operator.html.erb:3:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:4:12: C: [Correctable] Layout/SpaceAroundOperators: Surrounding space missing for operator `*`.
+cases/variables/ambiguous_operator.html.erb:4:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/ambiguous_operator.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:1:30: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:2:8: W: [Correctable] Lint/Void: Variable `total` used in void context.
+cases/variables/cross_tag_variables.html.erb:2:13: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:3:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `unused`.
+cases/variables/cross_tag_variables.html.erb:3:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:4:15: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `each` instead of a block.
+cases/variables/cross_tag_variables.html.erb:4:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:5:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/variables/cross_tag_variables.html.erb:6:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.

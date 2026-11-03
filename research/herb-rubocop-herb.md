@@ -1,0 +1,282 @@
+# herb 公式の rubocop-herb（marcoroth/herb#2260）と tk0miya/rubocop-herb の比較
+
+調査日: 2026-11-03
+
+herb 本体のリポジトリに提案されている RuboCop プラグイン（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)、以下「PR 版」）を、tk0miya/rubocop-herb（以下「rubocop-herb」）と比べた結果です。
+【実測】は手元で実行して確かめたこと（検証用 ERB と手順は [repro/README.md](repro/README.md)）、【出典】はソースコードや PR の議論で確かめたこと、【推測】は解釈です。
+
+## 対象
+
+- PR 版: `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head。Draft）の `gems/rubocop-herb`
+- rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4d915335e559aa93b7e3ec82adbbe203054e631e`（2026-11-03 時点の main）
+- rubocop 1.92.1 / ruby 4.0.5。herb は、PR 版が 0.11.0（gemspec で固定。rubygems のビルド済み gem）、rubocop-herb が 0.11.1
+- 設定は両方とも `NewCops: enable`、`TargetRubyVersion: 3.4`。rubocop-herb はリポジトリの `config/develop/rubocop.yml` を継承し、`Herb/Linting` を無効にした（[repro/tools/](repro/tools/)）
+- 入力
+  - 検証用 ERB（[repro/cases/](repro/cases/)、76 ファイル）
+  - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
+
+## まとめ
+
+- PR 版も rubocop-herb と同じく、**文書全体を位置を保った 1 本の Ruby にして**、RuboCop の ruby_extractors API に渡す方式です
+- ただし変換は `Herb.extract_ruby` で ERB タグ以外を空白にするだけで、`<%=` の「出力する」という意味が残りません。HTML も空白になるので、HTML だけを本文に持つ分岐やブロックは空に見えます。誤検知への対策は、cop をファイル全体で除外することだけです
+- autocorrect の結果を検査する仕組みがありません。このため **`-a`（安全な修正だけ）でもテンプレートを壊します**。実際のビュー 333 ファイルでは、63 ファイルで HTML が変わり、59 ファイルで Herb のパースエラーが増えました。rubocop-herb では、どちらも 0 ファイルでした
+- 主な原因は、既定で有効な `Layout/ExtraSpacing` と、メンテナの要望で除外を外した `Lint/Void` です。どちらも、空白にした HTML や ERB の区切りを Ruby の空白として扱い、修正で削除します
+- rubocop-herb の側には、PR 版では出ない指摘が実際のビューで出ます。`Layout/LineLength`（162 件）と `Lint/EmptyFile`（16 件）は妥当な指摘です。`Layout/EmptyLineAfterMagicComment` は、判定は正しいものの ERB には合わず、`-a` でテンプレートの出力が変わります。一方、`Style/MethodCallWithoutArgsParentheses` は、rubocop-herb の見逃しで PR 版にだけ出ます
+
+## PR の状況【出典】
+
+- 作者は Joel Hawksley 氏（GitHub）。GitHub で erb_lint をやめて Herb に移るにあたり、erb_lint の RuboCop linter の代わりが必要だというのが動機
+- Marco Roth 氏の整理では、herb 公式の rubocop-herb gem には 2 つの役割がある。(1) Herb の linter のルールを RuboCop の実行の中で動かす、(2) 設定済みの RuboCop の cop を ERB の中の Ruby に適用する。この PR は (2) だけを実装する
+- レビューでは、`Lint/Syntax` と `Lint/Void` を除外しないこと、`Style/WhileUntilDo` と `Lint/OutOfRangeRegexpRef` を除外の一覧から外すことが求められ、反映されている。`Lint/Void` は [marcoroth/herb#1619](https://github.com/marcoroth/herb/issues/1619)（`<%= %>` の中の複数行の Ruby で、演算子の優先順位の誤りを `Lint/Void` が見つけた例）を理由にしている
+- 作者は、RuboCop と Herb の「バイト位置と文字位置」の扱いの違いを調べるため、Draft に戻している
+
+## 仕組み【出典】
+
+### Ruby の取り出し
+
+`gems/rubocop-herb/lib/rubocop/herb/plugin.rb`（74 行）がすべてです。
+
+- `.erb` と `.herb` のファイルで、`Herb.extract_ruby` を呼ぶ。C の lexer が出すトークンを順に見て、ERB タグの中身だけを残し、それ以外を同じバイト数の空白にする。タグの終わりには `;` を補う
+- `<%=` も `<%` も空白になる。`<%= foo %>` は、ただの式 `foo;` になる
+- `<%# … %>` と、`<% # … %>` のように `#` で始まる 1 行のタグの中身は、空白になる
+- `<%%` は空白になる
+- HTML のマルチバイト文字は、バイト数の空白に置き換わる。`position_preserving_ruby` が元の 1 文字を 1 文字の空白に戻し、文字位置を元の ERB と揃える
+- `Extractor` は `[{ offset: 0, processed_source: … }]`、つまりファイル全体を 1 つの fragment として返す。ERB 以外のファイルでは `nil` を返して、RuboCop の通常の処理に任せる。Ruby が空のファイルでは `[]` を返し、何も検査しない
+
+変換の例（`Herb.extract_ruby` の出力。行末の空白は省略）【実測】:
+
+```erb
+<div>
+  <%= @user.name %>
+</div>
+<% if a %>
+  text
+<% end %>
+<% items.each do |item| %>
+  <li><%= item.name %></li>
+<% end %>
+```
+
+```ruby
+
+      @user.name  ;
+
+   if a  ;
+
+   end  ;
+   items.each do |item|  ;
+          item.name  ;
+   end  ;
+```
+
+### 除外している cop
+
+`config/default.yml` で、`AllCops/Include` に `**/*.erb` と `**/*.herb` を加え、次の 48 個の cop を同じパターンのファイルから除外しています。
+
+- Layout 33 個: `ArgumentAlignment`, `ArrayAlignment`, `BlockAlignment`, `ClosingParenthesisIndentation`, `CommentIndentation`, `InitialIndentation`, `EmptyLineAfterGuardClause`, `EndAlignment`, `FirstArgumentIndentation`, `FirstArrayElementIndentation`, `FirstArrayElementLineBreak`, `FirstHashElementIndentation`, `FirstHashElementLineBreak`, `FirstMethodArgumentLineBreak`, `FirstParameterIndentation`, `HashAlignment`, `IndentationConsistency`, `IndentationWidth`, `LeadingEmptyLine`（存在しない cop 名）, `LeadingEmptyLines`, `LineEndStringConcatenationIndentation`, `LineLength`, `MultilineArrayBraceLayout`, `MultilineAssignmentLayout`, `MultilineHashBraceLayout`, `MultilineMethodCallBraceLayout`, `MultilineMethodCallIndentation`, `MultilineMethodDefinitionBraceLayout`, `MultilineOperationIndentation`, `ParameterAlignment`, `SpaceBeforeSemicolon`, `TrailingEmptyLines`, `TrailingWhitespace`
+- Lint 2 個: `EmptyFile`, `EmptyConditionalBody`
+- その他: `Metrics/BlockLength`, `Naming/FileName`, `Rails/Presence`, `Style/FrozenStringLiteralComment`, `Style/EmptyElse`, `Style/IdenticalConditionalBranches`, `Style/IfWithSemicolon`, `Style/IfUnlessModifier`, `Style/MultilineTernaryOperator`, `Style/NestedTernaryOperator`, `Style/Next`, `Style/Semicolon`, `Style/WhileUntilModifier`
+
+`Layout/ExtraSpacing`、`Lint/Void`、`Lint/EmptyBlock`、`Lint/EmptyWhen`、`Style/SymbolProc`、`Style/BlockDelimiters`、`Style/SingleLineDoEndBlock` は除外していません。
+
+### rubocop-herb との違い
+
+| | PR 版 | rubocop-herb |
+|---|---|---|
+| 規模 | plugin.rb 74 行 + default.yml 108 行 | `lib/` 全体で約 3,000 行 |
+| ERB の読み方 | Herb の lexer のトークン（C 実装） | Herb の AST |
+| `<%= foo %>` | `foo;` | `_ = foo;` |
+| HTML | 空白 | `div;` や `_a;` などの識別子 |
+| 誤検知への対策 | 48 個の cop をファイル全体で除外 | 10 個をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする（[report.md](report.md#除外している-cop-と行単位で無効にしている-cop)） |
+| autocorrect の検査 | なし | `CopCorrectionGuard`（[report.md](report.md#autocorrect-の検査copcorrectionguard)） |
+| `<%# rubocop:disable … %>` | 効かない（コメントは空白になる）。タグの中の行末のコメントは効く【実測】 | 効く【実測】 |
+| herb-lint の実行 | なし（PR の対象外） | `Herb/Linting` cop |
+
+## 検証用 ERB での結果【実測】
+
+[repro/cases/](repro/cases/) の 76 ファイルにかけた結果です（`bin/lint herb-rubocop-herb`、`bin/lint tk0miya-rubocop-herb --except Herb/Linting`）。
+
+| | PR 版 | rubocop-herb |
+|---|---|---|
+| offense の数 | 292 | 83 |
+| `Layout/ExtraSpacing` | 192 | 0 |
+
+`Layout/ExtraSpacing` を除くと、次の offense が片方にだけ出ます。
+
+PR 版だけに出るもの:
+
+| cop | 例 | 理由 |
+|---|---|---|
+| `Layout/ExtraSpacing`（192 件） | ほぼすべての ERB タグ | `%>` が `;` の前の 2 つの空白になる |
+| `Lint/Void`（8 ファイル） | `<p><%= total %></p>`、`<%= user.name.nil? ? "anon" : user.name %>`、`<p><%= count + 1 %> items</p>` | 出力する式が、ただの式文になる |
+| `Style/SymbolProc`（4 ファイル） | `<% items.each do \|item\| %><%= item.name %><% end %>` | 同上。`-A` で従うと出力がなくなる |
+| `Lint/EmptyBlock`（3 ファイル） | `<% items.each do \|i\| %><li>item</li><% end %>`、1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 本文の HTML が空白になる |
+| `Lint/EmptyWhen`（2 件） | `case` / `when` の本文が HTML だけ（`control_flow/case_when`） | 同上 |
+| `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 1 行に書いた `<%= cache "fragment" do %>…<% end %>` | 同上 |
+| `Style/ConditionalAssignment` | `if` / `else` の各分岐で `<% x = 1 %>`（`control_flow/cond_assign`） | ERB には合わない指摘 |
+| `Style/SafeNavigation`、`Style/SoleNestedConditional`、`Lint/DuplicateBranch`、`Style/CombinableLoops` | `marker/` の ERB として正しい側（[ruby-rendering.md](ruby-rendering.md)） | HTML が空白になり、直すべきテンプレートと同じ Ruby になる |
+| `Lint/LiteralAsCondition`、`Style/StringLiterals`、`Lint/CopDirectiveSyntax` | `<%# rubocop:disable … %>` などで無効にした cop | 無効化コメントが効かない（[erb-comment-directive.md](erb-comment-directive.md)） |
+| `Style/MethodCallWithoutArgsParentheses`, `Style/RedundantParentheses` | `<div>` の中の `root_path()`、`(foo)`（`style/reparse_cops_in_html`） | 妥当な指摘。rubocop-herb の見逃し（[report.md](report.md#未解決の問題実測)） |
+
+rubocop-herb だけに出るもの:
+
+| cop | 例 | |
+|---|---|---|
+| `Lint/UnusedBlockArgument` | 上の `\|i\|` | PR 版は本文が空のブロックとみなすので出ない |
+| `Style/EmptyElse`, `Lint/EmptyConditionalBody` | `control_flow/if_then_elsif_else` の本当に空の `else` / `unless`、`marker/` の直すべき側 | PR 版はファイル全体で除外している |
+| `Style/IdenticalConditionalBranches` | 2 つの分岐の最後が同じ `<%= user.name %>`（`marker/duplicate_branch_*`） | PR 版はファイル全体で除外している |
+| `Style/CommentAnnotation` | `<% # note %>`（`comment/ruby_comment`） | PR 版では空白になる。rubocop-herb は Ruby のコメントとして扱う |
+| `Lint/MissingCopEnableDirective` | `<%# rubocop:disable Style/StringLiterals %>` | rubocop-herb では無効化が効き、`rubocop:enable` がないことを報告する |
+| `Herb/CommentedOutCode`、`Herb/IgnoredCopDirective`、`Herb/EmptyErbTag` | 行末のコメントが後ろのタグを隠す例、空のタグ | rubocop-herb の cop |
+
+- マルチバイト文字（`<p>日本語 <%= x=1 %></p>` や `<%# 日本語のコメント %>` の次の行）では、両方とも offense の位置は正しく、`-a` の結果も元の位置に書き戻される
+- タグの中の行末のコメント `<% x = "b" # rubocop:disable Style/StringLiterals %>` は、両方で効く。PR 版では `Lint/CopDirectiveSyntax` も出る
+
+## autocorrect の結果【実測】
+
+PR 版は、`-a` でも次のようにテンプレートを壊します。ファイルごとの `-a` の前後です。
+
+`repro/cases/output/two_tags_line.html.erb`:
+
+```erb
+<td><%= user.name %></td><td><%= user.email %></td>
+```
+
+↓ `-a`
+
+```erb
+<td><%= user.name%> user.email%></td>
+```
+
+`repro/cases/control_flow/inline_if.html.erb`:
+
+```erb
+<% if a %>A<% else %>B<% end %>
+```
+
+↓ `-a`
+
+```erb
+<% if a%> else%> end%>
+```
+
+`repro/cases/variables/cross_tag_variables.html.erb`:
+
+```erb
+<% total = items.sum(&:price) %>
+<p><%= total %></p>
+<% unused = 1 %>
+<% items.each do |item| %>
+  <li><%= item.name %></li>
+<% end %>
+```
+
+↓ `-a`
+
+```erb
+<% items.sum(&:price)%>%></p>%>
+<% items.each do |item|%>
+  <li><%= item.name%></li>
+<% end%>
+```
+
+- `two_tags_line.html.erb` と `inline_if.html.erb` は `Layout/ExtraSpacing` の修正です。同じ行の 2 つの ERB タグの間（`%></td><td><%=` や `%>A<%`）は、Ruby では `;` と次の式の間の空白に見えるので、まとめて削除されます
+- `cross_tag_variables.html.erb` は `Lint/Void` と `Lint/UselessAssignment` の修正です。`<%= total %>` の `total` などを前後の空白ごと削除するときに、`%></p>` や次の行の `<%` も消えます
+- 修正対象ではないタグでも、`%>` の前の空白が `Layout/ExtraSpacing` で削除される（`<% end %>` → `<% end%>`）
+- `-A` では、さらに `Style/SymbolProc` で、`cross_tag_variables.html.erb` の出力するブロックが `<% items.each(&:name)%>` になり、出力がなくなる
+
+検証用 ERB（76 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる）。
+
+| | 書き換わったファイル | HTML が変わった | パースエラーが増えた |
+|---|---|---|---|
+| PR 版 `-a` | 69 | 23 | 18 |
+| PR 版 `-A` | 69 | 26 | 18 |
+| rubocop-herb `-a` | 27 | 0 | 1 |
+| rubocop-herb `-A` | 32 | 0 | 1 |
+
+rubocop-herb でパースエラーが増えた 1 ファイルは、`output/empty_tag_after_output_tag`（`<% %>`⏎`<%= b %><% %>`）です。2 つの cop の修正が重なって、出力タグの `%>` が消えます（[report.md](report.md#未解決の問題実測)）。
+
+`html_changes.rb` は HTML とパースエラーだけを見るので、`Style/SymbolProc` で出力がなくなるような変化は数えていません。
+
+## 実際のビューでの結果【実測】
+
+rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル）にかけた結果です。
+
+| | PR 版 | rubocop-herb |
+|---|---|---|
+| offense の数 | 2,455 | 930 |
+| `-a` で書き換わったファイル | 251 | 140 |
+| うち HTML が変わったファイル | 63 | 0 |
+| うちパースエラーが増えたファイル | 59 | 0 |
+| 実行時間（`--cache false`、検出のみ） | 1.8 秒 | 2.8 秒 |
+
+片方にだけ多く出る cop:
+
+| cop | PR 版 | rubocop-herb | 内容 |
+|---|---|---|---|
+| `Layout/ExtraSpacing` | 1,606 | 0 | 上記の誤検知 |
+| `Lint/Void` | 50 | 0 | 変数 29 件（`<%= event.name %>` など）、リテラル 20 件（`<%= event.ongoing? ? "true" : "" %>`、`<%= ' current' if page.current? %>` など）、演算子 1 件。いずれも出力する式 |
+| `Lint/EmptyBlock` | 30 | 2 | PR 版の 28 件は、本文が HTML だけのブロック（`<%= link_to path do %>…<% end %>` など）。2 件は両方に出る、本当に空のブロック |
+| `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 10, 8 | 0, 0 | `<%= cache "fragment" do %><p>ERB</p><% end %>` のように 1 行に書いた、本文が HTML のブロック |
+| `Layout/LineLength` | 0 | 162 | 下記 |
+| `Lint/EmptyFile` | 0 | 16 | 下記 |
+| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | 下記 |
+| `Style/MethodCallWithoutArgsParentheses` | 2 | 0 | conference-app の `admin_talks_path()` など。HTML を含むテンプレートで、rubocop-herb がこの cop の指摘を出せない（[report.md](report.md#未解決の問題実測)） |
+| `Style/IfUnlessModifier` | 0 | 1 | `<%= '\|' unless names.last == name %>` の行（HTML を含めて 121 桁）に、修飾子の `unless` で行が長すぎると出る。`-a` では修正されない |
+
+`Lint/Void` の誤検知には、[marcoroth/herb#1619](https://github.com/marcoroth/herb/issues/1619) のもとになった rails の `active_storage/blobs/_blob.html.erb`（`<%= blob.representable? ? "preview" : "file" %>`）も含まれます。
+
+### rubocop-herb だけに出る指摘の内容
+
+#### `Layout/LineLength`
+
+rubocop-herb は、ERB タグを含む行について、HTML も含めた行全体の長さを測ります。ERB タグを含まない行と、`<%%` だけの行（テキスト）は測りません。162 件を、行のうち ERB タグ（`<%` 〜 `%>`）が占める長さで分けると、次のようになります。
+
+| 区分 | 件数 | 例 |
+|---|---|---|
+| ERB タグ 1 つだけで 120 桁を超える | 86（conference-app 81） | `<%= f.select :status, Announcement.statuses, {}, class: "block rounded-sm border-1 cursor-pointer disabled:bg-gray-200 …", disabled: @announcement.published? %>`（タグだけで 191 桁） |
+| 周りの HTML を除いても、ERB タグとインデントで超える | 23 | `<%= f.color_field :border_color_code, class: "block mb-4", data: { action: "…" } %>` |
+| 周りの HTML を含めると超える | 53 | `<span class="rounded-xl bg-theme-primary-300 px-3 text-sm ml-2"><%= current_user!.unread_announcement_count %></span>`（131 桁のうちタグは 46 桁） |
+
+- 前の 2 つ（109 件）は、Tailwind の長い `class:` の文字列をヘルパーに渡しているものがほとんど。ERB タグの中の Ruby を引数ごとに改行すれば短くできる
+- 残りの 53 件は、タグの外の HTML を改行すれば短くできる（属性を 1 行に 1 つずつ並べるなど）。RuboCop では autocorrect できないが、Herb の formatter（`herb-format`）が `maxLineLength` で属性やテキストを折り返す
+- `herb-format` の `maxLineLength` の既定値は 80（`javascript/packages/formatter/src/options.ts`）で、`Layout/LineLength` の既定値 120 と異なる
+- `-a` では、ERB タグの中の引数を改行する修正が入る。HTML は変わらないが、2 行目が 120 桁を超えたまま残り、`%>` が行頭に置かれる
+
+```erb
+    <%= f.select :status, Announcement.statuses, {},
+                 class: 'block rounded-sm border-1 cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed mb-8', disabled: @announcement.published?
+%>
+```
+
+- 120 桁は RuboCop の既定値で、conference-app は RuboCop を導入していない
+
+#### `Lint/EmptyFile`
+
+- 16 件とも 0 バイトのテンプレート。HTML だけのテンプレート、改行だけのテンプレート、`<%# … %>` だけのテンプレートには出ない。Ruby のファイルと同じく、0 バイトのときだけ出る
+- conference-app の `admin/signage_devices/edit.html.erb` は、ルーティング（`resources :signage_devices, only: [:new, :create, :edit, :update]`）とコントローラーの `edit` があるのに、テンプレートが空。編集画面が空のページになる
+- rails の 15 件は、空のテンプレートの描画を確かめるテスト用の fixture（actionmailer のメールのパート、actionview の digestor のテストなど）
+
+#### `Layout/EmptyLineAfterMagicComment`
+
+- 3 件とも rails の actionview のテスト用 fixture の `<%# encoding: utf-8 -%>` の次の行。ActionView は、テンプレート先頭の `<%# encoding: … -%>` をテンプレートのエンコーディング指定として読む（`action_view/template/handlers/erb.rb` の `ENCODING_TAG`）ので、マジックコメントという判定は正しい
+- `<%# frozen_string_literal: true %>` にも出る。ActionView がテンプレートの先頭から読むのは encoding だけ
+- `-a` で、マジックコメントの後に空行が挿入される。空行はテンプレートの出力の改行になるので、出力が変わる。`CopCorrectionGuard` は HTML の両端の空白の違いを無視するので、この修正を止めない
+
+```erb
+<%# encoding: utf-8 -%>
+
+Русский <%= render partial: 'test/utf8_partial_magic' %>
+```
+
+- この fixture を使う rails のテスト（`test_render_utf8_template_with_magic_comment`）は、描画結果を文字列で完全に比べている
+
+## 評価【推測】
+
+- PR 版の誤検知と壊れる autocorrect は、変換の段階で `<%=` の意味と HTML の存在を落としていることから生じている。除外する cop を増やせば `Layout/ExtraSpacing` などは止められるが、`Lint/Void` のように除外しないと決めた cop では、出力する式の誤検知が残る
+- `Layout/ExtraSpacing` は RuboCop の既定で有効なので、PR 版を既定の設定で入れて `rubocop -a` を実行すると、同じ行に ERB タグが 2 つ以上あるテンプレートが壊れる。修正後の ERB を検査する仕組み（rubocop-herb の `CopCorrectionGuard` に当たるもの）がない限り、autocorrect を安全に使えない
+- 一方で、PR 版は小さく、herb 本体の C 実装に乗っているので保守しやすい。herb 公式の gem として出すための土台としては妥当で、`<%=` を `_ =` にするような変換を `extract_ruby` のオプションとして C 側に足す方向もありうる
+- rubocop-herb の `Layout/LineLength` は、行全体の長さを測るので、HTML が原因の長い行も指摘する。テンプレートも読むためのソースファイルなので、どれも改行で短くすべき行と言える。違いは直す道具で、ERB タグの中は RuboCop、タグの外の HTML は `herb-format` が直す。両方を使うなら、`Layout/LineLength` の `Max` と `herb-format` の `maxLineLength` を揃えないと、基準が食い違う
+- `Layout/LineLength` の autocorrect は、ERB では `%>` の位置が崩れ、行の長さも収まらないことがある。修正を ERB に合う形にできないなら、ガードで拒否して指摘だけを残すほうがよい
+- `Lint/EmptyFile` は、作りかけの空のテンプレートを見つけられる。わざと空にしたテンプレートは、`<%# … %>` を置けば指摘されない
+- `Layout/EmptyLineAfterMagicComment` は、autocorrect でテンプレートの出力が変わるので、ERB では除外するか、少なくとも autocorrect を拒否するのが妥当

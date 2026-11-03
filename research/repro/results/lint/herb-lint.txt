@@ -1,0 +1,47 @@
+cases/comment/commented_out_end.html.erb:1:3: error: [parser-no-errors] conditional_term: expected an `end` to close the conditional clause (`RUBY_PARSE_ERROR`)
+cases/comment/commented_out_end.html.erb:1:54: error: [parser-no-errors] unexpected_token_close_context: unexpected end-of-input, assuming it is closing the parent top level context (`RUBY_PARSE_ERROR`)
+cases/comment/commented_out_output.html.erb:1:3: error: [erb-no-unused-local-variable] Local variable `name` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_name` to show it is intentionally unused.
+cases/comment/ruby_comment.html.erb:1:0: error: [erb-comment-syntax] Use `<%#` instead of `<% #`. Ruby comments immediately after ERB tags can cause parsing issues.
+cases/control_flow/if_then_elsif_else.html.erb:1:16: warning: [erb-no-then-in-control-flow] Avoid using `then` in `if` expressions inside ERB templates. Use the multiline block form instead.
+cases/control_flow/if_then_elsif_else.html.erb:5:0: hint: [erb-no-empty-control-flow] Empty else block: this control flow statement has no content
+cases/control_flow/if_then_elsif_else.html.erb:7:0: hint: [erb-no-empty-control-flow] Empty unless block: this control flow statement has no content
+cases/control_flow/unless_else.html.erb:2:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
+cases/control_flow/unless_else.html.erb:4:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
+cases/control_flow/unused_block_arg.html.erb:1:18: error: [erb-no-unused-block-argument] Block argument `i` is never used. Remove it and write `<% items.each do %>`, or prefix it with an underscore as `_i` to show it is intentionally unused.
+cases/erb_comment/not_erb_tag.html.erb:1:73: error: [parser-no-errors] Stray `%>` found at (1:73). This closing delimiter is not part of an ERB tag and will be treated as plain text. If you want a literal `%>`, use the HTML entities `&percnt;&gt;` instead. (`STRAY_ERB_CLOSING_TAG_ERROR`)
+cases/herb_disable/empty_if.html.erb:1:19: warning: [herb-disable-comment-unnecessary] No offenses from `erb-no-empty-control-flow` on this line. Remove the `herb:disable` comment.
+cases/herb_disable/if_sibling.html.erb:2:21: warning: [herb-disable-comment-unnecessary] No offenses from `erb-no-empty-control-flow` on this line. Remove the `herb:disable` comment.
+cases/herb_disable/same_anchor.html.erb:2:3: warning: [html-img-require-alt] Missing required `alt` attribute on `<img>` tag. Add `alt=""` for decorative images or `alt="description"` for informative images.
+cases/marker/duplicate_branch_ng.html.erb:1:0: warning: [erb-no-duplicate-branch-elements] All branches of this conditional have identical content. The conditional can be removed.
+cases/marker/empty_block_ng.html.erb:1:0: hint: [erb-no-empty-control-flow] Empty do block: this control flow statement has no content
+cases/marker/empty_conditional_ng.html.erb:1:0: hint: [erb-no-empty-control-flow] Empty if block: this control flow statement has no content
+cases/marker/empty_else_ng.html.erb:3:0: hint: [erb-no-empty-control-flow] Empty else block: this control flow statement has no content
+cases/marker/safe_navigation_ng.html.erb:2:5: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% user.touch %>` is evaluated but its return value is discarded. Use `<%= user.touch %>` to output the value or remove the expression.
+cases/marker/safe_navigation_ok.html.erb:2:17: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% user.touch %>` is evaluated but its return value is discarded. Use `<%= user.touch %>` to output the value or remove the expression.
+cases/marker/safe_navigation_short.html.erb:2:6: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% user.touch %>` is evaluated but its return value is discarded. Use `<%= user.touch %>` to output the value or remove the expression.
+cases/marker/symbol_proc_ng.html.erb:3:7: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% item.touch %>` is evaluated but its return value is discarded. Use `<%= item.touch %>` to output the value or remove the expression.
+cases/marker/void_ng.html.erb:2:6: error: [erb-no-unused-expressions] Avoid unused expressions in silent ERB tags. `<% count + 1 %>` is evaluated but its return value is discarded. Use `<%= count + 1 %>` to output the value or remove the expression.
+cases/multibyte/emoji.html.erb:1:39: error: [erb-no-unused-local-variable] Local variable `x` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_x` to show it is intentionally unused.
+cases/multibyte/multibyte_comment.html.erb:2:4: error: [erb-no-unused-local-variable] Local variable `y` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_y` to show it is intentionally unused.
+cases/multibyte/show.html.erb:8:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
+cases/multibyte/show.html.erb:10:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
+cases/output/empty_tag_after_output_tag.html.erb:1:0: error: [erb-no-empty-tags] ERB tag should not be empty. Remove empty ERB tags or add content.
+cases/output/empty_tag_after_output_tag.html.erb:2:8: error: [erb-no-empty-tags] ERB tag should not be empty. Remove empty ERB tags or add content.
+cases/output/raw_output.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"hello"`. Use `hello` instead.
+cases/output/string_literal.html.erb:1:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"hello"`. Use `hello` instead.
+cases/rubocop_disable/erb_comment.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
+cases/rubocop_disable/multiline_range.html.erb:4:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
+cases/rubocop_disable/multiline_range.html.erb:8:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"b"`. Use `b` instead.
+cases/rubocop_disable/multiline_tag.html.erb:6:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"c"`. Use `c` instead.
+cases/rubocop_disable/ruby_comment_tag.html.erb:1:0: error: [erb-comment-syntax] Use `<%#` instead of `<% #`. Ruby comments immediately after ERB tags can cause parsing issues.
+cases/rubocop_disable/ruby_comment_tag.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a" # rubocop:disable Style/StringLiterals`. Use `a` instead.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"b"`. Use `b` instead.
+cases/syntax/missing_close.html.erb:1:5: error: [parser-no-errors] Opening tag `<span>` at (1:6) doesn't have a matching closing tag `</span>` in the same scope. (`MISSING_CLOSING_TAG_ERROR`)
+cases/syntax/missing_end.html.erb:1:0: error: [parser-no-errors] `<% if %>` started here but never closed with an end tag. The end tag may be in a different scope. (`MISSING_ERB_END_TAG_ERROR`)
+cases/syntax/missing_end.html.erb:1:3: error: [parser-no-errors] conditional_term: expected an `end` to close the conditional clause (`RUBY_PARSE_ERROR`)
+cases/syntax/missing_end.html.erb:2:14: error: [parser-no-errors] unexpected_token_close_context: unexpected end-of-input, assuming it is closing the parent top level context (`RUBY_PARSE_ERROR`)
+cases/syntax/syntax_errors_ignored.html.erb:1:0: error: [erb-no-output-control-flow] Iteration blocks like `map` should not be used with output tags, they return the collection instead of the rendered output. Use `<% items.map do |i| %>` instead.
+cases/syntax/syntax_errors_ignored.html.erb:4:3: error: [erb-no-unused-local-variable] Local variable `result` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_result` to show it is intentionally unused.
+cases/syntax/unclosed_paren.html.erb:1:3: error: [parser-no-errors] argument_term_paren: unexpected end-of-input; expected a `)` to close the arguments (`RUBY_PARSE_ERROR`)
+cases/variables/cross_tag_variables.html.erb:3:3: error: [erb-no-unused-local-variable] Local variable `unused` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_unused` to show it is intentionally unused.

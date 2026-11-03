@@ -1,0 +1,33 @@
+643  Style/StringLiterals [Safe Correctable]
+162  Layout/LineLength [Safe Correctable]
+18   Layout/SpaceInsideHashLiteralBraces [Safe Correctable]
+16   Lint/EmptyFile
+13   Layout/SpaceInsideBlockBraces [Safe Correctable]
+13   Style/HashSyntax [Safe Correctable]
+13   Style/QuotedSymbols [Safe Correctable]
+10   Style/StringLiteralsInInterpolation [Safe Correctable]
+8    Layout/SpaceInsideArrayLiteralBrackets [Safe Correctable]
+3    Layout/EmptyLineAfterMagicComment [Safe Correctable]
+3    Layout/HashAlignment [Safe Correctable]
+3    Lint/AssignmentInCondition [Unsafe Correctable]
+2    Layout/SpaceBeforeFirstArg [Safe Correctable]
+2    Lint/EmptyBlock
+2    Lint/LiteralAsCondition [Safe Correctable]
+2    Naming/VariableNumber
+2    Style/RegexpLiteral [Safe Correctable]
+1    Layout/SpaceAroundOperators [Safe Correctable]
+1    Layout/SpaceInsideParens [Safe Correctable]
+1    Lint/ParenthesesAsGroupedExpression [Safe Correctable]
+1    Lint/SymbolConversion [Safe Correctable]
+1    Lint/Syntax
+1    Style/DoubleNegation [Unsafe Correctable]
+1    Style/HashEachMethods [Unsafe Correctable]
+1    Style/IfUnlessModifier [Safe Correctable]
+1    Style/NumericPredicate [Unsafe Correctable]
+1    Style/RescueModifier [Safe Correctable]
+1    Style/SafeNavigation [Unsafe Correctable]
+1    Style/SafeNavigationChainLength
+1    Style/StringConcatenation [Unsafe Correctable]
+1    Style/SymbolProc [Unsafe Correctable]
+1    Style/TernaryParentheses [Safe Correctable]
+930  Total in 165 files

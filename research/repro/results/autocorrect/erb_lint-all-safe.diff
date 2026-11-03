@@ -1,0 +1,603 @@
+--- cases/comment/commented_out_output.html.erb
++++ cases/comment/commented_out_output.html.erb
+@@ -1 +1,3 @@
+-<% name = user.name # the full name %><%= name %>
++# frozen_string_literal: true
++name
++ %>
+--- cases/comment/ruby_comment.html.erb
++++ cases/comment/ruby_comment.html.erb
+@@ -1,2 +1,6 @@
+-<% # note %>
+-<%= foo %>
++# frozen_string_literal: true
++# note
++ %>
++# frozen_string_literal: true
++foo
++ %>
+--- cases/control_flow/cond_assign.html.erb
++++ cases/control_flow/cond_assign.html.erb
+@@ -1,6 +1,12 @@
+ <% if a %>
+-  <% x = 1 %>
++# frozen_string_literal: true
++1
++ %>
+ <% else %>
+-  <% x = 2 %>
++# frozen_string_literal: true
++2
++ %>
+ <% end %>
+-<%= x %>
++# frozen_string_literal: true
++x
++ %>
+--- cases/control_flow/form_block.html.erb
++++ cases/control_flow/form_block.html.erb
+@@ -1,3 +1,7 @@
+-<%= form_with model: @user do |f| %>
+-  <%= f.text_field :name %>
++# frozen_string_literal: true
++form_with model: @user
++ do |f| %>
++# frozen_string_literal: true
++f.text_field :name
++ %>
+ <% end %>
+--- cases/control_flow/single_line_block.html.erb
++++ cases/control_flow/single_line_block.html.erb
+@@ -1 +1,3 @@
+-<%= cache "fragment" do %>This bit is cached<% end %>
++# frozen_string_literal: true
++cache 'fragment'
++ do %>This bit is cached<% end %>
+--- cases/control_flow/trim.html.erb
++++ cases/control_flow/trim.html.erb
+@@ -1,3 +1,7 @@
+-<%- items.each do |item| -%>
+-  <%= item %>
++# frozen_string_literal: true
++items.each
++ do |item| -%>
++# frozen_string_literal: true
++item
++ %>
+ <%- end -%>
+--- cases/control_flow/unused_block_arg.html.erb
++++ cases/control_flow/unused_block_arg.html.erb
+@@ -1,3 +1,5 @@
+-<% items.each do |i| %>
++# frozen_string_literal: true
++items.each
++ do |i| %>
+   <li>item</li>
+ <% end %>
+--- cases/erb_comment/multiline_tag.html.erb
++++ cases/erb_comment/multiline_tag.html.erb
+@@ -1,6 +1,6 @@
+ <div>
+-  <%
+-    # rubocop:disable Lint/LiteralAsCondition
++# frozen_string_literal: true
++# rubocop:disable Lint/LiteralAsCondition
+   %>
+   <% if 'hello' %>
+     <p>world</p>
+--- cases/marker/combinable_loops_ng.html.erb
++++ cases/marker/combinable_loops_ng.html.erb
+@@ -1,6 +1,14 @@
+-<% items.each do |item| %>
+-  <%= item.name %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.name
++ %>
+ <% end %>
+-<% items.each do |item| %>
+-  <%= item.price %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.price
++ %>
+ <% end %>
+--- cases/marker/combinable_loops_ok.html.erb
++++ cases/marker/combinable_loops_ok.html.erb
+@@ -1,7 +1,15 @@
+-<% items.each do |item| %>
+-  <%= item.name %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.name
++ %>
+ <% end %>
+ Prices:
+-<% items.each do |item| %>
+-  <%= item.price %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.price
++ %>
+ <% end %>
+--- cases/marker/duplicate_branch_ng.html.erb
++++ cases/marker/duplicate_branch_ng.html.erb
+@@ -1,5 +1,9 @@
+ <% if morning? %>
+-  <%= user.name %>
++# frozen_string_literal: true
++user.name
++ %>
+ <% else %>
+-  <%= user.name %>
++# frozen_string_literal: true
++user.name
++ %>
+ <% end %>
+--- cases/marker/duplicate_branch_ok.html.erb
++++ cases/marker/duplicate_branch_ok.html.erb
+@@ -1,5 +1,9 @@
+ <% if morning? %>
+-  Good morning, <%= user.name %>
++# frozen_string_literal: true
++user.name
++ %>
+ <% else %>
+-  Hello, <%= user.name %>
++# frozen_string_literal: true
++user.name
++ %>
+ <% end %>
+--- cases/marker/empty_block_ng.html.erb
++++ cases/marker/empty_block_ng.html.erb
+@@ -1,2 +1,4 @@
+-<% items.each do %>
++# frozen_string_literal: true
++items.each
++ do %>
+ <% end %>
+--- cases/marker/empty_block_ok.html.erb
++++ cases/marker/empty_block_ok.html.erb
+@@ -1,3 +1,5 @@
+-<% items.each do %>
++# frozen_string_literal: true
++items.each
++ do %>
+   <li>item</li>
+ <% end %>
+--- cases/marker/empty_else_ng.html.erb
++++ cases/marker/empty_else_ng.html.erb
+@@ -1,4 +1,6 @@
+ <% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
++# frozen_string_literal: true
++link_to 'Admin', admin_path
++ %>
+ <% else %>
+ <% end %>
+--- cases/marker/empty_else_ok.html.erb
++++ cases/marker/empty_else_ok.html.erb
+@@ -1,5 +1,7 @@
+ <% if user.admin? %>
+-  <%= link_to "Admin", admin_path %>
++# frozen_string_literal: true
++link_to 'Admin', admin_path
++ %>
+ <% else %>
+   You are not an administrator.
+ <% end %>
+--- cases/marker/safe_navigation_ng.html.erb
++++ cases/marker/safe_navigation_ng.html.erb
+@@ -1,3 +1,5 @@
+ <% if user %>
+-  <% user.touch %>
++# frozen_string_literal: true
++user.touch
++ %>
+ <% end %>
+--- cases/marker/safe_navigation_ok.html.erb
++++ cases/marker/safe_navigation_ok.html.erb
+@@ -1,3 +1,5 @@
+ <% if user %>
+-  Last login: <% user.touch %>
++# frozen_string_literal: true
++user.touch
++ %>
+ <% end %>
+--- cases/marker/safe_navigation_short.html.erb
++++ cases/marker/safe_navigation_short.html.erb
+@@ -1,3 +1,5 @@
+ <% if user %>
+-  |<% user.touch %>
++# frozen_string_literal: true
++user.touch
++ %>
+ <% end %>
+--- cases/marker/sole_nested_conditional_ng.html.erb
++++ cases/marker/sole_nested_conditional_ng.html.erb
+@@ -1,5 +1,7 @@
+ <% if user %>
+   <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
++# frozen_string_literal: true
++link_to 'Admin', admin_path
++ %>
+   <% end %>
+ <% end %>
+--- cases/marker/sole_nested_conditional_ok.html.erb
++++ cases/marker/sole_nested_conditional_ok.html.erb
+@@ -1,6 +1,8 @@
+ <% if user %>
+   Welcome!
+   <% if user.admin? %>
+-    <%= link_to "Admin", admin_path %>
++# frozen_string_literal: true
++link_to 'Admin', admin_path
++ %>
+   <% end %>
+ <% end %>
+--- cases/marker/symbol_proc_ng.html.erb
++++ cases/marker/symbol_proc_ng.html.erb
+@@ -1,5 +1,9 @@
+ <ul>
+-  <% items.each do |item| %>
+-    <% item.touch %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.touch
++ %>
+   <% end %>
+ </ul>
+--- cases/marker/symbol_proc_ok.html.erb
++++ cases/marker/symbol_proc_ok.html.erb
+@@ -1,5 +1,9 @@
+ <ul>
+-  <% items.each do |item| %>
+-    <li><%= item.name %></li>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.name
++ %></li>
+   <% end %>
+ </ul>
+--- cases/marker/void_ng.html.erb
++++ cases/marker/void_ng.html.erb
+@@ -1,3 +1,9 @@
+-<% count = items.size %>
+-<p><% count + 1 %> items</p>
+-<p><%= count %> left</p>
++# frozen_string_literal: true
++items.size
++ %>
++# frozen_string_literal: true
++count + 1
++ %> items</p>
++# frozen_string_literal: true
++count
++ %> left</p>
+--- cases/marker/void_ok.html.erb
++++ cases/marker/void_ok.html.erb
+@@ -1,3 +1,9 @@
+-<% count = items.size %>
+-<p><%= count + 1 %> items</p>
+-<p><%= count %> left</p>
++# frozen_string_literal: true
++items.size
++ %>
++# frozen_string_literal: true
++count + 1
++ %> items</p>
++# frozen_string_literal: true
++count
++ %> left</p>
+--- cases/multibyte/emoji.html.erb
++++ cases/multibyte/emoji.html.erb
+@@ -1,2 +1,4 @@
+-<p>😀 日本語 <%= link_to "あ", path %> <%= x=1 %></p>
++# frozen_string_literal: true
++1
++ %></p>
+ <% if foo == nil %>🍣<% end %>
+--- cases/multibyte/multibyte_comment.html.erb
++++ cases/multibyte/multibyte_comment.html.erb
+@@ -1,2 +1,4 @@
+ <%# 日本語のコメント %>
+-<%= y=2 %>
++# frozen_string_literal: true
++2
++ %>
+--- cases/multibyte/show.html.erb
++++ cases/multibyte/show.html.erb
+@@ -1,5 +1,7 @@
+ <div class="user">
+-  <p>こんにちは <%= link_to( "ホーム",root_path ) %></p>
++# frozen_string_literal: true
++link_to('ホーム', root_path)
++ %></p>
+ </div>
+ <% if foo == nil %>
+   <span>empty</span>
+--- cases/output/attr.html.erb
++++ cases/output/attr.html.erb
+@@ -1 +1,3 @@
+-<div class="<%= active ? "on" : "off" %>">x</div>
++# frozen_string_literal: true
++active ? 'on' : 'off'
++ %>">x</div>
+--- cases/output/escaped_tag.html.erb
++++ cases/output/escaped_tag.html.erb
+@@ -1,2 +1,4 @@
+ <%%= link_to "a", a_path %>
+-<%= link_to "b", b_path %>
++# frozen_string_literal: true
++link_to 'b', b_path
++ %>
+--- cases/output/link_to_class.html.erb
++++ cases/output/link_to_class.html.erb
+@@ -1 +1,3 @@
+-<%= link_to "x", path, class: 'btn' %>
++# frozen_string_literal: true
++link_to 'x', path, class: 'btn'
++ %>
+--- cases/output/one_tag_line.html.erb
++++ cases/output/one_tag_line.html.erb
+@@ -1 +1,3 @@
+-<li><%= link_to "a", a_path %></li>
++# frozen_string_literal: true
++link_to 'a', a_path
++ %></li>
+--- cases/output/raw_output.html.erb
++++ cases/output/raw_output.html.erb
+@@ -1,2 +1,6 @@
+-<%== raw_html %>
+-<%= "hello" %>
++# frozen_string_literal: true
++raw_html
++ %>
++# frozen_string_literal: true
++'hello'
++ %>
+--- cases/output/same_line_tags.html.erb
++++ cases/output/same_line_tags.html.erb
+@@ -1 +1,3 @@
+-<%= a %><%= b %>
++# frozen_string_literal: true
++b
++ %>
+--- cases/output/string_literal.html.erb
++++ cases/output/string_literal.html.erb
+@@ -1 +1,3 @@
+-<%= "hello" %>
++# frozen_string_literal: true
++'hello'
++ %>
+--- cases/output/symbol_proc_map.html.erb
++++ cases/output/symbol_proc_map.html.erb
+@@ -1,3 +1,7 @@
+-<% users.map { |u| u.name }.each do |name| %>
+-  <%= name %>
++# frozen_string_literal: true
++users.map(&:name).each
++ do |name| %>
++# frozen_string_literal: true
++name
++ %>
+ <% end %>
+--- cases/output/two_tags_line.html.erb
++++ cases/output/two_tags_line.html.erb
+@@ -1 +1,3 @@
+-<td><%= user.name %></td><td><%= user.email %></td>
++# frozen_string_literal: true
++user.email
++ %></td>
+--- cases/rubocop_disable/erb_comment.html.erb
++++ cases/rubocop_disable/erb_comment.html.erb
+@@ -1,2 +1,4 @@
+ <%# rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++# frozen_string_literal: true
++'a'
++ %>
+--- cases/rubocop_disable/multiline_range.html.erb
++++ cases/rubocop_disable/multiline_range.html.erb
+@@ -1,8 +1,12 @@
+-<%
+-  # rubocop:disable Style/StringLiterals
++# frozen_string_literal: true
++# rubocop:disable Style/StringLiterals
+ %>
+-<%= "a" %>
+-<%
+-  # rubocop:enable Style/StringLiterals
++# frozen_string_literal: true
++'a'
++ %>
++# frozen_string_literal: true
++# rubocop:enable Style/StringLiterals
+ %>
+-<%= "b" %>
++# frozen_string_literal: true
++'b'
++ %>
+--- cases/rubocop_disable/multiline_tag.html.erb
++++ cases/rubocop_disable/multiline_tag.html.erb
+@@ -1,6 +1,10 @@
+-<%
+-  # rubocop:disable Style/StringLiterals
+-  x = "b"
++# frozen_string_literal: true
++# rubocop:disable Style/StringLiterals
++"b"
+ %>
+-<%= x %>
+-<%= "c" %>
++# frozen_string_literal: true
++x
++ %>
++# frozen_string_literal: true
++'c'
++ %>
+--- cases/rubocop_disable/ruby_comment_tag.html.erb
++++ cases/rubocop_disable/ruby_comment_tag.html.erb
+@@ -1,2 +1,6 @@
+-<% # rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++# frozen_string_literal: true
++# rubocop:disable Style/StringLiterals
++ %>
++# frozen_string_literal: true
++'a'
++ %>
+--- cases/rubocop_disable/trailing_ruby_comment.html.erb
++++ cases/rubocop_disable/trailing_ruby_comment.html.erb
+@@ -1,2 +1,6 @@
+-<% x = "b" # rubocop:disable Style/StringLiterals %>
+-<%= x %>
++# frozen_string_literal: true
++"b" # rubocop:disable Style/StringLiterals
++ %>
++# frozen_string_literal: true
++x
++ %>
+--- cases/rubocop_disable/trailing_ruby_comment_output.html.erb
++++ cases/rubocop_disable/trailing_ruby_comment_output.html.erb
+@@ -1,2 +1,6 @@
+-<%= "a" # rubocop:disable Style/StringLiterals %>
+-<%= "b" %>
++# frozen_string_literal: true
++"a" # rubocop:disable Style/StringLiterals
++ %>
++# frozen_string_literal: true
++'b'
++ %>
+--- cases/style/empty_lines.html.erb
++++ cases/style/empty_lines.html.erb
+@@ -1,6 +1,10 @@
+-<% a = 1 %>
++# frozen_string_literal: true
++1
++ %>
+ <p>
+ 
+ 
+ </p>
+-<%= a %>
++# frozen_string_literal: true
++a
++ %>
+--- cases/style/multiline_tag.html.erb
++++ cases/style/multiline_tag.html.erb
+@@ -1,5 +1,7 @@
+-<%
+-  x = 1
+-  y = 2
++# frozen_string_literal: true
++1
++  2
+ %>
+-<%= x + y %>
++# frozen_string_literal: true
++x + y
++ %>
+--- cases/style/reparse_cops_in_html.html.erb
++++ cases/style/reparse_cops_in_html.html.erb
+@@ -1,5 +1,11 @@
+ <div>
+-  <%= link_to root_path() %>
+-  <%= (a == b) ? 1 : 2 %>
+-  <%= (foo) %>
++# frozen_string_literal: true
++link_to root_path
++ %>
++# frozen_string_literal: true
++a == b ? 1 : 2
++ %>
++# frozen_string_literal: true
++foo
++ %>
+ </div>
+--- cases/style/ruby_style.html.erb
++++ cases/style/ruby_style.html.erb
+@@ -1,3 +1,9 @@
+-<%= link_to( 'Home',root_path ) %>
+-<%= user.name.nil? ? "anon" : user.name %>
+-<%= undefined_helper_xyz(@post) %>
++# frozen_string_literal: true
++link_to('Home', root_path)
++ %>
++# frozen_string_literal: true
++user.name.nil? ? 'anon' : user.name
++ %>
++# frozen_string_literal: true
++undefined_helper_xyz(@post)
++ %>
+--- cases/syntax/syntax_errors_ignored.html.erb
++++ cases/syntax/syntax_errors_ignored.html.erb
+@@ -1,5 +1,9 @@
+-<%= items.map do |i| %>
+-  <%= i %>
++# frozen_string_literal: true
++items.map
++ do |i| %>
++# frozen_string_literal: true
++i
++ %>
+ <% end.join(", ") %>
+ <% result = if foo %>
+   a
+--- cases/variables/ambiguous_operator.html.erb
++++ cases/variables/ambiguous_operator.html.erb
+@@ -1,5 +1,13 @@
+-<% count = items.size %>
+-<p><%= count -1 %></p>
+-<% items.each do |item| %>
+-  <%= item *2 %>
++# frozen_string_literal: true
++items.size
++ %>
++# frozen_string_literal: true
++count(-1)
++ %></p>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item(2)
++ %>
+ <% end %>
+--- cases/variables/cross_tag_variables.html.erb
++++ cases/variables/cross_tag_variables.html.erb
+@@ -1,6 +1,16 @@
+-<% total = items.sum(&:price) %>
+-<p><%= total %></p>
+-<% unused = 1 %>
+-<% items.each do |item| %>
+-  <li><%= item.name %></li>
++# frozen_string_literal: true
++items.sum(&:price)
++ %>
++# frozen_string_literal: true
++total
++ %></p>
++# frozen_string_literal: true
++1
++ %>
++# frozen_string_literal: true
++items.each
++ do |item| %>
++# frozen_string_literal: true
++item.name
++ %></li>
+ <% end %>

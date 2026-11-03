@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# 検証用 ERB（cases/）を、ツールを切り替えて検査する
+#
+#   bin/lint TOOL [OPTIONS...] [PATHS...]
+#
+# research/repro で実行する。PATHS を省略すると cases/ 全体を検査する。
+# OPTIONS は各ツールにそのまま渡す（rubocop 系なら --format emacs、-a、--only など）。
+#
+# TOOL:
+#   erb_lint-all          erb_lint 0.9.0（Rubocop linter だけ。全 cop を有効）
+#   erb_lint-recommended  erb_lint 0.9.0（Rubocop linter だけ。README の推奨どおりに cop を無効化）
+#   rubocop-erb-0.7       rubocop-erb 0.7.2（タグ単位）
+#   rubocop-erb-0.8       rubocop-erb 0.8.2（Herb.extract_ruby で文書全体）
+#   rubocop-erb-0.8-noexclude
+#                         rubocop-erb 0.8.2 から、ERB で除外している cop の除外を外したもの
+#   herb-rubocop-herb     marcoroth/herb#2260 の rubocop-herb（d0323df）
+#   ruumba                ruumba 0.1.17（README の推奨設定）
+#   tk0miya-rubocop-herb  tk0miya/rubocop-herb（$RUBOCOP_HERB に clone したもの）
+#   herb-lint             @herb-tools/linter（npx herb-lint）
+#   herb-format           @herb-tools/formatter（npx herb-format）
+#   plain-ruby            比較用の Ruby（plain_ruby/）に rubocop 1.92.1 をかける
+
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+REPRO="$PWD"
+TOOLS="$REPRO/tools"
+
+tool="${1:?usage: bin/lint TOOL [OPTIONS...] [PATHS...]}"
+shift
+
+# 引数に既存のパスがなければ、cases/ を検査する
+has_path=false
+for arg in "$@"; do
+  if [[ "$arg" != -* && -e "$arg" ]]; then
+    has_path=true
+  fi
+done
+args=("$@")
+if [[ "$has_path" == false && "$tool" != plain-ruby ]]; then
+  args+=(cases)
+fi
+
+rubocop() {
+  local gemfile="$1" config="$2"
+  shift 2
+  BUNDLE_GEMFILE="$gemfile" bundle exec rubocop --cache false -c "$config" "$@"
+}
+
+# erb_lint はディレクトリを受け付けないので、ファイルに展開する
+expand_erb() {
+  local arg
+  for arg in "$@"; do
+    if [[ -d "$arg" ]]; then
+      find "$arg" -name '*.html.erb' | sort
+    else
+      printf '%s\n' "$arg"
+    fi
+  done
+}
+
+case "$tool" in
+  erb_lint-all | erb_lint-recommended)
+    config="$TOOLS/erb_lint/${tool#erb_lint-}"
+    config="${config/%all/all_cops}.yml"
+    files=()
+    while IFS= read -r line; do files+=("$line"); done < <(expand_erb "${args[@]}")
+    BUNDLE_GEMFILE="$TOOLS/erb_lint/Gemfile" bundle exec erb_lint --config "$config" "${files[@]}"
+    ;;
+  rubocop-erb-0.7)
+    rubocop "$TOOLS/rubocop-erb-0.7/Gemfile" "$TOOLS/rubocop-erb-0.7/erb.yml" "${args[@]}"
+    ;;
+  rubocop-erb-0.8)
+    rubocop "$TOOLS/rubocop-erb-0.8/Gemfile" "$TOOLS/rubocop-erb-0.8/erb.yml" "${args[@]}"
+    ;;
+  rubocop-erb-0.8-noexclude)
+    rubocop "$TOOLS/rubocop-erb-0.8/Gemfile" "$TOOLS/rubocop-erb-0.8/erb-noexclude.yml" "${args[@]}"
+    ;;
+  herb-rubocop-herb)
+    rubocop "$TOOLS/herb-rubocop-herb/Gemfile" "$TOOLS/herb-rubocop-herb/pr.yml" "${args[@]}"
+    ;;
+  ruumba)
+    BUNDLE_GEMFILE="$TOOLS/ruumba/Gemfile" bundle exec ruumba -D -e -c "$TOOLS/ruumba/.ruumba.yml" "${args[@]}"
+    ;;
+  tk0miya-rubocop-herb)
+    : "${RUBOCOP_HERB:?set RUBOCOP_HERB to the directory of tk0miya/rubocop-herb}"
+    export RUBOCOP_HERB
+    rubocop "$RUBOCOP_HERB/Gemfile" "$TOOLS/tk0miya-rubocop-herb/tk.yml" "${args[@]}"
+    ;;
+  herb-lint)
+    npx herb-lint "${args[@]}"
+    ;;
+  herb-format)
+    npx herb-format "${args[@]}"
+    ;;
+  plain-ruby)
+    (cd plain_ruby && BUNDLE_GEMFILE="$TOOLS/erb_lint/Gemfile" bundle exec rubocop --cache false "${args[@]}")
+    ;;
+  *)
+    echo "unknown tool: $tool" >&2
+    exit 1
+    ;;
+esac

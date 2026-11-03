@@ -1,0 +1,19 @@
+94   Layout/LineLength [Safe Correctable]
+16   Lint/EmptyFile
+3    Lint/AssignmentInCondition [Unsafe Correctable]
+2    Layout/BlockAlignment [Safe Correctable]
+2    Lint/EmptyBlock
+2    Lint/LiteralAsCondition [Safe Correctable]
+2    Naming/VariableNumber
+1    Layout/IndentationWidth [Safe Correctable]
+1    Lint/Syntax
+1    Style/DoubleNegation [Unsafe Correctable]
+1    Style/HashEachMethods [Unsafe Correctable]
+1    Style/IfUnlessModifier [Safe Correctable]
+1    Style/NumericPredicate [Unsafe Correctable]
+1    Style/SafeNavigation [Unsafe Correctable]
+1    Style/SafeNavigationChainLength
+1    Style/StringConcatenation [Unsafe Correctable]
+1    Style/SymbolProc [Unsafe Correctable]
+1    Style/TernaryParentheses [Safe Correctable]
+132  Total in 64 files

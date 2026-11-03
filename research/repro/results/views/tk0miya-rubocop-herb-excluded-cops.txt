@@ -1,0 +1,11 @@
+162  Layout/LineLength [Safe Correctable]
+90   Layout/MultilineAssignmentLayout [Safe Correctable]
+16   Lint/EmptyFile
+3    Layout/HashAlignment [Safe Correctable]
+2    Lint/EmptyBlock
+1    Lint/Syntax
+1    Style/IfUnlessModifier [Safe Correctable]
+1    Style/RescueModifier [Safe Correctable]
+1    Style/SafeNavigation [Unsafe Correctable]
+1    Style/SymbolProc [Unsafe Correctable]
+278  Total in 101 files
