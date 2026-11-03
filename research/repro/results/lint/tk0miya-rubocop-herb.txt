@@ -1,11 +1,11 @@
 cases/comment/commented_out_end.html.erb:1:4: F: Lint/Syntax: expected an `end` to close the conditional clause (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
-cases/comment/commented_out_end.html.erb:1:14: C: Herb/CommentedOutCode: This Ruby comment comments out the ERB tags and HTML following it on the same line. Place them on a separate line or use an ERB comment (`<%# %>`).
+cases/comment/commented_out_end.html.erb:1:14: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
 cases/comment/commented_out_end.html.erb:1:55: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
 cases/comment/commented_out_output.html.erb:1:4: E: Herb/Linting: [erb-no-unused-local-variable] Local variable `name` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_name` to show it is intentionally unused.
 cases/comment/commented_out_output.html.erb:1:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `name`.
-cases/comment/commented_out_output.html.erb:1:21: C: Herb/CommentedOutCode: This Ruby comment comments out the ERB tags and HTML following it on the same line. Place them on a separate line or use an ERB comment (`<%# %>`).
+cases/comment/commented_out_output.html.erb:1:21: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
 cases/comment/ruby_comment.html.erb:1:1: E: Herb/Linting: [erb-comment-syntax] Use `<%#` instead of `<% #`. Ruby comments immediately after ERB tags can cause parsing issues.
-cases/comment/ruby_comment.html.erb:1:6: C: Style/CommentAnnotation: Annotation comment, with keyword `note`, is missing a note.
+cases/comment/ruby_comment.html.erb:1:4: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
 cases/control_flow/if_then_elsif_else.html.erb:1:17: C: [Correctable] Style/MultilineIfThen: Do not use `then` for multi-line `if`.
 cases/control_flow/if_then_elsif_else.html.erb:1:17: W: Herb/Linting: [erb-no-then-in-control-flow] Avoid using `then` in `if` expressions inside ERB templates. Use the multiline block form instead.
 cases/control_flow/if_then_elsif_else.html.erb:3:14: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
@@ -30,6 +30,8 @@ cases/erb_comment/multiline_comment.html.erb:3:1: W: Lint/MissingCopEnableDirect
 cases/erb_comment/multiline_tag.html.erb:3:5: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.
 cases/erb_comment/not_erb_tag.html.erb:1:7: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
 cases/erb_comment/not_erb_tag.html.erb:1:74: E: Herb/Linting: [parser-no-errors] Stray `%>` found at (1:73). This closing delimiter is not part of an ERB tag and will be treated as plain text. If you want a literal `%>`, use the HTML entities `&percnt;&gt;` instead. (`STRAY_ERB_CLOSING_TAG_ERROR`)
+cases/erb_comment/trailing_in_tag.html.erb:2:17: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
+cases/erb_comment/trailing_in_tag.html.erb:2:17: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/herb_disable/empty_if.html.erb:1:20: W: Herb/Linting: [herb-disable-comment-unnecessary] No offenses from `erb-no-empty-control-flow` on this line. Remove the `herb:disable` comment.
 cases/herb_disable/if_sibling.html.erb:2:22: W: Herb/Linting: [herb-disable-comment-unnecessary] No offenses from `erb-no-empty-control-flow` on this line. Remove the `herb:disable` comment.
 cases/herb_disable/same_anchor.html.erb:2:4: W: Herb/Linting: [html-img-require-alt] Missing required `alt` attribute on `<img>` tag. Add `alt=""` for decorative images or `alt="description"` for informative images.
@@ -78,9 +80,6 @@ cases/multibyte/show.html.erb:8:4: R: Herb/Linting: [erb-no-duplicate-branch-ele
 cases/multibyte/show.html.erb:10:4: R: Herb/Linting: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/output/attr.html.erb:1:26: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/attr.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
-cases/output/empty_tag_after_output_tag.html.erb:1:1: C: [Correctable] Herb/EmptyErbTag: Remove the empty ERB tag.
-cases/output/empty_tag_after_output_tag.html.erb:2:7: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
-cases/output/empty_tag_after_output_tag.html.erb:2:9: C: [Correctable] Herb/EmptyErbTag: Remove the empty ERB tag.
 cases/output/escaped_tag.html.erb:2:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/link_to_class.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/one_tag_line.html.erb:1:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
@@ -97,13 +96,18 @@ cases/rubocop_disable/multiline_range.html.erb:8:5: E: Herb/Linting: [erb-prefer
 cases/rubocop_disable/multiline_tag.html.erb:2:3: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
 cases/rubocop_disable/multiline_tag.html.erb:6:5: E: Herb/Linting: [erb-prefer-direct-output] Avoid outputting string literal `"c"`. Use `c` instead.
 cases/rubocop_disable/ruby_comment_tag.html.erb:1:1: E: Herb/Linting: [erb-comment-syntax] Use `<%#` instead of `<% #`. Ruby comments immediately after ERB tags can cause parsing issues.
+cases/rubocop_disable/ruby_comment_tag.html.erb:1:4: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
+cases/rubocop_disable/ruby_comment_tag.html.erb:1:4: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/rubocop_disable/ruby_comment_tag.html.erb:1:4: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
 cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: E: Herb/Linting: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:5: E: Herb/Linting: [erb-prefer-direct-output] Avoid outputting string literal `"a" # rubocop:disable Style/StringLiterals`. Use `a` instead.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: C: Herb/TrailingRubyComment: Ruby code in an output tag should not end with a comment because it causes a syntax error. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
+cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: E: Herb/Linting: [erb-prefer-direct-output] Avoid outputting string literal `"b"`. Use `b` instead.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: C: Herb/TrailingRubyComment: Ruby code in an ERB tag should not end with a comment because it comments out any ERB tags and HTML placed after it on the same line. Use an ERB comment (`<%# %>`) or put `%>` on the next line.
+cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/style/empty_lines.html.erb:4:1: C: Layout/EmptyLines: Extra blank line detected.
-cases/style/reparse_cops_in_html.html.erb:3:7: C: Style/TernaryParentheses: Omit parentheses for ternary conditions.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
 cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.

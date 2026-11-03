@@ -1,5 +1,6 @@
 94   Layout/LineLength [Safe Correctable]
 16   Lint/EmptyFile
+2    Herb/TrailingRubyComment
 2    Layout/BlockAlignment [Safe Correctable]
 2    Lint/EmptyBlock
 2    Lint/LiteralAsCondition [Safe Correctable]
@@ -8,5 +9,4 @@
 1    Lint/Syntax
 1    Style/IfUnlessModifier [Safe Correctable]
 1    Style/SafeNavigationChainLength
-1    Style/TernaryParentheses [Safe Correctable]
-123  Total in 60 files
+124  Total in 61 files

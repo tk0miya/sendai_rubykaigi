@@ -25,8 +25,6 @@ cases/multibyte/emoji.html.erb:1:39: error: [erb-no-unused-local-variable] Local
 cases/multibyte/multibyte_comment.html.erb:2:4: error: [erb-no-unused-local-variable] Local variable `y` is assigned but never used. Remove the assignment, or prefix it with an underscore as `_y` to show it is intentionally unused.
 cases/multibyte/show.html.erb:8:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/multibyte/show.html.erb:10:3: hint: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
-cases/output/empty_tag_after_output_tag.html.erb:1:0: error: [erb-no-empty-tags] ERB tag should not be empty. Remove empty ERB tags or add content.
-cases/output/empty_tag_after_output_tag.html.erb:2:8: error: [erb-no-empty-tags] ERB tag should not be empty. Remove empty ERB tags or add content.
 cases/output/raw_output.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"hello"`. Use `hello` instead.
 cases/output/string_literal.html.erb:1:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"hello"`. Use `hello` instead.
 cases/rubocop_disable/erb_comment.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
