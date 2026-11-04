@@ -402,12 +402,12 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 | `output/escaped_tag`（`<%%= link_to "a", a_path %>` の行） | — | `Style/StringLiterals`（誤） | `Lint/Syntax`（誤） | — | — | — |
 | `syntax/missing_end`（`end` の抜け） | — | —（除外） | `Lint/Syntax` | `Lint/Syntax` | `Lint/Syntax` | `Lint/Syntax` |
 | `syntax/syntax_errors_ignored`（`<% end.join(", ") %>` など） | — | — | `Lint/UselessAssignment` と `Lint/EmptyConditionalBody`（誤） | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` |
-| `comment/ruby_comment`（`<% # note %>`） | — | `Style/CommentAnnotation` | `Style/CommentAnnotation` | —（空白になる） | — | `Herb/TrailingRubyComment` |
-| `comment/commented_out_output`（`<% name = user.name # … %><%= name %>`） | — | — | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment`、`Herb/TrailingRubyComment` |
+| `comment/ruby_comment`（`<% # note %>`） | — | `Style/CommentAnnotation` | `Style/CommentAnnotation` | —（空白になる） | — | — |
+| `comment/commented_out_output`（`<% name = user.name # … %><%= name %>`） | — | — | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` |
 
 - erb_lint の全 cop の設定では、このほかに `Lint/UselessAssignment` の誤検知と、タグごとの `Style/FrozenStringLiteralComment` などが出る（[3.1 節](#31-erb_lintrubocop-linter)）
 - ruumba は、このほかに Layout 系の誤検知が多数出る（[4.1 節](#41-ruumba)）。herb-rubocop-herb は、ほぼすべての ERB タグに `Layout/ExtraSpacing` が出る（187 件）
-- `comment/commented_out_output` の `Lint/UselessAssignment` は誤検知ではない。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、行末のコメントは後ろの `<%= name %>` までコメントにし、`name` は本当に使われない。文書全体を変換するツールはどれもこれを再現する。tk0miya-rubocop-herb は、さらに `Herb/TrailingRubyComment` でこの書き方自体を報告する
+- `comment/commented_out_output` の `Lint/UselessAssignment` は誤検知ではない。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、行末のコメントは後ろの `<%= name %>` までコメントにし、`name` は本当に使われない。文書全体を変換するツールはどれもこれを再現する。この書き方自体は、herb-lint の `erb-no-trailing-comment` ルール（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。マージ済みで、未リリース）が報告する
 - herb-lint（`bin/lint herb-lint`）は RuboCop の cop を実行しないので、`Style/NilComparison` などは出ない。`end` の抜け、未使用の変数とブロック引数、本当に空の分岐は検出する（[4.4 節](#44-herbherb-lint--herb-format)）
 
 herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除いて片方にだけ出る offense をまとめると、次のようになります。
@@ -421,7 +421,7 @@ herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除い
 | `Lint/LiteralAsCondition`、`Style/StringLiterals`、`Lint/CopDirectiveSyntax` | 無効化コメントが効かない（[6 章](#6-無効化コメント)） | |
 | `Lint/UnusedBlockArgument`、`Style/EmptyElse`、`Lint/EmptyConditionalBody`、`Style/IdenticalConditionalBranches` | | 本当に未使用の引数、本当に空の分岐、分岐の外に移せる出力（herb-rubocop-herb はファイル全体で除外しているか、本文を空と見なす） |
 | `Lint/MissingCopEnableDirective` | | 効いた無効化コメント |
-| `Herb/TrailingRubyComment`、`Herb/IgnoredCopDirective` | | tk0miya-rubocop-herb の cop |
+| `Herb/IgnoredCopDirective` | | tk0miya-rubocop-herb の cop |
 
 マルチバイト文字（`cases/multibyte/`）を含むテンプレートでは、文書全体を変換するツールはどれも、offense の位置が正しく、`-a` の結果も元の位置に書き戻されます。tk0miya-rubocop-herb では、`<%-` / `-%>` のタグ（`control_flow/trim`）や属性値の中のタグ（`output/attr`）も位置がずれずに修正され、`<%= form_with … do |f| %>…<% end %>`（`control_flow/form_block`）は変更されません。
 
@@ -520,9 +520,9 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | | rubocop-erb 0.7.2 | rubocop-erb 0.8.2 | herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|
-| offense の数 | 762 | 763 | 2,455 | 934 |
-| offense のあるファイル | 143 | 151 | 252 | 166 |
-| `-A` の後に残る offense | — | 9 | — | 124（うち `Layout/LineLength` 94） |
+| offense の数 | 762 | 763 | 2,455 | 932 |
+| offense のあるファイル | 143 | 151 | 252 | 165 |
+| `-A` の後に残る offense | — | 9 | — | 122（うち `Layout/LineLength` 94） |
 | 実行時間（`--cache false`、検出のみ） | 5.6 秒 | 2.0 秒 | 1.8 秒 | 2.8 秒 |
 
 #### rubocop-erb 0.7.2 と 0.8.2 の違い
@@ -551,7 +551,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `Style/BlockDelimiters` | 8 | 0 | 上記 |
 | `Naming/FileName` | 3 | 0 | tk0miya-rubocop-herb は除外。`hello_world.pt-BR.html.erb` はロケール付きのテンプレートで、Rails はこの名前で探すので名前を変えられない。`_FooBar.html.erb` と `_a-in.html.erb` は、大文字やハイフンを含む partial 名を確かめる rails のテスト用 fixture |
 
-`Lint/Syntax` は両方に 1 件出ます（同じファイルで、報告する位置が違う）。このほか、tk0miya-rubocop-herb には `Herb/TrailingRubyComment` が 2 件出ます（`<% talks.reverse.each do |talk| # want to place … %>` と `<% # Template Dependency: events/* %>`）。
+`Lint/Syntax` は両方に 1 件出ます（同じファイルで、報告する位置が違う）。
 
 #### herb-rubocop-herb と tk0miya-rubocop-herb の違い
 
@@ -654,9 +654,9 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | ファイル | 書き方 | rubocop-erb 0.7.2 | rubocop-erb 0.8.2 / herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|
 | `erb_comment` | `<%# rubocop:disable Style/StringLiterals %>` | 効かない | 効かない | 効く |
-| `ruby_comment_tag` | `<% # rubocop:disable Style/StringLiterals %>` | 効かない（同じタグの中だけに効く） | 効かない | 効くが、`Lint/CopDirectiveSyntax` と `Herb/TrailingRubyComment` が出る |
-| `trailing_ruby_comment` | `<% x = "b" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効くが、`Lint/CopDirectiveSyntax` と `Herb/TrailingRubyComment` が出る |
-| `trailing_ruby_comment_output` | `<%= "a" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効くが、`Lint/CopDirectiveSyntax` と `Herb/TrailingRubyComment` が出る |
+| `ruby_comment_tag` | `<% # rubocop:disable Style/StringLiterals %>` | 効かない（同じタグの中だけに効く） | 効かない | 効くが、`Lint/CopDirectiveSyntax` が出る |
+| `trailing_ruby_comment` | `<% x = "b" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効くが、`Lint/CopDirectiveSyntax` が出る |
+| `trailing_ruby_comment_output` | `<%= "a" # rubocop:disable Style/StringLiterals %>` | その行に効く | その行に効くが、`Lint/CopDirectiveSyntax` が出る | その行に効くが、`Lint/CopDirectiveSyntax` が出る |
 | `multiline_tag` | `<%`⏎`  # rubocop:disable Style/StringLiterals`⏎`  x = "b"`⏎`%>` の後に `<%= "c" %>` | 同じタグの中の `x = "b"` だけに効く | 後の `<%= "c" %>` にも効く | 後の `<%= "c" %>` にも効く |
 | `multiline_range` | `<%`⏎`  # rubocop:disable …`⏎`%>` と `<%`⏎`  # rubocop:enable …`⏎`%>` で範囲を区切る | 効かない | 範囲の中だけに効く | 範囲の中だけに効く |
 
@@ -665,7 +665,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 - コメントの後で改行してから `%>` を書けば、補われる `;` が次の行に回るので、通常の Ruby のコメントとして扱われる。ファイル全体に効き、`# rubocop:enable` で範囲を区切れる
 - 0.7.2 はタグ 1 つを 1 つの Ruby として検査するので、無効化コメントは同じタグの中にしか効かない。`<% # rubocop:disable … %>` では、そのタグに `Lint/MissingCopEnableDirective` が出る
 - tk0miya-rubocop-herb は、右側に別のタグや HTML がない `<%# … %>` を Ruby のコメントに変換するので、どの書き方でも効く。右側にタグや HTML があって効かない書き方は、`Herb/IgnoredCopDirective` が報告する（[第 2 部 7 章](tk0miya-rubocop-herb.md#7-tk0miya-rubocop-herb-の-cop)）
-- tk0miya-rubocop-herb でも、タグの中の行末に書いたコメント（`<% # … %>` を含む）には、補う `;` がコメントの中に入るので `Lint/CopDirectiveSyntax` が出る。無効化そのものは効く。行末の Ruby のコメント自体も `Herb/TrailingRubyComment` が報告する
+- tk0miya-rubocop-herb でも、タグの中の行末に書いたコメント（`<% # … %>` を含む）には、補う `;` がコメントの中に入るので `Lint/CopDirectiveSyntax` が出る。無効化そのものは効く
 
 `<%# rubocop:disable … %>` が効かないことは、既存のテンプレートに 0.8 系を入れるときの障害になりえます。このコメントで抑えていた指摘が、まとめて出ます。0.8 系で無効化コメントを使うなら、Ruby のコメントだけを書いた複数行のタグにするのが確実です【推測】。
 
@@ -696,7 +696,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `indent` | 確かめられない | 確かめられない | 効かない | 効く | 効く |
 | `multiline_comment` | 確かめられない | 確かめられない | 効かない | 効く | 効く |
 | `multiline_tag` | 確かめられない | 確かめられない | 効く | 効く | 効く |
-| `trailing_in_tag` | 確かめられない | 確かめられない | 効くが、`Lint/CopDirectiveSyntax` が出る | 効く | 効くが、`Lint/CopDirectiveSyntax` と `Herb/TrailingRubyComment` が出る |
+| `trailing_in_tag` | 確かめられない | 確かめられない | 効くが、`Lint/CopDirectiveSyntax` が出る | 効く | 効くが、`Lint/CopDirectiveSyntax` が出る |
 | `empty_if` | 確かめられない | 確かめられない | 確かめられない（`.erb` では `Lint/EmptyConditionalBody` を除外） | 出ない | 効く |
 
 - erb_lint と rubocop-erb 0.7.2 は、`<% if 'hello' %>` と `<% end %>` を 1 つずつ Ruby として検査するので、どちらも構文エラーとして黙って飛ばす。0.7.2 では、`multiline_tag` に `Lint/MissingCopEnableDirective` と `Lint/RedundantCopDisableDirective` が、`trailing_in_tag` に `Lint/RedundantCopDisableDirective` が出る。erb_lint では、`multiline_tag` に `Layout/CommentIndentation` と `Layout/LeadingEmptyLines` が出る（誤検知）。ほかのファイルでは offense 0 件
@@ -793,7 +793,7 @@ herb-format は、herb-lint の無効化コメント `<%# herb:disable … %>` �
 #### 考察【推測】
 
 - tk0miya-rubocop-herb の行単位の無効化は、`<%#` がコードと同じ行の右端にあることを前提にしている。herb-format を使うプロジェクトでは、整形でこの前提が崩れ、無効化が外れる。多くの場合は offense が出るので気づけるが、`empty_if` のように offense が出ないまま無効化の範囲だけが広がることもある。herb-format と併用するなら、無効化コメントは独立した行に書き、`rubocop:enable` で閉じるのが確実
-- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなる。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけ。また、タグの中の行末のコメントは、ERB や Erubi ではタグの後ろに生成されるコードまでコメントにするので、構文エラーになったり、テンプレートの残りが黙って出力されなくなったりする（`cases/comment/commented_out_*`）。構文エラーのもとになる書き方なので、非推奨とし、無効化コメントの書き方としてもサポートしなくてよいと考える。herb-lint にこの書き方を報告する `erb-no-trailing-comment` ルールを提案し（[marcoroth/herb#2867](https://github.com/marcoroth/herb/issues/2867)、open）、実装した PR を出している（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)、open）。ルールは既定で有効（severity は `error`）で、`template_engine: herb` のときは報告しない（`Herb::Engine` は行末のコメントを扱える）。autofix はコメントを別の `<%# %>` タグに移す（unsafe）
+- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなる。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけ。また、タグの中の行末のコメントは、ERB や Erubi ではタグの後ろに生成されるコードまでコメントにするので、構文エラーになったり、テンプレートの残りが黙って出力されなくなったりする（`cases/comment/commented_out_*`）。構文エラーのもとになる書き方なので、非推奨とし、無効化コメントの書き方としてもサポートしなくてよいと考える。herb-lint にこの書き方を報告する `erb-no-trailing-comment` ルールを提案し（[marcoroth/herb#2867](https://github.com/marcoroth/herb/issues/2867)）、実装した PR がマージされた（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。未リリース）。tk0miya-rubocop-herb はこの書き方を報告する cop を持たず、herb-lint に任せる。ルールは既定で有効（severity は `error`）で、`template_engine: herb` のときは報告しない（`Herb::Engine` は行末のコメントを扱える）。autofix はコメントを別の `<%# %>` タグに移す（unsafe）
 - `herb:disable` は herb-format で行末に残るように作られている一方、`rubocop:disable` の `<%#` は整形で動く。ERB の中で使う 2 つの無効化コメントのうち、行末に書けるのが片方だけというのは釣り合いが取れていない。ただ、`herb:disable` の書き戻しもテキスト検索に頼っていて、制御構文や同じ内容のタグでは別の行に付く。行末の無効化コメントを整形でどう保つかは、`herb:disable` と `rubocop:disable` をまとめて仕様を議論する必要がある
 
 #### 今後の検討事項
@@ -959,7 +959,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 **誤検知が少ない【実測・出典】**
 
 - erb_lint の `Lint/UselessAssignment` やタグごとの `Style/FrozenStringLiteralComment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は、いずれも出ない
-- ファイル全体で除外する cop は 10 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（31 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- ファイル全体で除外する cop は 10 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（39 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
 - rubocop-erb 0.8 系が除外している `Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation` なども、誤検知にならない行では検出する。実際のビューでは、本当に空のブロックや `map { |k| k.to_s }` を検出した（[5.4 節](#54-実際のビュー実測)）
 
 **autocorrect がテンプレートを壊さない【実測・出典】**

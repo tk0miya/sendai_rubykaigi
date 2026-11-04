@@ -149,7 +149,7 @@ div;
 - タグの中身は元の位置に、それ以外は空白に（改行は残す）
 - `<%=` は `_ =` に → 「出力する」意味が残るので `Lint/Void` / `Style/SymbolProc` の誤検知が出ない
 - `<%` `%>` の分の空白があるので `;` を補っても位置がずれない
-- 変換結果は rubocop-herb `727ab4f` の `bin/erb2ruby` の出力（行末の空白は省略）
+- 変換結果は rubocop-herb `1215c59` の `bin/erb2ruby` の出力（行末の空白は省略）
 
 ### 15. HTML も Ruby として見せる
 
@@ -171,7 +171,7 @@ div;
 ### 17. 残る誤検知は ERB の構造を見て抑える
 
 - ファイル全体で除外する cop は 10 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
-- それ以外は、誤検知になる**その行だけ**で cop を無効化（31 個）
+- それ以外は、誤検知になる**その行だけ**で cop を無効化（39 個）
   - 本文に HTML を含む分岐・ブロック: `Lint/EmptyConditionalBody` など → 本当に空の `else` は検出できる
   - ERB タグに跨がる `<% end %>` や本文: `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中に書いた Ruby は検査される
 - 図: ERB の上に「この行ではこの cop を無効化」を重ねて示す
