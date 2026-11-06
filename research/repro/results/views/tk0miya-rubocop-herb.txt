@@ -10,7 +10,6 @@
 3    Layout/EmptyLineAfterMagicComment [Safe Correctable]
 3    Layout/HashAlignment [Safe Correctable]
 3    Lint/AssignmentInCondition [Unsafe Correctable]
-2    Herb/TrailingRubyComment
 2    Layout/SpaceBeforeFirstArg [Safe Correctable]
 2    Lint/EmptyBlock
 2    Lint/LiteralAsCondition [Safe Correctable]
@@ -32,4 +31,4 @@
 1    Style/StringConcatenation [Unsafe Correctable]
 1    Style/SymbolProc [Unsafe Correctable]
 1    Style/TernaryParentheses [Safe Correctable]
-934  Total in 166 files
+932  Total in 165 files

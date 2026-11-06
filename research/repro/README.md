@@ -38,7 +38,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
 | `herb-rubocop-herb` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-rubocop-herb/pr.yml` |
 | `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
-| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `727ab4fa76ae383741fd11c44cfdd4b970a78efe` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
+| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `1215c590c25e8f00b77d88900c962b0467d89f71` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
 | `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
 | `herb-format` | @herb-tools/formatter | 同上 |
 | `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
@@ -52,7 +52,7 @@ $ cd research/repro
 $ for d in tools/*/; do [ -f "$d/Gemfile" ] && (cd "$d" && BUNDLE_FROZEN=true bundle install); done
 $ npm install
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 727ab4fa76ae383741fd11c44cfdd4b970a78efe && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 1215c590c25e8f00b77d88900c962b0467d89f71 && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 ```
 
@@ -163,7 +163,7 @@ $ bin/fetch-views && bin/record-views
 |---|---|---|
 | `ruby_style` | `<%= link_to( 'Home',root_path ) %>` など | herb-lint はスタイル違反を見ない |
 | `multiline_tag` | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | erb_lint の推奨設定でも、`Layout/LeadingEmptyLines` の修正で `<%` が消える |
-| `empty_lines` | タグの間に空行を含む HTML | `Layout/EmptyLines` |
+| `empty_lines` | タグの間に空行を含む HTML | HTML の中の空行に `Layout/EmptyLines` が出るか |
 
 ### `syntax/`: 構文エラー
 
@@ -186,7 +186,7 @@ $ bin/fetch-views && bin/record-views
 | ファイル | 内容 | 確かめること |
 |---|---|---|
 | `ruby_comment` | `<% # note %>` | `Herb.extract_ruby` は空白にする。tk0miya-rubocop-herb は Ruby のコメントとして扱う |
-| `commented_out_output` | `<% name = user.name # the full name %><%= name %>` | ERB では行末のコメントが後ろの出力タグまでコメントにする（`Herb/TrailingRubyComment`） |
+| `commented_out_output` | `<% name = user.name # the full name %><%= name %>` | ERB では行末のコメントが後ろの出力タグまでコメントにする（herb-lint の `erb-no-trailing-comment`） |
 | `commented_out_end` | `<% if admin? # only for admins %><p>admin</p><% end %>` | 同上。`<% end %>` がコメントになって構文エラーになる |
 
 ### `rubocop_disable/`: `Style/StringLiterals` を無効にするコメントの書き方
