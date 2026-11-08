@@ -9,7 +9,7 @@ tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ru
 
 ## 目次
 
-1. [概要](#1-概要)
+1. [概要](#1-概要)（[方針](#11-方針)）
 2. [ERB から Ruby への変換](#2-erb-から-ruby-への変換)
 3. [なぜ `<%=` と HTML を Ruby として描画するのか](#3-なぜ--と-html-を-ruby-として描画するのか)
 4. [RuboCop との連携](#4-rubocop-との連携出典)
@@ -29,6 +29,15 @@ tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ru
 - `Herb/Linting` cop で herb-lint も同時に実行でき、HTML の構造の誤りも RuboCop の出力に並ぶ（Node.js と `@herb-tools/linter` が必要）。herb-lint の修正も `rubocop -a` / `-A` で適用する
 - `Herb/Formatting` cop は、`.herb.yml` で formatter を有効にしたときだけ herb-format を実行し、`rubocop -A` で整形する
 - 規模は `lib/` の Ruby で 3,521 行（herb-rubocop-herb は 74 行、rubocop-erb 0.8.2 は 386 行）。うち 697 行は herb-lint / herb-format との連携
+
+### 1.1 方針
+
+tk0miya-rubocop-herb は、作者の次の方針で作られています。この文書での評価も、この方針に従います。
+
+- **誤検知（false positive）を限りなくゼロにすることを最優先にする**。誤検知が多いと、AI のコーディングエージェントや CI のブロッカーになる
+- **autocorrect は、決定的に、確実に正しく修正できるものだけにする**。修正を間違えうるものは、offense を報告するだけにして、修正は AI に任せる。AI の進化で、指摘されたコードを直すこと自体は容易になった
+- そのため、ガード（[6 章](#6-autocorrect-の検査copcorrectionguard)）が修正を捨てて「autocorrect できない offense」として報告するのは、意図どおりの扱い。`-a` の後に残る offense が多いことは問題にしない
+- 問題として扱うのは、誤検知と、適用されてしまう誤った修正。見逃し（false negative）は、誤検知より優先度が低い
 
 ## 2. ERB から Ruby への変換
 
@@ -322,7 +331,7 @@ RuboCop の修正、herb-lint の修正、herb-format の整形が同じ実行�
 
 ## 8. 既知の問題【実測・推測】
 
-tk0miya-rubocop-herb は、誤検知と誤編集（テンプレートを壊す修正や ERB に合わない修正）をなくすことを優先しています。offense を報告して autocorrect しない（ガードが修正を捨てる）のは、意図どおりの扱いです。ここでは、それ以外に残っている問題を挙げます。
+[1.1 節](#11-方針)の方針に従い、誤検知と、適用されてしまう誤った修正（テンプレートを壊す修正や ERB に合わない修正）を問題として挙げます。offense を報告して autocorrect しない（ガードが修正を捨てる）ものは挙げません。
 
 ### 8.1 herb-lint / herb-format の修正
 
