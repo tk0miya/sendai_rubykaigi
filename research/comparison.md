@@ -407,7 +407,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 - erb_lint の全 cop の設定では、このほかに `Lint/UselessAssignment` の誤検知と、タグごとの `Style/FrozenStringLiteralComment` などが出る（[3.1 節](#31-erb_lintrubocop-linter)）
 - ruumba は、このほかに Layout 系の誤検知が多数出る（[4.1 節](#41-ruumba)）。herb-rubocop-herb は、ほぼすべての ERB タグに `Layout/ExtraSpacing` が出る（187 件）
-- `comment/commented_out_output` の `Lint/UselessAssignment` は誤検知ではない。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、行末のコメントは後ろの `<%= name %>` までコメントにし、`name` は本当に使われない。文書全体を変換するツールはどれもこれを再現する。この書き方自体は、herb-lint の `erb-no-trailing-comment` ルール（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。マージ済みで、未リリース）が報告する
+- `comment/commented_out_output` の `Lint/UselessAssignment` は誤検知ではない。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、行末のコメントは後ろの `<%= name %>` までコメントにし、`name` は本当に使われない。文書全体を変換するツールはどれもこれを再現する。この書き方自体は、herb-lint の `erb-no-trailing-comment` ルール（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。`@herb-tools/linter` 0.11.2 で入った。検証環境の 0.11.1 にはない）が報告する
 - herb-lint（`bin/lint herb-lint`）は RuboCop の cop を実行しないので、`Style/NilComparison` などは出ない。`end` の抜け、未使用の変数とブロック引数、本当に空の分岐は検出する（[4.4 節](#44-herbherb-lint--herb-format)）
 
 herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除いて片方にだけ出る offense をまとめると、次のようになります。
@@ -481,10 +481,11 @@ herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除い
 | rubocop-erb 0.8.2 `-A` | 26 / 0 / 0 | 145 / 0 / 0 |
 | herb-rubocop-herb `-a` | 67 / 22 / 17 | 251 / 63 / 59 |
 | herb-rubocop-herb `-A` | 67 / 25 / 17 | 251 / 63 / 56 |
-| tk0miya-rubocop-herb `-a` | 26 / 0 / 0 | 140 / 0 / 0 |
-| tk0miya-rubocop-herb `-A` | 31 / 0 / 0 | 142 / 0 / 0 |
+| tk0miya-rubocop-herb `-a` | 31 / 9 / 0 | 140 / 0 / 0 |
+| tk0miya-rubocop-herb `-A` | 37 / 9 / 0 | 142 / 0 / 0 |
 
 - rubocop-erb 0.7.2 の `-A` でパースエラーが増えたのは `control_flow/safe_navigation`（`user&&.admin?`）
+- tk0miya-rubocop-herb の検証用 ERB の値は `Herb/Linting` を含み、HTML が変わった 9 ファイルは、どれも herb-lint の修正（`<%= "hello" %>` を `hello` にする `erb-prefer-direct-output` など）によるもの。`Herb/Linting` を外すと `-a` が 26 / 0 / 0、`-A` が 31 / 0 / 0 になる。実際のビューの値は `Herb/Linting` を外したもので、含めると `-a` が 232 / 30 / 0、`-A` が 234 / 30 / 0（herb-lint 単体の `--fix` でも、HTML が変わるのは 30 ファイル）。[第 2 部 7.1 節](tk0miya-rubocop-herb.md#71-herblinting)
 - `html_changes.rb` は HTML とパースエラーしか見ないので、Ruby の意味が変わる修正（`count(-1)`、出力がなくなる `Style/SymbolProc` など）は数えていない
 
 修正の中身です。
@@ -499,7 +500,7 @@ herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除い
 | `<td><%= user.name %></td><td><%= user.email %></td>` | herb-rubocop-herb `-a`: `<td><%= user.name%> user.email%></td>` |
 | `<% if a %>A<% else %>B<% end %>` | herb-rubocop-herb `-a`: `<% if a%> else%> end%>` |
 | `<% total = items.sum(&:price) %>`⏎`<p><%= total %></p>`⏎`<% unused = 1 %>`⏎（ループ） | herb-rubocop-herb `-a`: `<% items.sum(&:price)%>%></p>%>`⏎…。0.8.2 `-A`: `<% unused = 1 %>` が `<% 1 %>` になって残る（`Lint/Void` を除外しているので、offense も出ない）。tk0miya-rubocop-herb `-a`: `<% unused = 1 %>` の行が消える |
-| `<% end.join(", ") %>`、`<% result = if foo %>`（`syntax/syntax_errors_ignored`） | erb_lint（推奨設定）/ 0.7.2: 変わらない（黙って飛ばす）。0.8.2 / tk0miya-rubocop-herb: `", "` が `', '` になり、`-A` では使われていない `result =` も消える |
+| `<% end.join(", ") %>`、`<% result = if foo %>`（`syntax/syntax_errors_ignored`） | erb_lint（推奨設定）/ 0.7.2: 変わらない（黙って飛ばす）。0.8.2 / tk0miya-rubocop-herb: `", "` が `', '` になり、`-A` では使われていない `result =` も消える。tk0miya-rubocop-herb では、さらに `Herb/Linting` が `<%= items.map do |i| %>` を `<% items.map do |i| %>` にする（herb-lint の `erb-no-output-control-flow`） |
 | `<%= cache "fragment" do %>This bit is cached<% end %>` | 0.8.2 `-a`: `<%= cache 'fragment' do`⏎` %>This bit is cached<% `⏎`end %>`（出力は変わらないが、タグの中に改行が入る）。tk0miya-rubocop-herb: `'fragment'` だけ |
 | `<% unless a %>`…`<% else %>`…`<% end %>`（本文に HTML） | 0.8.2、tk0miya-rubocop-herb: `Style/UnlessElse` の修正は捨てられる |
 
@@ -520,9 +521,9 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | | rubocop-erb 0.7.2 | rubocop-erb 0.8.2 | herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|
-| offense の数 | 762 | 763 | 2,455 | 932 |
+| offense の数 | 762 | 763 | 2,455 | 929 |
 | offense のあるファイル | 143 | 151 | 252 | 165 |
-| `-A` の後に残る offense | — | 9 | — | 122（うち `Layout/LineLength` 94） |
+| `-A` の後に残る offense | — | 9 | — | 194（うち `Layout/LineLength` 166） |
 | 実行時間（`--cache false`、検出のみ） | 5.6 秒 | 2.0 秒 | 1.8 秒 | 2.8 秒 |
 
 #### rubocop-erb 0.7.2 と 0.8.2 の違い
@@ -540,7 +541,6 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 |---|---|---|---|
 | `Layout/LineLength` | 0 | 162 | 0.8.2 は除外（下記） |
 | `Lint/EmptyFile` | 0 | 16 | 0.8.2 は除外（下記） |
-| `Layout/EmptyLineAfterMagicComment` | 0 | 3 | `<%# encoding: utf-8 -%>` の次の行。0.8.2 では `<%# … %>` が空白になるので出ない（下記） |
 | `Layout/HashAlignment` | 0 | 3 | 0.8.2 は除外。複数行に渡る `link_to` の引数の揃え |
 | `Lint/EmptyBlock` | 0 | 2 | 0.8.2 は除外。2 件とも本当に空のブロック（`<%= check_box_tag … do %>`⏎`<% end %>` など） |
 | `Style/SymbolProc` | 0 | 1 | 0.8.2 は除外。`<%= local_assigns.keys.map {\|k\| k.to_s }.sort.join(",") -%>` で、妥当な指摘 |
@@ -561,7 +561,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 | `Lint/Void` | 50 | 0 | 変数 29 件（`<%= event.name %>` など）、リテラル 20 件（`<%= event.ongoing? ? "true" : "" %>`、`<%= ' current' if page.current? %>` など）、演算子 1 件。いずれも出力する式 |
 | `Lint/EmptyBlock` | 30 | 2 | herb-rubocop-herb の 28 件は、本文が HTML だけのブロック（`<%= link_to path do %>…<% end %>` など）。2 件は両方に出る、本当に空のブロック |
 | `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 10, 8 | 0, 0 | 1 行に書いた、本文が HTML のブロック |
-| `Layout/LineLength`、`Lint/EmptyFile`、`Layout/EmptyLineAfterMagicComment` | 0 | 162、16、3 | herb-rubocop-herb は除外、または `<%#` が空白になる |
+| `Layout/LineLength`、`Lint/EmptyFile` | 0 | 162、16 | herb-rubocop-herb は除外 |
 
 `Lint/Void` の誤検知には、[marcoroth/herb#1619](https://github.com/marcoroth/herb/issues/1619) のもとになった rails の `active_storage/blobs/_blob.html.erb`（`<%= blob.representable? ? "preview" : "file" %>`）も含まれます。
 
@@ -605,13 +605,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 - 前の 2 つ（109 件）は、Tailwind の長い `class:` の文字列をヘルパーに渡しているものがほとんど。ERB タグの中の Ruby を引数ごとに改行すれば短くできる
 - 残りの 53 件は、タグの外の HTML を改行すれば短くできる（属性を 1 行に 1 つずつ並べるなど）。RuboCop では autocorrect できないが、Herb の formatter（`herb-format`）が `maxLineLength` で属性やテキストを折り返す
 - `herb-format` の `maxLineLength` の既定値は 80（`javascript/packages/formatter/src/options.ts`）で、`Layout/LineLength` の既定値 120 と異なる
-- `-a` では、ERB タグの中の引数を改行する修正が入る。HTML は変わらないが、2 行目が 120 桁を超えたまま残り、`%>` が行頭に置かれる
-
-```erb
-    <%= f.select :status, Announcement.statuses, {},
-                 class: 'block rounded-sm border-1 cursor-pointer disabled:bg-gray-200 disabled:cursor-not-allowed mb-8', disabled: @announcement.published?
-%>
-```
+- ERB タグの中の引数の後ろで改行すると、行は短くならず `%>` が次の行に移る。ガードはこの修正を捨てて指摘だけを残すので、上の `f.select` の行は `-a` でも変わらない。ガードを通って適用される修正（`Layout/LineLength` だけをかけた `-a` で 7 ファイルの 12 件）には、ERB に合わない形が残る（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）
 
 - 120 桁は RuboCop の既定値で、conference-app は RuboCop を導入していない
 
@@ -621,21 +615,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 - conference-app の `admin/signage_devices/edit.html.erb` は、ルーティング（`resources :signage_devices, only: [:new, :create, :edit, :update]`）とコントローラーの `edit` があるのに、テンプレートが空。編集画面が空のページになる
 - rails の 15 件は、空のテンプレートの描画を確かめるテスト用の fixture（actionmailer のメールのパート、actionview の digestor のテストなど）
 
-**`Layout/EmptyLineAfterMagicComment`**:
-
-- 3 件とも rails の actionview のテスト用 fixture の `<%# encoding: utf-8 -%>` の次の行。ActionView は、テンプレート先頭の `<%# encoding: … -%>` をテンプレートのエンコーディング指定として読む（`action_view/template/handlers/erb.rb` の `ENCODING_TAG`）ので、マジックコメントという判定は正しい
-- `<%# frozen_string_literal: true %>` にも出る。ActionView がテンプレートの先頭から読むのは encoding だけ
-- `-a` で、マジックコメントの後に空行が挿入される。空行はテンプレートの出力の改行になるので、出力が変わる。`CopCorrectionGuard` は HTML の両端の空白の違いを無視するので、この修正を止めない
-
-```erb
-<%# encoding: utf-8 -%>
-
-Русский <%= render partial: 'test/utf8_partial_magic' %>
-```
-
-- この fixture を使う rails のテスト（`test_render_utf8_template_with_magic_comment`）は、描画結果を文字列で完全に比べている
-
-これらの指摘に対する評価は [第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測) にまとめます。
+これらの指摘に対する評価は [第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測) にまとめます。
 
 ### 5.5 指摘の表示【実測・出典】
 
@@ -704,7 +684,6 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 - ruumba の `empty_if` は、コメントが `if` と同じ行の Ruby のコメントになり、`Lint/EmptyConditionalBody` は出ない
 - ruumba は `<%# … %>` を `# …` という Ruby のコメントにする。`leading` は `# rubocop:disable Lint/LiteralAsCondition ;     if 'hello' ;          end` という 1 行のコメントになり、`if` が消える。代わりに `Lint/CopDirectiveSyntax`、`Lint/MissingCopEnableDirective`、`Lint/RedundantCopDisableDirective` が出る。ほかのファイルでも `Layout/CommentIndentation` などの誤検知が出る
 - tk0miya-rubocop-herb は、右側に何もない `<%#` を Ruby のコメントにする。コードと同じ行にあれば、その行だけに効く（`trailing`、`after_if`）。独立した行にあれば、`rubocop:enable` までの範囲に効く（`indent`、`multiline_comment`）
-- tk0miya-rubocop-herb は、`multiline_comment` の `<%#` だけの行に `Layout/EmptyComment` を出す（誤検知）
 - `not_erb_tag` の `<# … %>` は ERB のタグではなく、HTML のテキストとしてそのまま出力される。herb-lint は `%>` に `STRAY_ERB_CLOSING_TAG_ERROR`（`parser-no-errors`）を出す。ほかのファイルには、herb-lint の offense は出ない
 - herb-lint は、本文が空の `if` に `erb-no-empty-control-flow` を出す（hint）。ただし `<%#` も本文として数えるので、`empty_if` には出ない。中身が無効化のコメントだけでも、herb-lint にとっては空ではない `if`
 
@@ -763,7 +742,7 @@ herb-format で整形したファイル（`multiline_tag` は、さらに herb-l
 | `after_if` | 効かない → 効かない | 効く → **効かない**。コメントが本文の行に移り、そこからの範囲に効く。`Lint/MissingCopEnableDirective` と `Lint/RedundantCopDisableDirective` も出る |
 | `leading` | 効かない → 効かない | 効かない → 効く。独立した行になり、ファイルの終わりまで効く（`Lint/MissingCopEnableDirective`） |
 | `indent` | 効かない → 効かない | 効く → 効く |
-| `multiline_comment` | 効かない → 効かない | 効く → 効く。`Layout/EmptyComment` は出なくなる |
+| `multiline_comment` | 効かない → 効かない | 効く → 効く |
 | `multiline_tag` | 効く → **効かない**（`--fix` で `<%#` にしても効かない） | 効く → 効く |
 | `trailing_in_tag` | 効く → 効く（整形で変わらない。`Lint/CopDirectiveSyntax` は出る） | 効く → 効く |
 | `empty_if` | 確かめられない | 効く → 出ない。ただし無効化が効いたからではない（下を参照） |
@@ -793,7 +772,8 @@ herb-format は、herb-lint の無効化コメント `<%# herb:disable … %>` �
 #### 考察【推測】
 
 - tk0miya-rubocop-herb の行単位の無効化は、`<%#` がコードと同じ行の右端にあることを前提にしている。herb-format を使うプロジェクトでは、整形でこの前提が崩れ、無効化が外れる。多くの場合は offense が出るので気づけるが、`empty_if` のように offense が出ないまま無効化の範囲だけが広がることもある。herb-format と併用するなら、無効化コメントは独立した行に書き、`rubocop:enable` で閉じるのが確実
-- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなる。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけ。また、タグの中の行末のコメントは、ERB や Erubi ではタグの後ろに生成されるコードまでコメントにするので、構文エラーになったり、テンプレートの残りが黙って出力されなくなったりする（`cases/comment/commented_out_*`）。構文エラーのもとになる書き方なので、非推奨とし、無効化コメントの書き方としてもサポートしなくてよいと考える。herb-lint にこの書き方を報告する `erb-no-trailing-comment` ルールを提案し（[marcoroth/herb#2867](https://github.com/marcoroth/herb/issues/2867)）、実装した PR がマージされた（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。未リリース）。tk0miya-rubocop-herb はこの書き方を報告する cop を持たず、herb-lint に任せる。ルールは既定で有効（severity は `error`）で、`template_engine: herb` のときは報告しない（`Herb::Engine` は行末のコメントを扱える）。autofix はコメントを別の `<%# %>` タグに移す（unsafe）
+- tk0miya-rubocop-herb の `Herb/Formatting` cop で整形すると（`rubocop -A`）、整形で動いた無効化コメントを、同じ実行の `Lint/RedundantCopDisableDirective` が消す。`trailing`、`after_if`、`empty_if` ではコメントが消え、抑えていた offense がまた出る（[第 2 部 7.2 節](tk0miya-rubocop-herb.md#72-herbformatting)）。外れた無効化に気づく手がかりは offense だけになる
+- rubocop-erb 0.8 系と herb-format を併用すると、0.8 系で範囲を指定して無効にする書き方（複数行のタグ）が、整形で `<% # … %>` になって効かなくなる。今回試した書き方のうち、整形の後も 0.8.2 で効くのはタグの中の行末のコメントだけで、`Lint/CopDirectiveSyntax` が出るうえ、効くのはその行だけ。また、タグの中の行末のコメントは、ERB や Erubi ではタグの後ろに生成されるコードまでコメントにするので、構文エラーになったり、テンプレートの残りが黙って出力されなくなったりする（`cases/comment/commented_out_*`）。構文エラーのもとになる書き方なので、非推奨とし、無効化コメントの書き方としてもサポートしなくてよいと考える。herb-lint にこの書き方を報告する `erb-no-trailing-comment` ルールを提案し（[marcoroth/herb#2867](https://github.com/marcoroth/herb/issues/2867)）、実装した PR がマージされ、`@herb-tools/linter` 0.11.2 でリリースされた（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。検証環境は 0.11.1 なので、この節の実測には出ない）。tk0miya-rubocop-herb はこの書き方を報告する cop を持たず、herb-lint に任せる。ルールは既定で有効（severity は `error`）で、`template_engine: herb` のときは報告しない（`Herb::Engine` は行末のコメントを扱える）。autofix はコメントを別の `<%# %>` タグに移す（unsafe）
 - `herb:disable` は herb-format で行末に残るように作られている一方、`rubocop:disable` の `<%#` は整形で動く。ERB の中で使う 2 つの無効化コメントのうち、行末に書けるのが片方だけというのは釣り合いが取れていない。ただ、`herb:disable` の書き戻しもテキスト検索に頼っていて、制御構文や同じ内容のタグでは別の行に付く。行末の無効化コメントを整形でどう保つかは、`herb:disable` と `rubocop:disable` をまとめて仕様を議論する必要がある
 
 #### 今後の検討事項
@@ -920,9 +900,9 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 - **切り替える理由は、Ruby 部分の検査の正しさ**。既存ツールの見逃し・誤検知・テンプレートを壊す autocorrect は、検証用 ERB ではほぼすべて起きない。`.rubocop.yml` と `rubocop` コマンドに一本化できることも大きい
 - **使い続ける理由は、実績と、RuboCop 以外の機能**。erb_lint は利用者が桁違いに多く、Ruby だけで動く HTML 検査や、独自 linter・プラグインの資産がある
 - **今すぐ切り替えられない理由は 2 種類ある**
-  - tk0miya-rubocop-herb 側で解消できるもの: rubygems に未公開（gem 名も衝突）、herb-lint の autocorrect に未対応
+  - tk0miya-rubocop-herb 側で解消できるもの: rubygems に未公開（gem 名も衝突）
   - 利用者の環境や資産によるもの: HTML 検査に Node.js が必要、erb_lint の独自 linter・プラグインに移行先がない、Ruby 3.3 以上が必要
-- rubocop-erb 0.8 系は、tk0miya-rubocop-herb と同じく文書全体を検査し、テンプレートを壊す修正を捨てる。tk0miya-rubocop-herb との差は、除外する cop の数（65 個と 10 個）、`<%# rubocop:disable %>` が効くか、修正の検査の細かさ
+- rubocop-erb 0.8 系は、tk0miya-rubocop-herb と同じく文書全体を検査し、テンプレートを壊す修正を捨てる。tk0miya-rubocop-herb との差は、除外する cop の数（65 個と 11 個）、`<%# rubocop:disable %>` が効くか、修正の検査の細かさ
 - 既存ツールごとに見ると、ruumba と rubocop-erb 0.7 系の利用者は失うものがほぼなく、移行しやすい。rubocop-erb 0.8 系の利用者にとっては、移行の利点は検査できる cop の多さに限られる。erb_lint の利用者は Ruby 部分だけを tk0miya-rubocop-herb に移す併用が現実的。herb-lint の利用者にとっては、tk0miya-rubocop-herb は置き換えではなく追加になる
 
 ### 既存ツールを使い続ける理由
@@ -959,7 +939,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 **誤検知が少ない【実測・出典】**
 
 - erb_lint の `Lint/UselessAssignment` やタグごとの `Style/FrozenStringLiteralComment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は、いずれも出ない
-- ファイル全体で除外する cop は 10 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（39 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- ファイル全体で除外する cop は 11 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（39 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
 - rubocop-erb 0.8 系が除外している `Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation` なども、誤検知にならない行では検出する。実際のビューでは、本当に空のブロックや `map { |k| k.to_s }` を検出した（[5.4 節](#54-実際のビュー実測)）
 
 **autocorrect がテンプレートを壊さない【実測・出典】**
@@ -970,12 +950,14 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 - 修正を元の ERB に当ててみて、HTML が変わる修正、出力タグの数が変わる修正、パースエラーが増える修正は適用しない（[第 2 部 6 章](tk0miya-rubocop-herb.md#6-autocorrect-の検査copcorrectionguard)）
 - `<% unused = 1 %>` は、通常の Ruby ファイルと同じく `-a` でタグごと消える（`Herb/EmptyErbTag`）
 - ただし、ガードは cop ごとの修正を検査し、RuboCop が複数の cop の修正をまとめた結果は検査しない
+- `Herb/Linting` と `Herb/Formatting` が適用する herb-lint と herb-format の修正も検査しない。herb-lint の `erb-comment-syntax` の修正は、`<% # コメント`⏎`  コード %>` のコードをコメントにする（[第 2 部 7.1 節](tk0miya-rubocop-herb.md#71-herblinting)）
 
 **RuboCop に一本化できる【出典・推測】**
 
 - 設定は `.rubocop.yml` だけ。Ruby のファイルと同じ規約が ERB にも当たり、`.erb_lint.yml` で cop を二重管理しなくてよい
 - 実行は `rubocop` コマンドだけ。RuboCop の結果キャッシュ、`--parallel`、formatter、`rubocop:disable` コメントがそのまま使える（RuboCop と同じプロセス内で動く）
-- `Herb/Linting` cop で herb-lint の結果も同じ出力に並ぶ。herb-lint の設定（`.herb.yml`、`.herb/rules/` の独自ルール、`herb:disable` コメント）もそのまま効く（README）
+- `Herb/Linting` cop で herb-lint の結果も同じ出力に並び、`rubocop -a` / `-A` で herb-lint の修正も適用される。herb-lint の設定（`.herb.yml`、`.herb/rules/` の独自ルール、`herb:disable` コメント）もそのまま効く（README）
+- `.herb.yml` で formatter を有効にすれば、`Herb/Formatting` cop で herb-format の整形も `rubocop -A` に入る（README）
 - エディタの RuboCop 連携（Ruby LSP など）で ERB も検査できる見込み【推測。未確認】
 
 **既存ツールの開発が止まりつつある【出典】**
@@ -992,9 +974,8 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 | 理由 | 影響 | 解消の見込み |
 |---|---|---|
 | rubygems に未公開。gem 名が Marco Roth 氏の `rubocop-herb` 0.0.1 と衝突している。README の Installation が雛形のまま | Gemfile に git で指定するしかない。業務のプロジェクトでは導入しにくい | gem 名を決めて公開すれば解消 |
-| herb-lint の autocorrect に対応していない（README） | HTML 側の修正には `herb-lint --fix` を別に実行する必要がある | 実装すれば解消 |
 
-autocorrect については、壊す修正を捨てる仕組みがあり、検証用 ERB でも実際のビューでも `-a`・`-A` ともテンプレートを壊しませんでした。ただし、これは見つかった問題にひとつずつ対処した結果で、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とまでは言えません。ガードは複数の cop の修正をまとめた結果を検査せず、`Layout/EmptyLineAfterMagicComment` のように出力を変える修正も残っています（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）。
+autocorrect については、壊す修正を捨てる仕組みがあり、検証用 ERB でも実際のビューでも、RuboCop の cop の修正は `-a`・`-A` ともテンプレートを壊しませんでした。ただし、これは見つかった問題にひとつずつ対処した結果で、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とまでは言えません。ガードは複数の cop の修正をまとめた結果を検査せず、`Herb/Linting` と `Herb/Formatting` が適用する herb-lint と herb-format の修正も検査しません。herb-lint の `erb-comment-syntax` の修正が複数行のタグのコードをコメントにするバグも、そのまま適用されます（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）。
 
 **利用者の環境や資産によるもの**
 
@@ -1017,11 +998,11 @@ autocorrect については、壊す修正を捨てる仕組みがあり、検�
 | rubocop-erb 0.8 系 | 除外されていた cop（`Lint/EmptyBlock`、`Style/SymbolProc`、`Layout/LineLength` など）の検査、`<%# rubocop:disable %>`、修正後の ERB の検査、herb-lint の統合 | 利用実績 | 移行の利点は検査できる cop の多さ。急いで切り替える理由は小さい |
 | erb_lint（Rubocop linter のみ） | 同上と、`.rubocop.yml` への一本化 | 導入時の offense の増加 | Ruby 部分は移行する価値がある |
 | erb_lint（HTML 系 linter・プラグインも利用） | Ruby 部分の検査の正しさ | 独自 linter・プラグイン、Node.js 不要という性質 | Ruby 部分だけ tk0miya-rubocop-herb に移し、erb_lint の Rubocop linter を無効にして併用する |
-| herb-lint | Ruby のスタイル検査（herb-lint にはない）、RuboCop との統合 | herb-lint の autocorrect（`herb-lint --fix` は別に実行すれば残る） | 置き換えではなく追加。`Herb/Linting` cop で 1 コマンドにまとめられる |
+| herb-lint | Ruby のスタイル検査（herb-lint にはない）、RuboCop との統合 | ほぼない（herb-lint の autocorrect も `Herb/Linting` で適用される） | 置き換えではなく追加。`Herb/Linting` cop で 1 コマンドにまとめられる |
 
 ### 発表に向けて
 
-- 提案では「チェックできる範囲、auto correct できる範囲が広がっています」と書いている。範囲が広がったことは検証用 ERB で示せ、テンプレートを壊す修正を捨てる仕組みも説明できる。ただし、見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とは言わないほうがよい。出力を変える修正も残っている（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）
+- 提案では「チェックできる範囲、auto correct できる範囲が広がっています」と書いている。範囲が広がったことは検証用 ERB で示せ、テンプレートを壊す修正を捨てる仕組みも説明できる。ただし、見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えないので、「autocorrect は常に安全」とは言わないほうがよい。herb-lint の修正のバグ（`erb-comment-syntax`）は `rubocop -a` でも適用される（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）
 - rubocop-erb 0.8 系が同じ方式（文書全体の変換と修正範囲の検査）なので、比べる相手は 0.7 系だけでなく 0.8 系も含める。0.8 系との違いは、除外する cop の数と、`<%=` と HTML の意味を残す変換にある
 - 「切り替えられない理由」のうち、tk0miya-rubocop-herb 側で解消できるもの（rubygems への公開）は、発表までに片付けておきたい
 - 利用者の環境によるもの（Node.js、erb_lint の独自 linter）は、「erb_lint と併用できる」「herb-lint を Ruby から使える」という形で、移行の道筋として示せる

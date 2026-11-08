@@ -38,7 +38,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
 | `herb-rubocop-herb` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-rubocop-herb/pr.yml` |
 | `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
-| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `1215c590c25e8f00b77d88900c962b0467d89f71` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
+| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `95ff7dee1a7af8cdc446735c729359e4a47223ef` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
 | `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
 | `herb-format` | @herb-tools/formatter | 同上 |
 | `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
@@ -52,7 +52,7 @@ $ cd research/repro
 $ for d in tools/*/; do [ -f "$d/Gemfile" ] && (cd "$d" && BUNDLE_FROZEN=true bundle install); done
 $ npm install
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 1215c590c25e8f00b77d88900c962b0467d89f71 && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 95ff7dee1a7af8cdc446735c729359e4a47223ef && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 ```
 
@@ -74,7 +74,8 @@ $ bin/lint plain-ruby
 ```
 
 - オプションは各ツールにそのまま渡す。パスを省略すると `cases/` 全体を検査する
-- `tk0miya-rubocop-herb` は `Herb/Linting` cop で herb-lint も実行する。RuboCop の結果だけを見るときは `--except Herb/Linting` を付ける。`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる
+- `tk0miya-rubocop-herb` は `Herb/Linting` cop で herb-lint も実行する。RuboCop の結果だけを見るときは `--except Herb/Linting` を付ける。`--except` は最後の指定だけが効くので、ほかの cop と 1 つにまとめる。`-a` / `-A` では herb-lint の修正も適用する
+- `tk0miya-rubocop-herb` の `Herb/Formatting` cop（herb-format の実行）は、`.herb.yml` で `formatter.enabled: true` にしたときだけ動く。この `.herb.yml` では有効にしていないので、何もしない
 - `Herb/Linting` は、`@herb-tools/linter` を RuboCop のプロジェクトのルート（上へたどって最初に見つかる `Gemfile` のディレクトリ。なければカレントディレクトリ）の `node_modules` から読み込む。`research/repro` とその上には `Gemfile` がないので、`research/repro/node_modules` が使われる。`research/` に空の `Gemfile` を置くと、`research/` がルートになり、「`@herb-tools/linter is not installed in …/research`」というエラーになる
 
 ### autocorrect

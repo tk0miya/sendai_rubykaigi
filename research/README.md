@@ -25,7 +25,7 @@
 | rubocop-erb 0.8 系 | 0.8.2 | 文書全体（`Herb.extract_ruby`） |
 | marcoroth/herb#2260 の rubocop-herb（以下「herb-rubocop-herb」） | `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head。Draft） | 文書全体（`Herb.extract_ruby`） |
 | ruumba | 0.1.17 | 文書全体（正規表現） |
-| tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」） | `1215c590c25e8f00b77d88900c962b0467d89f71`（2026-11-05 時点の main） | 文書全体（Herb の AST から独自に変換） |
+| tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」） | `95ff7dee1a7af8cdc446735c729359e4a47223ef`（2026-11-08 時点の main） | 文書全体（Herb の AST から独自に変換） |
 | herb-lint / herb-format | @herb-tools/linter 0.11.1 / @herb-tools/formatter 0.11.1 | RuboCop を使わない |
 
 - rubocop 1.92.1、herb 0.11.1（herb-rubocop-herb だけは gemspec が固定している 0.11.0）、ruby 4.0.5、node v26.9.0
@@ -40,8 +40,8 @@
 - **文書全体を 1 本の Ruby にする**方式（ruumba、rubocop-erb 0.8 系、herb-rubocop-herb、tk0miya-rubocop-herb）は文脈を保つ。ただし、ERB タグの外を空白にすると `<%=` の「出力する」という意味と HTML の存在が消え、ERB として正しいテンプレートと直すべきテンプレートが同じ Ruby になる。cop には区別できないので、誤検知を出すか、cop を除外して見逃すしかない（[第 1 部 5.2 節](comparison.md#52-erb-として正しいものと直すべきものの区別)）
   - herb-rubocop-herb は誤検知が多く、`-a` でもテンプレートを壊す。実際のビュー 333 ファイルのうち 63 ファイルで HTML が変わる
   - rubocop-erb 0.8 系は 65 個の cop を除外し、修正の範囲を検査するので、テンプレートを壊さない。代わりに、除外した cop の妥当な指摘も失う
-- tk0miya-rubocop-herb は、`<%=` を `_ =` に、HTML を `div;` などの識別子にして、ERB の意味を Ruby の上に残す。除外する cop は 10 個で、ほかの誤検知は ERB の構造を見て該当する行だけで無効にする。修正後の ERB を検査して、テンプレートを壊す autocorrect を捨てる（[第 2 部](tk0miya-rubocop-herb.md)）
-- tk0miya-rubocop-herb の autocorrect は、検証用 ERB でも実際のビューでもテンプレートを壊さなかった。ただし、`Layout/EmptyLineAfterMagicComment` の空行の挿入のように出力を変える修正や、`Layout/EmptyComment` などの誤検知が残っている（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-erb-に合わない修正と誤検知実測推測)）
+- tk0miya-rubocop-herb は、`<%=` を `_ =` に、HTML を `div;` などの識別子にして、ERB の意味を Ruby の上に残す。除外する cop は 11 個で、ほかの誤検知は ERB の構造を見て該当する行だけで無効にする。修正後の ERB を検査して、テンプレートを壊す autocorrect を捨てる（[第 2 部](tk0miya-rubocop-herb.md)）
+- tk0miya-rubocop-herb の RuboCop の cop の autocorrect は、検証用 ERB でも実際のビューでもテンプレートを壊さなかった。ERB に合わない修正は、捨てて指摘だけを残す。ただし、`Herb/Linting` と `Herb/Formatting` が適用する herb-lint と herb-format の修正は検査しないので、herb-lint の `erb-comment-syntax` の修正が複数行のタグのコードをコメントにするバグも、`rubocop -a` で適用される（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）
 - tk0miya-rubocop-herb に切り替える理由は Ruby 部分の検査の正しさで、使い続ける理由は既存ツールの実績と RuboCop 以外の機能（[第 1 部 9 章](comparison.md#9-既存ツールから-tk0miya-rubocop-herb-に切り替えるか)）
 
 ## 関連する文書

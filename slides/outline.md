@@ -9,7 +9,7 @@
 - 15 分なので、**lint（RuboCop × ERB）に絞る**。フォーマット・型チェック・LSP は最後に「この基盤の先」として 1〜2 枚で触れる
 - 話の軸は「Ruby だけを取り出すと、分割しても連結しても文脈が失われる → HTML と Ruby の両方を理解して解析する」
 - 既存ツールの問題は、どれも検証用 ERB（`research/repro/cases/`）で実測したものだけを見せる
-- 「autocorrect は常に安全」とは言わない。見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えない。出力を変える修正（`Layout/EmptyLineAfterMagicComment` の空行の挿入など）も残っている（[comparison.md](../research/comparison.md#発表に向けて)）
+- 「autocorrect は常に安全」とは言わない。見つかった問題にひとつずつ対処しただけで、すべての問題を解決したとは言えない。herb-lint / herb-format の修正は検査しないので、そのバグ（`erb-comment-syntax` が複数行のタグのコードをコメントにする）もそのまま適用される（[comparison.md](../research/comparison.md#発表に向けて)）
 
 ## 時間配分
 
@@ -149,7 +149,7 @@ div;
 - タグの中身は元の位置に、それ以外は空白に（改行は残す）
 - `<%=` は `_ =` に → 「出力する」意味が残るので `Lint/Void` / `Style/SymbolProc` の誤検知が出ない
 - `<%` `%>` の分の空白があるので `;` を補っても位置がずれない
-- 変換結果は rubocop-herb `1215c59` の `bin/erb2ruby` の出力（行末の空白は省略）
+- 変換結果は rubocop-herb `95ff7de` の `bin/erb2ruby` の出力（行末の空白は省略）
 
 ### 15. HTML も Ruby として見せる
 
@@ -170,7 +170,7 @@ div;
 
 ### 17. 残る誤検知は ERB の構造を見て抑える
 
-- ファイル全体で除外する cop は 10 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
+- ファイル全体で除外する cop は 11 個だけ（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。`Lint/Syntax`、`Lint/UselessAssignment` は除外しない
 - それ以外は、誤検知になる**その行だけ**で cop を無効化（39 個）
   - 本文に HTML を含む分岐・ブロック: `Lint/EmptyConditionalBody` など → 本当に空の `else` は検出できる
   - ERB タグに跨がる `<% end %>` や本文: `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中に書いた Ruby は検査される
@@ -206,7 +206,8 @@ div;
 - 現在: herb-lint は TypeScript（Node.js）製なので、Ruby から直接は呼べない
   - `Herb/Linting` cop が Node.js の子プロセスで herb-lint を起動する
   - プロセスは RuboCop のプロセスごとに 1 つだけ起動し、全ファイルで使い回す
-  - 制約: Node.js と `@herb-tools/linter` が必要。herb-lint の autocorrect には未対応
+  - herb-lint の修正も `rubocop -a` / `-A` で適用する。`.herb.yml` で formatter を有効にすれば、`Herb/Formatting` cop が herb-format の整形も `rubocop -A` で行う
+  - 制約: Node.js と `@herb-tools/linter` が必要
 - 将来: Marco Roth 氏が Herb の linter / formatter を Rust で書き直そうとしている（[comparison.md](../research/comparison.md#8-herb-の今後rust-化)）
   - 狙いは「Ruby と JavaScript の両方から使える、同じ API の単一の実装」（v0.9 のリリース記事）
   - 動くプロトタイプはあるが、未マージのブランチにあり、まだリリースされていない
@@ -259,7 +260,7 @@ div;
 ## 発表までに決めること・確かめること
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、15 分では lint で手一杯。パート 5 で構想として触れる形でよいか。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
-- **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 10 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
+- **rubocop-erb 0.8 系の扱い**: 同じ「文書全体を 1 本の Ruby にする」方式に移ったので、パート 2 の「既存ツールはなぜ正しく lint できないのか」は 0.7 系の話として見せ、0.8 系とは除外する cop の数（65 個と 11 個）と `<%=`・HTML の意味を残す変換で比べる。スライドを 1 枚足すか、ノートで触れるかを決める
 - **Marco Roth 氏との調整**: 氏は Rust 製 linter を RuboCop に公開する RuboCop プラグインのプロトタイプも作っていて、herb#475 で「調整が必要」と述べている。rubygems の `rubocop-herb` / `herb-linter` 0.0.1 もこの計画のためと思われる（[comparison.md](../research/comparison.md#8-herb-の今後rust-化)）。スライド 20 で氏の計画に触れる前に、役割分担（Ruby パートはこちら、HTML パートは Rust 製 linter）と gem 名について話しておきたい
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく
 - **デモ**: ライブか録画か。15 分ならスライド 18 の Before / After を録画で見せるのが安全
