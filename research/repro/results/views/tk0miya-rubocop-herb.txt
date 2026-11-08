@@ -7,7 +7,6 @@
 13   Style/QuotedSymbols [Safe Correctable]
 10   Style/StringLiteralsInInterpolation [Safe Correctable]
 8    Layout/SpaceInsideArrayLiteralBrackets [Safe Correctable]
-3    Layout/EmptyLineAfterMagicComment [Safe Correctable]
 3    Layout/HashAlignment [Safe Correctable]
 3    Lint/AssignmentInCondition [Unsafe Correctable]
 2    Layout/SpaceBeforeFirstArg [Safe Correctable]
@@ -31,4 +30,4 @@
 1    Style/StringConcatenation [Unsafe Correctable]
 1    Style/SymbolProc [Unsafe Correctable]
 1    Style/TernaryParentheses [Safe Correctable]
-932  Total in 165 files
+929  Total in 165 files

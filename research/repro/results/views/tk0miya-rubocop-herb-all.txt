@@ -1,4 +1,4 @@
-94   Layout/LineLength [Safe Correctable]
+166  Layout/LineLength [Safe Correctable]
 16   Lint/EmptyFile
 2    Layout/BlockAlignment [Safe Correctable]
 2    Lint/EmptyBlock
@@ -8,4 +8,4 @@
 1    Lint/Syntax
 1    Style/IfUnlessModifier [Safe Correctable]
 1    Style/SafeNavigationChainLength
-122  Total in 60 files
+194  Total in 76 files

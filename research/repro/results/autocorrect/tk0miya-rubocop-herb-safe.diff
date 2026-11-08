@@ -3,6 +3,12 @@
 @@ -1 +1 @@
 -<% name = user.name # the full name %><%= name %>
 +<% user.name # the full name %><%= name %>
+--- cases/comment/ruby_comment.html.erb
++++ cases/comment/ruby_comment.html.erb
+@@ -1,2 +1,2 @@
+-<% # note %>
++<%# note %>
+ <%= foo %>
 --- cases/control_flow/if_then_elsif_else.html.erb
 +++ cases/control_flow/if_then_elsif_else.html.erb
 @@ -1,8 +1,7 @@
@@ -36,6 +42,21 @@
 @@ -1 +1 @@
 -<%= cache "fragment" do %>This bit is cached<% end %>
 +<%= cache 'fragment' do %>This bit is cached<% end %>
+--- cases/control_flow/unless_else.html.erb
++++ cases/control_flow/unless_else.html.erb
+@@ -1,5 +1,7 @@
+-<% unless foo %>
+-  <p>bar</p>
+-<% else %>
+-  <p>baz</p>
+-<% end %>
++<p>
++  <% unless foo %>
++    bar
++  <% else %>
++    baz
++  <% end %>
++</p>
 --- cases/control_flow/unused_block_arg.html.erb
 +++ cases/control_flow/unused_block_arg.html.erb
 @@ -1,3 +1,3 @@
@@ -102,7 +123,7 @@
 +<%= 2 %>
 --- cases/multibyte/show.html.erb
 +++ cases/multibyte/show.html.erb
-@@ -1,7 +1,7 @@
+@@ -1,11 +1,13 @@
  <div class="user">
 -  <p>こんにちは <%= link_to( "ホーム",root_path ) %></p>
 +  <p>こんにちは <%= link_to('ホーム', root_path) %></p>
@@ -111,7 +132,18 @@
 +<% if foo.nil? %>
    <span>empty</span>
  <% end %>
- <% unless a %>
+-<% unless a %>
+-  <p>x</p>
+-<% else %>
+-  <p>y</p>
+-<% end %>
++<p>
++  <% unless a %>
++    x
++  <% else %>
++    y
++  <% end %>
++</p>
 --- cases/output/attr.html.erb
 +++ cases/output/attr.html.erb
 @@ -1 +1 @@
@@ -138,26 +170,52 @@
 @@ -1,2 +1,2 @@
  <%== raw_html %>
 -<%= "hello" %>
-+<%= 'hello' %>
++hello
 --- cases/output/string_literal.html.erb
 +++ cases/output/string_literal.html.erb
 @@ -1 +1 @@
 -<%= "hello" %>
-+<%= 'hello' %>
++hello
+--- cases/rubocop_disable/erb_comment.html.erb
++++ cases/rubocop_disable/erb_comment.html.erb
+@@ -1,2 +1 @@
+-<%# rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++a
 --- cases/rubocop_disable/multiline_range.html.erb
 +++ cases/rubocop_disable/multiline_range.html.erb
-@@ -5,4 +5,4 @@
+@@ -1,8 +1,5 @@
++a
  <%
+-  # rubocop:disable Style/StringLiterals
+-%>
+-<%= "a" %>
+-<%
    # rubocop:enable Style/StringLiterals
  %>
 -<%= "b" %>
-+<%= 'b' %>
++b
+--- cases/rubocop_disable/multiline_tag.html.erb
++++ cases/rubocop_disable/multiline_tag.html.erb
+@@ -3,4 +3,4 @@
+   x = "b"
+ %>
+ <%= x %>
+-<%= "c" %>
++c
+--- cases/rubocop_disable/ruby_comment_tag.html.erb
++++ cases/rubocop_disable/ruby_comment_tag.html.erb
+@@ -1,2 +1 @@
+-<% # rubocop:disable Style/StringLiterals %>
+-<%= "a" %>
++a
 --- cases/rubocop_disable/trailing_ruby_comment_output.html.erb
 +++ cases/rubocop_disable/trailing_ruby_comment_output.html.erb
 @@ -1,2 +1,2 @@
- <%= "a" # rubocop:disable Style/StringLiterals %>
+-<%= "a" # rubocop:disable Style/StringLiterals %>
 -<%= "b" %>
-+<%= 'b' %>
++a
++b
 --- cases/style/ruby_style.html.erb
 +++ cases/style/ruby_style.html.erb
 @@ -1,3 +1,3 @@
@@ -169,7 +227,8 @@
 --- cases/syntax/syntax_errors_ignored.html.erb
 +++ cases/syntax/syntax_errors_ignored.html.erb
 @@ -1,6 +1,6 @@
- <%= items.map do |i| %>
+-<%= items.map do |i| %>
++<% items.map do |i| %>
    <%= i %>
 -<% end.join(", ") %>
 -<% result = if foo %>
