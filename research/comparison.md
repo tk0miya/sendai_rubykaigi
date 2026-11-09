@@ -521,10 +521,10 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | | rubocop-erb 0.7.2 | rubocop-erb 0.8.2 | herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|
-| offense の数 | 762 | 763 | 2,455 | 929 |
+| offense の数 | 762 | 763 | 2,455 | 933 |
 | offense のあるファイル | 143 | 151 | 252 | 165 |
 | `-A` の後に残る offense | — | 9 | — | 194（うち `Layout/LineLength` 166） |
-| 実行時間（`--cache false`、検出のみ） | 5.6 秒 | 2.0 秒 | 1.8 秒 | 2.8 秒 |
+| 実行時間（`--cache false`、検出のみ） | 5.6 秒 | 2.0 秒 | 1.8 秒 | 3.0 秒 |
 
 #### rubocop-erb 0.7.2 と 0.8.2 の違い
 
@@ -541,6 +541,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 |---|---|---|---|
 | `Layout/LineLength` | 0 | 162 | 0.8.2 は除外（下記） |
 | `Lint/EmptyFile` | 0 | 16 | 0.8.2 は除外（下記） |
+| `Layout/ExtraSpacing` | 0 | 4 | 0.8.2 は除外。タグの中に書いた余分な空白（`<%= render    partial:  "form" %>`、`<%=  @live_streams[:day1][:red_ja] %>` など）で、妥当な指摘 |
 | `Layout/HashAlignment` | 0 | 3 | 0.8.2 は除外。複数行に渡る `link_to` の引数の揃え |
 | `Lint/EmptyBlock` | 0 | 2 | 0.8.2 は除外。2 件とも本当に空のブロック（`<%= check_box_tag … do %>`⏎`<% end %>` など） |
 | `Style/SymbolProc` | 0 | 1 | 0.8.2 は除外。`<%= local_assigns.keys.map {\|k\| k.to_s }.sort.join(",") -%>` で、妥当な指摘 |
@@ -557,7 +558,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 | cop | herb-rubocop-herb | tk0miya-rubocop-herb | 内容 |
 |---|---|---|---|
-| `Layout/ExtraSpacing` | 1,606 | 0 | `%>` が `;` の前の空白になることによる誤検知 |
+| `Layout/ExtraSpacing` | 1,606 | 4 | herb-rubocop-herb は、`%>` が `;` の前の空白になることによる誤検知。tk0miya-rubocop-herb の 4 件は、タグの中に書いた余分な空白 |
 | `Lint/Void` | 50 | 0 | 変数 29 件（`<%= event.name %>` など）、リテラル 20 件（`<%= event.ongoing? ? "true" : "" %>`、`<%= ' current' if page.current? %>` など）、演算子 1 件。いずれも出力する式 |
 | `Lint/EmptyBlock` | 30 | 2 | herb-rubocop-herb の 28 件は、本文が HTML だけのブロック（`<%= link_to path do %>…<% end %>` など）。2 件は両方に出る、本当に空のブロック |
 | `Style/SingleLineDoEndBlock`, `Style/BlockDelimiters` | 10, 8 | 0, 0 | 1 行に書いた、本文が HTML のブロック |
@@ -567,7 +568,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 #### rubocop-erb 0.8.2 の除外で何が消えているか
 
-0.8.2 が `**/*.erb` から除外している 65 個の cop のうち 64 個（`Rails/Presence` は rubocop-rails を入れていないので除く）だけを、除外を外した設定（[repro/tools/rubocop-erb-0.8/erb-noexclude.yml](repro/tools/rubocop-erb-0.8/erb-noexclude.yml)。`bin/lint rubocop-erb-0.8-noexclude`）と tk0miya-rubocop-herb でかけました。64 個の cop で、除外を外した 0.8.2 は 9,310 件、tk0miya-rubocop-herb は 278 件です。
+0.8.2 が `**/*.erb` から除外している 65 個の cop のうち 64 個（`Rails/Presence` は rubocop-rails を入れていないので除く）だけを、除外を外した設定（[repro/tools/rubocop-erb-0.8/erb-noexclude.yml](repro/tools/rubocop-erb-0.8/erb-noexclude.yml)。`bin/lint rubocop-erb-0.8-noexclude`）と tk0miya-rubocop-herb でかけました。64 個の cop で、除外を外した 0.8.2 は 9,310 件、tk0miya-rubocop-herb は 282 件です。
 
 内容に関わる cop の結果です。妥当かどうかは、1 件ずつテンプレートを見て判断しました。
 
@@ -588,7 +589,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 
 - tk0miya-rubocop-herb の 22 件は、どれも 0.8.2 が除外で捨てている妥当な指摘
 - `Style/SafeNavigation` の妥当な 2 件のうち、`<%= @request.parameters["controller"].camelize if @request.parameters["controller"] %>` は tk0miya-rubocop-herb では出ない（[第 2 部 3.3 節](tk0miya-rubocop-herb.md#33-マーカーの限界実測出典)）
-- 内容に関わらない cop では、0.8.2 の除外を外すと、`Style/Semicolon` が 1,554 件、`Style/FrozenStringLiteralComment` が 254 件、`Style/IfWithSemicolon` が 62 件、`Layout` の 15 個の cop が計 7,308 件出る。どれも、タグの終わりに補った `;` や、空白にした HTML と ERB の区切りから生じる。tk0miya-rubocop-herb は、このうち `Style/Semicolon`、`Style/FrozenStringLiteralComment` と `Layout` の 6 個を除外し、残りの多くは誤検知になる行だけで無効にしている。`Layout/LineLength`（162 件）と `Layout/HashAlignment`（3 件）は tk0miya-rubocop-herb でも出る
+- 内容に関わらない cop では、0.8.2 の除外を外すと、`Style/Semicolon` が 1,554 件、`Style/FrozenStringLiteralComment` が 254 件、`Style/IfWithSemicolon` が 62 件、`Layout` の 15 個の cop が計 7,308 件出る。どれも、タグの終わりに補った `;` や、空白にした HTML と ERB の区切りから生じる。tk0miya-rubocop-herb は、このうち `Style/FrozenStringLiteralComment` と `Layout` の 5 個を除外し、`Style/Semicolon`、`Style/IfWithSemicolon`、`Layout/TrailingWhitespace`、`Layout/ExtraSpacing` は変換で書いた文字への指摘だけを除き、残りの多くは誤検知になる行だけで無効にしている（[第 2 部 5 章](tk0miya-rubocop-herb.md#5-erb-で止めている-cop出典)）。`Layout/LineLength`（162 件）、`Layout/ExtraSpacing`（4 件）、`Layout/HashAlignment`（3 件）は tk0miya-rubocop-herb でも出る
 
 誤検知が 8 割を超える cop を除外するのは、空白にする方式では合理的な判断です。ただしその判断は、`<% count + 1 %>`（`=` の書き忘れ）や本当に空の `else` も見逃すことと引き換えです【推測】。
 
@@ -902,7 +903,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 - **今すぐ切り替えられない理由は 2 種類ある**
   - tk0miya-rubocop-herb 側で解消できるもの: rubygems に未公開（gem 名も衝突）
   - 利用者の環境や資産によるもの: HTML 検査に Node.js が必要、erb_lint の独自 linter・プラグインに移行先がない、Ruby 3.3 以上が必要
-- rubocop-erb 0.8 系は、tk0miya-rubocop-herb と同じく文書全体を検査し、テンプレートを壊す修正を捨てる。tk0miya-rubocop-herb との差は、除外する cop の数（65 個と 11 個）、`<%# rubocop:disable %>` が効くか、修正の検査の細かさ
+- rubocop-erb 0.8 系は、tk0miya-rubocop-herb と同じく文書全体を検査し、テンプレートを壊す修正を捨てる。tk0miya-rubocop-herb との差は、ファイル全体で除外する cop の数（65 個と 9 個）、`<%# rubocop:disable %>` が効くか、修正の検査の細かさ
 - 既存ツールごとに見ると、ruumba と rubocop-erb 0.7 系の利用者は失うものがほぼなく、移行しやすい。rubocop-erb 0.8 系の利用者にとっては、移行の利点は検査できる cop の多さに限られる。erb_lint の利用者は Ruby 部分だけを tk0miya-rubocop-herb に移す併用が現実的。herb-lint の利用者にとっては、tk0miya-rubocop-herb は置き換えではなく追加になる
 
 ### 既存ツールを使い続ける理由
@@ -939,7 +940,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 **誤検知が少ない【実測・出典】**
 
 - erb_lint の `Lint/UselessAssignment` やタグごとの `Style/FrozenStringLiteralComment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は、いずれも出ない
-- ファイル全体で除外する cop は 11 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。それ以外の誤検知になる cop（39 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- ファイル全体で除外する cop は 9 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。変換で書いた文字（`;`、`_ =`、区切りの位置の空白）に反応する 22 個は、ERB タグに書かれたコードの上の offense だけを報告する。それ以外の誤検知になる cop（20 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
 - rubocop-erb 0.8 系が除外している `Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation` なども、誤検知にならない行では検出する。実際のビューでは、本当に空のブロックや `map { |k| k.to_s }` を検出した（[5.4 節](#54-実際のビュー実測)）
 
 **autocorrect がテンプレートを壊さない【実測・出典】**

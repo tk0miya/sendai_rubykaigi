@@ -16,6 +16,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `bin/record`, `bin/record-views` | すべてのツールの結果を `results/` に書き出す |
 | `bin/fetch-views` | 実際のビュー（rails/rails と kaigionrails/conference-app）を取得する |
 | `results/` | `bin/record`、`bin/record-views` の結果 |
+| `semantics/` | ERB と cop の関係を確かめるスクリプトと Ruby（[第 3 部](../erb-and-rubocop.md)）。[使い方](#erb-と-cop-の関係の確認) |
 
 統合していない入力は次の 2 つです。
 
@@ -38,7 +39,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
 | `herb-rubocop-herb` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-rubocop-herb/pr.yml` |
 | `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
-| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `95ff7dee1a7af8cdc446735c729359e4a47223ef` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
+| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `4cbe9062156f28b95d94d27ebc59ab3f9da35f33` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
 | `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
 | `herb-format` | @herb-tools/formatter | 同上 |
 | `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
@@ -52,7 +53,7 @@ $ cd research/repro
 $ for d in tools/*/; do [ -f "$d/Gemfile" ] && (cd "$d" && BUNDLE_FROZEN=true bundle install); done
 $ npm install
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 95ff7dee1a7af8cdc446735c729359e4a47223ef && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout 4cbe9062156f28b95d94d27ebc59ab3f9da35f33 && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 ```
 
@@ -115,6 +116,33 @@ $ bin/fetch-views && bin/record-views
 
 ツールの版やケースを変えたら、記録し直して `git diff results/` で変化を確かめます。
 `bin/fetch-views` は git の clone を使うので、`.git` を作れない sandbox の中では動きません。
+
+## ERB と cop の関係の確認
+
+[第 3 部](../erb-and-rubocop.md) の実測です。
+
+```console
+$ ruby semantics/render.rb                 # ERB の書き換えの前後を ActionView で描画して比べ、コンパイルされる Ruby を表示する
+$ ruby semantics/count_structures.rb       # 実際のビューで、タグに跨がるブロックのうち 1 行に書いたものを数える
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Lint/EmptyConditionalBody,Style/EmptyElse,Lint/EmptyWhen,Lint/DuplicateBranch,Style/RedundantCondition,Style/IfWithSemicolon,Style/Next,Style/ConditionalAssignment semantics/ruby
+$ BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c semantics/block_length.yml \
+    --only Metrics/BlockLength --format emacs work/views | ruby semantics/block_length_lines.rb
+$ ruby semantics/extract_ruby.rb semantics/layout "$TMPDIR/layout"          # 7 章の例を、文字位置の揃った Ruby にする
+$ ruby semantics/extract_ruby.rb work/views "$TMPDIR/views"                 # 実際のビューを Ruby にする
+$ ruby semantics/extract_ruby.rb work/views "$TMPDIR/views_norm" norm       # 開始タグの幅を揃えてから Ruby にする
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Layout/EndAlignment,Layout/BlockAlignment,Layout/IndentationWidth,Layout/IndentationConsistency \
+    --format emacs "$TMPDIR/layout"                                         # "$TMPDIR/views"、"$TMPDIR/views_norm" も同じように検査して件数を比べる
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Layout/EmptyLines,Layout/EmptyLinesAroundBlockBody semantics/ruby/blank_lines.rb
+```
+
+- `semantics/ruby/` は、ERB と同じ形の Ruby。`blank_*.rb` は HTML を空白にした形、`kept_*.rb` は HTML を出力の文（`_erbout << "<p>x</p>"`）として残した形。`if_semicolon.rb`、`next.rb`、`cond_assign.rb` は、タグに跨がる構造を Ruby にした形。`blank_lines.rb` は、HTML だけの行を空行にした形
+- `semantics/layout/` は、第 3 部 7 章の配置への指摘の ERB。`extract_ruby.rb` は herb gem の `Herb.extract_ruby` で、元の ERB と文字位置の揃った Ruby を作る。`norm` を付けると `<%=` と `<%-` を `<%` にしてから Ruby にする
+- 第 3 部 7.3 節の空行の件数は、`$TMPDIR/views` の空白だけの行から空白を除いてから、空行の cop で検査した数
+- `tools/rubocop-erb-0.8/Gemfile` は rubocop 1.92.1 を使うために借りているだけで、rubocop-erb は読み込まない（`plain_ruby/.rubocop.yml` はプラグインを使わない）
+- `render.rb`、`count_structures.rb`、`extract_ruby.rb` は、actionview 8.1.4.1 と herb 0.11.1 の gem で確かめた
 
 ## ケースの一覧
 
