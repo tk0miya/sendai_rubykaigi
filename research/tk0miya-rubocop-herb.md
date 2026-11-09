@@ -3,7 +3,7 @@
 tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ruby にし、RuboCop の誤検知と壊れる autocorrect をどう防いでいるかを説明します。
 対象の版と凡例は [README.md](README.md) にあります。既存ツールとの比較の結果は [第 1 部](comparison.md) にあります。
 
-- tk0miya-rubocop-herb: https://github.com/tk0miya/rubocop-herb の `95ff7dee1a7af8cdc446735c729359e4a47223ef`（2026-11-08 時点の main）
+- tk0miya-rubocop-herb: https://github.com/tk0miya/rubocop-herb の `4cbe9062156f28b95d94d27ebc59ab3f9da35f33`（2026-11-09 時点の main と `lib/` が同じ。main は rubocop を 1.92.2 に上げているので、ほかのツールと揃えるためにこのコミットを使う）
 - rubocop 1.92.1 / herb 0.11.1（同リポジトリの `Gemfile.lock`）/ ruby 4.0.5
 - 設定はリポジトリの `config/develop/rubocop.yml`（`bin/lint tk0miya-rubocop-herb`）。特に断りがない限り、`Herb/Linting` cop（herb-lint の実行）は外して、RuboCop の結果だけを見た。`Herb/Formatting` cop（herb-format の実行）は、`.herb.yml` で formatter を有効にしていないので何もしない（有効にした結果は [7.2 節](#72-herbformatting)）
 
@@ -13,7 +13,7 @@ tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ru
 2. [ERB から Ruby への変換](#2-erb-から-ruby-への変換)
 3. [なぜ `<%=` と HTML を Ruby として描画するのか](#3-なぜ--と-html-を-ruby-として描画するのか)
 4. [RuboCop との連携](#4-rubocop-との連携出典)
-5. [除外している cop と、行単位で無効にしている cop](#5-除外している-cop-と行単位で無効にしている-cop出典)
+5. [ERB で止めている cop](#5-erb-で止めている-cop出典)
 6. [autocorrect の検査（CopCorrectionGuard）](#6-autocorrect-の検査copcorrectionguard)
 7. [tk0miya-rubocop-herb の cop](#7-tk0miya-rubocop-herb-の-cop)
 8. [既知の問題](#8-既知の問題実測推測)
@@ -23,12 +23,12 @@ tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」）が、ERB をどう Ru
 
 - ruumba、rubocop-erb 0.8 系と同じく、**文書全体を 1 本の Ruby にする**方式。ただし HTML は空白で埋めるのではなく、元の位置に識別子（`div;` など）として書き込む。`<%=` は `_ =` にして、「出力する」という意味を残す
 - 文字位置を変えずに変換するので、offense の位置も autocorrect の修正範囲も、そのまま元の ERB に当てられる
-- ファイル全体で除外する cop は 11 個だけ。Layout 系などの誤検知は、ERB の構造を見て該当する行だけで cop を無効にする
+- ファイル全体で除外する cop は 9 個だけ。変換で書いた文字（HTML、区切り、`;`）に反応する cop は、ERB タグに書かれたコードの上の offense だけを報告する。ほかの誤検知は、ERB の構造を見て該当する行だけで cop を無効にする
 - **テンプレートを壊す autocorrect を捨てる仕組み**（`CopCorrectionGuard`）がある。修正を元の ERB に当ててみて、HTML が変わる修正、出力タグの数が変わる修正、Herb のパースエラーが増える修正は適用せず、「autocorrect できない offense」として報告する
 - 文を消す修正で空になったタグは、`Herb/EmptyErbTag` cop が行ごと消す。`<% unused = 1 %>` は、通常の Ruby ファイルと同じく `-a` でタグごと消える
 - `Herb/Linting` cop で herb-lint も同時に実行でき、HTML の構造の誤りも RuboCop の出力に並ぶ（Node.js と `@herb-tools/linter` が必要）。herb-lint の修正も `rubocop -a` / `-A` で適用する
 - `Herb/Formatting` cop は、`.herb.yml` で formatter を有効にしたときだけ herb-format を実行し、`rubocop -A` で整形する
-- 規模は `lib/` の Ruby で 3,521 行（herb-rubocop-herb は 74 行、rubocop-erb 0.8.2 は 386 行）。うち 697 行は herb-lint / herb-format との連携
+- 規模は `lib/` の Ruby で 3,505 行（herb-rubocop-herb は 74 行、rubocop-erb 0.8.2 は 386 行）。うち 701 行は herb-lint / herb-format との連携
 
 ### 1.1 方針
 
@@ -146,11 +146,12 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 |---|---|---|---|
 | herb-rubocop-herb | `Herb.extract_ruby` | 48 個の cop をファイル全体で除外 | 74 行（`plugin.rb`） |
 | rubocop-erb 0.8.2 | `Herb.extract_ruby` | 65 個の cop をファイル全体で除外 | 386 行 |
-| tk0miya-rubocop-herb | 独自（`RubyRenderer`、302 行） | 11 個の cop をファイル全体で除外し、ほかは ERB の構造を見て誤検知になる行だけで無効にする | 3,521 行（うち herb-lint / herb-format との連携 697 行） |
+| tk0miya-rubocop-herb | 独自（`RubyRenderer`、302 行） | 9 個の cop をファイル全体で除外する。変換で書いた文字への指摘を除き、ほかは ERB の構造を見て誤検知になる行だけで無効にする | 3,505 行（うち herb-lint / herb-format との連携 701 行） |
 
-- ファイル全体で除外する 11 個は、どれも ERB のファイルとしての性質（どの位置からでも書き始められる、マジックコメントを置かない、ファイル名にロケールが入る、空行が出力になるなど）から ERB に合わない cop で、マーカーでは解決しない（[5 章](#5-除外している-cop-と行単位で無効にしている-cop出典)）
-- 行単位の無効化（`lib/rubocop/herb/erb_parser/` と `*_collector.rb`、計 892 行）は、ERB タグに跨がる `if` や `<% end %>` の位置合わせなど、Ruby として書けない ERB の構造を扱う。HTML を本文に持つ分岐やブロックを空とみなす cop の無効化は、主にマーカーを置けない短いテキストのためにある
-- `CopCorrectionGuard` まわり（`CopCorrectionGuard`、`CorrectionAdjuster`、`CorrectionValidator`、計 452 行）は、修正後の ERB の HTML、出力タグの数、パースエラーなどを検査する。誤検知そのものが出なければ、誤った修正も提案されないので、この検査は変換で防げない壊れ方に備えるものになる
+- ファイル全体で除外する 9 個は、どれも ERB のファイルとしての性質（どの位置からでも書き始められる、マジックコメントを置かない、ファイル名にロケールが入る、空行が出力になるなど）から ERB に合わない cop で、マーカーでは解決しない（[5.1 節](#51-ファイル全体で除外している-cop)）
+- 変換で書いた文字への指摘を除く仕組み（`VerbatimCode`、`CopOffenseFilter`、計 70 行）は、タグの終わりに補った `;` や `_ =` など、変換そのものが生む誤検知を扱う。offense の範囲だけで判断するので、ERB の形ごとに場所を探す必要がない（[5.2 節](#52-変換で書いた文字への指摘を除く-cop)）
+- 行単位の無効化（`lib/rubocop/herb/erb_parser/` と `*_collector.rb`、計 757 行）は、ERB タグに跨がる `if` や `<% end %>` の位置合わせなど、Ruby として書けない ERB の構造を扱う。HTML を本文に持つ分岐やブロックを空とみなす cop の無効化は、主にマーカーを置けない短いテキストのためにある
+- `CopCorrectionGuard` まわり（`CopCorrectionGuard`、`CorrectionAdjuster`、`CorrectionValidator`、計 455 行）は、修正後の ERB の HTML、出力タグの数、パースエラーなどを検査する。誤検知そのものが出なければ、誤った修正も提案されないので、この検査は変換で防げない壊れ方に備えるものになる
 
 ### 3.3 マーカーの限界【実測・出典】
 
@@ -162,7 +163,7 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 
 - `Herb.extract_ruby` で生じる誤検知は、cop の側の問題ではなく、変換で ERB の意味（出力する、HTML がある）を落としたことの帰結。落とした情報は cop からは取り戻せないので、ERB として正しいものと直すべきものは原理的に区別できない。除外は「誤検知を消す」ことではなく、「その cop が見つけるはずの問題ごと捨てる」ことになる
 - tk0miya-rubocop-herb は、ERB のコンパイル結果にある文を `_ =` と `_a;` で残し、Ruby の上で ERB と同じ文の数と値の使われ方を再現している。誤検知の原因が変換の段階で消えるので、cop を除外せずに済み、妥当な指摘が残る。autocorrect も、ERB の構造を変える修正が提案されなくなる
-- 実装の規模は、herb-rubocop-herb の約 48 倍、0.8.2 の約 9 倍（herb-lint / herb-format との連携を除くと、約 38 倍と約 7 倍）。それでも、除外で済ませる方式では、除外の一覧が「ERB で誤検知になる cop」をすべて把握している必要があり、RuboCop に cop が増えるたびに追いかけることになる。`NewCops: enable` の利用者には、除外の一覧に入る前の新しい cop の誤検知がそのまま届く。変換で意味を残す方式は、未知の cop にも同じ Ruby を見せるので、この追いかけっこが小さくなる
+- 実装の規模は、herb-rubocop-herb の約 47 倍、0.8.2 の約 9 倍（herb-lint / herb-format との連携を除くと、約 38 倍と約 7 倍）。それでも、除外で済ませる方式では、除外の一覧が「ERB で誤検知になる cop」をすべて把握している必要があり、RuboCop に cop が増えるたびに追いかけることになる。`NewCops: enable` の利用者には、除外の一覧に入る前の新しい cop の誤検知がそのまま届く。変換で意味を残す方式は、未知の cop にも同じ Ruby を見せるので、この追いかけっこが小さくなる
 - 一方で、変換が複雑なぶん、`ReparsedEquivalence` のような RuboCop 側の仕組みと噛み合わせる処理が要る（[2.3 節](#23-ast-の書き換え出典)）。0.8 系は `Herb.extract_ruby` の結果をそのまま RuboCop に渡すので、この種の処理は要らない
 - マーカーは万能ではない。短いテキストの穴と、`_ =` が隠す指摘があり、それぞれ行単位の無効化と見逃しとして残っている
 
@@ -176,34 +177,70 @@ ERB は、テキストと `<%=` を `_erbout` への追記という文にコン�
 - RuboCop と同じプロセス内で動く。ruumba のように一時ファイルや子プロセスを使わない
 - ERB では `--disable-uncorrectable` も無効にする（挿入される `# rubocop:todo` コメントがテンプレートを壊すため）
 
-## 5. 除外している cop と、行単位で無効にしている cop【出典】
+## 5. ERB で止めている cop【出典】
 
-`lib/rubocop/herb/configuration.rb` で、次の 11 個の cop を `**/*.html.erb` から除外しています。
+tk0miya-rubocop-herb は、ERB で誤検知になる cop を 3 つの方法で止めています。ファイル全体での除外が 9 個、変換で書いた文字への指摘だけを除くものが 22 個、ERB の構造を見て行単位で無効にするものが 20 個です。止める理由の分類は [第 3 部](erb-and-rubocop.md) にあります。
 
-`Layout/CommentIndentation`, `Layout/EmptyLineAfterMagicComment`, `Layout/ExtraSpacing`, `Layout/IndentationConsistency`, `Layout/InitialIndentation`, `Layout/LeadingEmptyLines`, `Layout/TrailingEmptyLines`, `Metrics/BlockLength`, `Naming/FileName`, `Style/FrozenStringLiteralComment`, `Style/Semicolon`
+### 5.1 ファイル全体で除外している cop
+
+`lib/rubocop/herb/configuration.rb` の `EXCLUDED_COPS` で、次の 9 個の cop を `**/*.html.erb` から除外しています。
+
+`Layout/CommentIndentation`, `Layout/EmptyLineAfterMagicComment`, `Layout/IndentationConsistency`, `Layout/InitialIndentation`, `Layout/LeadingEmptyLines`, `Layout/TrailingEmptyLines`, `Metrics/BlockLength`, `Naming/FileName`, `Style/FrozenStringLiteralComment`
 
 `Naming/FileName` は、ロケールなどを含むテンプレートの名前（`show.pt-BR.html.erb` など）を snake_case でないと報告するため除外しています。`Layout/EmptyLineAfterMagicComment` は、`<%# encoding: utf-8 -%>` の後ろに挿入する空行がテンプレートの出力を変えるうえ、herb-format がその空行を消すので除外しています。ERB の空行は herb-lint と herb-format に任せます。rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個、herb-rubocop-herb は 48 個、ruumba の推奨設定は 5 個です。`Lint/Syntax`、`Lint/UselessAssignment`、`Lint/Void` は除外していません。
 
-さらに、ERB の構造を見て、誤検知になる行でだけ cop を無効にしています（`<%# rubocop:disable %>` と同じ仕組み。`RuboCop::Herb::ProcessedSource#comment_config`）。対象は 39 個です。
+### 5.2 変換で書いた文字への指摘を除く cop
+
+`Configuration::VERBATIM_CODE_COPS` の 22 個は、ERB タグに書かれたコードの上の offense だけを報告します（`lib/rubocop/herb/cop_offense_filter.rb`、`lib/rubocop/herb/verbatim_code.rb`）。
+
+- `CopOffenseFilter` が `RuboCop::Cop::Base#enabled_lines?` を上書きし、offense の範囲が 1 つの ERB タグの中身（区切りを除く）に収まり、範囲の文字が元の ERB と同じときだけ報告する。変換で書いた HTML の識別子、`_ =`、区切りの位置の空白、タグの終わりに補った `;` に掛かる offense は、`rubocop:disable` で止めた行の offense と同じ扱いになる
+- 誤検知を除くための仕組みなので、`--ignore-disable-comments` を付けても報告しない
+- ERB の構造を調べて場所を探すのではなく、offense の範囲だけで判断する。cop ごとに誤検知になる形を調べる必要がない
+
+| cop | 反応する、変換で書いた文字 |
+|---|---|
+| `Style/Semicolon` | タグの終わりに補った `;` |
+| `Style/IfWithSemicolon`, `Style/WhenThen`, `Style/InPatternThen` | `<% if a %>`、`<% when 1 %>`、`<% in 1 %>` の終わりに補った `;`（`if a;`、`when 1;`、`in 1;`） |
+| `Lint/ElseLayout` | `<% else %>` の終わりに補った `;` と、同じ行に続く出力タグ（`else;  _ = x;`） |
+| `Style/OneLineConditional`, `Style/SingleLineDoEndBlock` | 1 行に書いた、タグに跨がる条件分岐とブロック（`if a; …; end`、`foo do …; end`） |
+| `Style/ConditionalAssignment`, `Style/RedundantCondition` | 分岐の出力タグがどれも `_ = …` になる（`if a; _ = a; else; _ = b; end`） |
+| `Layout/SpaceAroundOperators` | `<%=` を書き換えた `_ =`（`<%=foo%>` が `_ =foo;` になる） |
+| `Layout/ExtraSpacing`, `Layout/TrailingWhitespace` | 区切りや HTML の位置の空白 |
+| `Layout/BlockEndNewline` | `<% end %>` の前の HTML が、`end` の前の式になる |
+| `Layout/EmptyComment` | 複数行の ERB コメントの 1 行目が、空のコメントになる |
+| `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` | タグの間の空行（HTML の中の空行は herb-lint の `erb-no-extra-newline` に任せる） |
+
+1 つのタグの中に書いたコードは、Ruby のファイルと同じく検査されます【実測】。
+
+| ERB | 結果 |
+|---|---|
+| `<% a = 1; b = 2 %>` | `Style/Semicolon`（autocorrect はしない。[6.1 節](#61-仕組み出典)） |
+| `<% if a; b; end %>` | `Style/IfWithSemicolon`、`Style/IfUnlessModifier` |
+| `<% items.each do \|i\| foo(i) end %>` | `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters` |
+| `<% case x; when 1; foo; end %>` | `Style/WhenThen` |
+| 複数行のタグの中の行末の空白 | `Layout/TrailingWhitespace` |
+| `<div class="<% if a %>on<% else %>off<% end %>">`、`<%= link_to(path) do %>Profile<% end %>`、`<% case x %><% when 1 %>one<% end %>`、`<%=foo%>`、HTML の行末の空白 | 出ない |
+
+実際のビュー 333 ファイルでは、`Layout/ExtraSpacing` が 4 件出ます。rails の fixture の `<%= render    partial:  "form" %>` などの 2 件と、conference-app の `<%=  @live_streams[:day1][:red_ja] %>` などの 2 件で、どれもタグの中に書いた余分な空白です。`-a` で直り、HTML は変わりません【実測】。
+
+### 5.3 行単位で無効にしている cop
+
+ERB の構造を見て、誤検知になる行でだけ cop を無効にしています（`<%# rubocop:disable %>` と同じ仕組み。`RuboCop::Herb::ProcessedSource#comment_config`）。対象は 20 個です。
 
 | cop | 無効にする場所 | 実装 |
 |---|---|---|
 | `Lint/EmptyConditionalBody`, `Style/EmptyElse`, `Lint/EmptyWhen`, `Lint/EmptyInPattern`, `Lint/EmptyBlock`, `Lint/SuppressedException`, `Lint/EmptyEnsure` | 本文に HTML を含む分岐・ブロック | `DisabledCopsCollector` |
 | `Lint/DuplicateBranch` | Ruby に現れない HTML だけが異なる分岐 | `DisabledCopsCollector` |
-| `Style/ConditionalAssignment` | `case` / `case in`（どの分岐の出力も `_ =` になるため）、ERB タグに跨がる条件分岐 | `DisabledCopsCollector` |
-| `Style/IfUnlessModifier`, `Style/IfWithSemicolon`, `Style/RedundantCondition`, `Style/Next` | ERB タグに跨がる条件分岐 | `DisabledCopsCollector` |
-| `Style/OneLineConditional` | 1 行に書いた、ERB タグに跨がる条件分岐 | `DisabledCopsCollector` |
-| `Style/BlockDelimiters`, `Style/SingleLineDoEndBlock` | 1 行に書いた、ERB タグに跨がるブロック | `DisabledCopsCollector` |
-| `Style/WhenThen`, `Style/InPatternThen` | ERB タグに跨がる `when` / `in` | `DisabledCopsCollector` |
-| `Lint/ElseLayout` | `<% else %>` と同じ行に続く出力タグ | `DisabledCopsCollector` |
-| `Layout/EndAlignment`, `Layout/BlockAlignment`, `Layout/BlockEndNewline`, `Layout/BeginEndAlignment` | ERB タグに跨がる分岐・ループ・ブロック・`begin` の `<% end %>` | `DisabledCopsCollector` |
+| `Style/IfUnlessModifier`, `Style/Next` | ERB タグに跨がる条件分岐 | `DisabledCopsCollector` |
+| `Style/BlockDelimiters` | 1 行に書いた、ERB タグに跨がるブロック | `DisabledCopsCollector` |
+| `Layout/EndAlignment`, `Layout/BlockAlignment`, `Layout/BeginEndAlignment` | ERB タグに跨がる分岐・ループ・ブロック・`begin` の `<% end %>` | `DisabledCopsCollector` |
 | `Layout/ElseAlignment`, `Layout/CaseIndentation`, `Layout/RescueEnsureAlignment` | ERB タグに跨がる `else` / `elsif`、`when` / `in`、`rescue` / `ensure` | `DisabledCopsCollector` |
 | `Layout/IndentationWidth` | 複数の ERB タグに跨がる本文の、最初の内容から最初の ERB タグまで | `DisabledCopsCollector` |
-| `Layout/SpaceAroundOperators` | `<%=` の直後に空白がない出力タグ（`<%=foo%>` が `_ =foo;` になる） | `DisabledCopsCollector` |
-| `Layout/TrailingWhitespace` | 変換で空白になった ERB の区切りや HTML による行末の空白（利用者が書いた行末の空白は検出する） | `TrailingWhitespaceCollector` |
 | `Layout/LineLength` | ERB タグを含まない行（HTML の行の長さは herb-format に任せる） | `HtmlOnlyLineCollector` |
-| `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` | ERB タグを含まない行（HTML の中の空行は herb-lint の `erb-no-extra-newline` に任せる） | `HtmlOnlyLineCollector` |
 | `Style/IdenticalConditionalBranches` | HTML と隣り合っていて分岐の外に移せない式、条件分岐の最初と最後の行 | `ImmovableExpressionCollector` |
+
+- `Style/IfUnlessModifier`、`Style/Next`、`Style/BlockDelimiters` は、変換で書いた文字ではなく、ERB の書き方に合わない修正を勧めることが理由（修飾子の `if` にすると HTML が落ちる、`next` にすると `<% end %>` の閉じが残る、ERB では `{ … }` を避ける。ソースのコメント）。offense の範囲（`if` や `do`）はタグの中に収まるので、5.2 節の仕組みでは止まらない【推測】
+- `Layout/LineLength` は、行を超えた部分が同じ行の HTML のこともあるので、5.2 節の仕組みではなく行単位で止める（ソースのコメント）
 
 1 つの ERB タグの中に書いた Ruby は、これらの cop でも検査されます。本当に空の `else` や、入れ子の空の `if` も検出されることを確かめました【実測】。
 
@@ -225,6 +262,7 @@ ERB タグに跨がる構造では Layout 系の cop を無効にしているの
   - Herb のパースエラーが増えていない
   - 同じ行にある ERB タグのコードと `%>` の間に、改行を入れていない。変換で `%>` の前の空白に `;` を補うので、`Layout/LineLength` がその後ろで改行すると、行は短くならず `%>` だけが次の行に移る
 - 検査に通らなかった修正は捨て、その offense は「autocorrect できない」（`[Correctable]` が付かない）として報告する
+- `Style/Semicolon` の修正は、検査せずに常に捨てる（`Configuration::UNCORRECTABLE_COPS`）。`;` の位置で改行すると、次の文がインデントされずに行頭から始まるため。README に、手で直すよう書かれている
 - HTML の両端の空白は無視するので、ERB タグをインデントや改行ごと削除する修正（`else` + `if` → `elsif` など）は通る
 - `Herb/` で始まる tk0miya-rubocop-herb の cop は、ERB を直接書き換えるので検査しない。`Herb/Linting` と `Herb/Formatting` が適用する herb-lint と herb-format の修正も検査しない（[7 章](#7-tk0miya-rubocop-herb-の-cop)）
 - 検査は cop ごとの修正に対して行う。RuboCop が複数の cop の修正を 1 つにまとめた結果は検査しない

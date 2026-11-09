@@ -1,0 +1,8 @@
+# tk0miya-rubocop-herb が ERB から除外している Metrics/BlockLength を、実際のビューにかけるための設定
+#   BUNDLE_GEMFILE=$RUBOCOP_HERB/Gemfile bundle exec rubocop --cache false -c semantics/block_length.yml --only Metrics/BlockLength work/views
+inherit_from: <%= ENV.fetch("RUBOCOP_HERB") %>/config/develop/rubocop.yml
+AllCops:
+  SuggestExtensions: false
+  TargetRubyVersion: 3.4
+Metrics/BlockLength:
+  Exclude: []
