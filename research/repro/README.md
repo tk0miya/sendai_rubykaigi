@@ -128,11 +128,21 @@ $ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cach
     --only Lint/EmptyConditionalBody,Style/EmptyElse,Lint/EmptyWhen,Lint/DuplicateBranch,Style/RedundantCondition,Style/IfWithSemicolon,Style/Next,Style/ConditionalAssignment semantics/ruby
 $ BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec rubocop --cache false -c semantics/block_length.yml \
     --only Metrics/BlockLength --format emacs work/views | ruby semantics/block_length_lines.rb
+$ ruby semantics/extract_ruby.rb semantics/layout "$TMPDIR/layout"          # 7 章の例を、文字位置の揃った Ruby にする
+$ ruby semantics/extract_ruby.rb work/views "$TMPDIR/views"                 # 実際のビューを Ruby にする
+$ ruby semantics/extract_ruby.rb work/views "$TMPDIR/views_norm" norm       # 開始タグの幅を揃えてから Ruby にする
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Layout/EndAlignment,Layout/BlockAlignment,Layout/IndentationWidth,Layout/IndentationConsistency \
+    --format emacs "$TMPDIR/layout"                                         # "$TMPDIR/views"、"$TMPDIR/views_norm" も同じように検査して件数を比べる
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Layout/EmptyLines,Layout/EmptyLinesAroundBlockBody semantics/ruby/blank_lines.rb
 ```
 
-- `semantics/ruby/` は、ERB と同じ形の Ruby。`blank_*.rb` は HTML を空白にした形、`kept_*.rb` は HTML を出力の文（`_erbout << "<p>x</p>"`）として残した形。`if_semicolon.rb`、`next.rb`、`cond_assign.rb` は、タグに跨がる構造を Ruby にした形
-- 3 つ目は rubocop 1.92.1 を使うために rubocop-erb 0.8 の `Gemfile` を借りているだけで、rubocop-erb は読み込まない（`plain_ruby/.rubocop.yml` はプラグインを使わない）
-- `render.rb` と `count_structures.rb` は、actionview 8.1.4.1 と herb 0.11.1 の gem で確かめた
+- `semantics/ruby/` は、ERB と同じ形の Ruby。`blank_*.rb` は HTML を空白にした形、`kept_*.rb` は HTML を出力の文（`_erbout << "<p>x</p>"`）として残した形。`if_semicolon.rb`、`next.rb`、`cond_assign.rb` は、タグに跨がる構造を Ruby にした形。`blank_lines.rb` は、HTML だけの行を空行にした形
+- `semantics/layout/` は、第 3 部 7 章の配置への指摘の ERB。`extract_ruby.rb` は herb gem の `Herb.extract_ruby` で、元の ERB と文字位置の揃った Ruby を作る。`norm` を付けると `<%=` と `<%-` を `<%` にしてから Ruby にする
+- 第 3 部 7.3 節の空行の件数は、`$TMPDIR/views` の空白だけの行から空白を除いてから、空行の cop で検査した数
+- `tools/rubocop-erb-0.8/Gemfile` は rubocop 1.92.1 を使うために借りているだけで、rubocop-erb は読み込まない（`plain_ruby/.rubocop.yml` はプラグインを使わない）
+- `render.rb`、`count_structures.rb`、`extract_ruby.rb` は、actionview 8.1.4.1 と herb 0.11.1 の gem で確かめた
 
 ## ケースの一覧
 

@@ -12,7 +12,7 @@ ERB の中の Ruby を RuboCop で検査すると、Ruby のファイルでは�
 4. [区切りへの指摘](#4-区切りへの指摘)
 5. [HTML が見えないことによる指摘](#5-html-が見えないことによる指摘)
 6. [ERB の書き方に合わない指摘](#6-erb-の書き方に合わない指摘)
-7. [ERB のツールが担う指摘](#7-erb-のツールが担う指摘)
+7. [配置への指摘](#7-配置への指摘)
 8. [理想の姿](#8-理想の姿推測)
 9. [今後の検討事項](#9-今後の検討事項)
 
@@ -23,7 +23,7 @@ ERB の中の Ruby を RuboCop で検査すると、Ruby のファイルでは�
   - 区切りへの指摘: 書き手が書いていない `;` や空白に反応する
   - HTML が見えないことによる指摘: HTML の本文を空と見る
   - ERB の書き方に合わない指摘: Ruby の規範で、ERB の書き方を直させる
-  - ERB のツールが担う指摘: HTML の配置や空行を検査する
+  - 配置への指摘: Ruby の位置が、開始タグの幅（`<%` と `<%=`）や HTML の構造で決まる
 - ERB の例を、cop が勧めるとおりに書き換えて ActionView で描画し、出力が変わるかを確かめた。ERB の書き方に合わない指摘は、従うと出力が変わるもの（`Style/SingleLineDoEndBlock` など）と、変わらないスタイルの選択（`Style/IfUnlessModifier` など）に分かれる【実測】
 - 検証のスクリプトは [repro/semantics/](repro/semantics/)。ERB の描画とコンパイルは actionview 8.1.4.1、cop は rubocop 1.92.1 で確かめた
 
@@ -50,7 +50,7 @@ RuboCop で ERB を検査するときは、この Ruby をそのまま使わず�
 | [区切りへの指摘](#4-区切りへの指摘) | 書き手が書いていない `;` や空白に反応する | 9 | 区切りへの指摘だけを捨て、タグの中のコードは検査する |
 | [HTML が見えないことによる指摘](#5-html-が見えないことによる指摘) | HTML の本文を空と見る | 10 | HTML の存在を Ruby に残し、cop を止めない |
 | [ERB の書き方に合わない指摘](#6-erb-の書き方に合わない指摘) | Ruby の規範で、ERB の書き方を直させる | 14 | 出力が変わる書き換えは勧めない。スタイルの選択は選べるようにする |
-| [ERB のツールが担う指摘](#7-erb-のツールが担う指摘) | HTML の配置や空行を検査する | 19 | RuboCop はタグの中の Ruby だけを見る |
+| [配置への指摘](#7-配置への指摘) | Ruby の位置が、開始タグの幅や HTML の構造で決まる | 19 | 開始タグの幅によるずれは捨てる。HTML の構造に従う配置は ERB のツールに任せる |
 
 `Style/ConditionalAssignment` は、`case` では区切りへの指摘、タグに跨がる `if` では ERB の書き方に合わない指摘なので、両方に数えました（51 個で、のべ 52）。
 
@@ -133,18 +133,53 @@ ERB では HTML の中に制御構造を埋め込むので、Ruby とは違う�
 | `Layout/LeadingEmptyLines`, `Layout/TrailingEmptyLines`, `Layout/EmptyLineAfterMagicComment` | 空行がそのまま出力になる。`"\n<p>x</p>\n\n"` は、先頭と末尾の空行ごと出力される【実測】 |
 | `Metrics/BlockLength` | 本文の HTML も行数に入る。実際のビュー 333 ファイルで 25 行を超えるブロックは 7 個（29〜41 行）で、どれも ERB タグを含む行だけを数えると 12〜21 行【実測】 |
 
-## 7. ERB のツールが担う指摘
+## 7. 配置への指摘
 
-ERB のインデントや空行は、Ruby の構造ではなく HTML の構造に従います。これを検査し、整形するのは herb-format / herb-lint の領域です。
+ERB の中の Ruby の位置は、Ruby の構造ではなく、開始タグの幅と HTML の構造で決まります。Ruby の位置や空行を見る cop は、このどちらかに反応します。表の例は [repro/semantics/layout/](repro/semantics/layout/) の ERB を、元の ERB と文字位置が揃った Ruby にして確かめました（herb gem の `Herb.extract_ruby`。[repro/semantics/extract_ruby.rb](repro/semantics/extract_ruby.rb)）【実測】。
 
-| 対象 | cop |
+| 原因 | cop |
 |---|---|
-| タグに跨がる構造の位置合わせ | `Layout/EndAlignment`, `Layout/BlockAlignment`, `Layout/BlockEndNewline`, `Layout/BeginEndAlignment`, `Layout/ElseAlignment`, `Layout/CaseIndentation`, `Layout/RescueEnsureAlignment`, `Layout/IndentationWidth`, `Layout/IndentationConsistency`, `Layout/CommentIndentation` |
-| HTML だけの行の長さ | `Layout/LineLength` |
-| HTML の中の空行 | `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` |
+| [開始タグの幅](#71-開始タグの幅による指摘) | `Layout/EndAlignment`, `Layout/BlockAlignment`, `Layout/BeginEndAlignment`, `Layout/ElseAlignment`, `Layout/CaseIndentation`, `Layout/RescueEnsureAlignment`, `Layout/IndentationWidth`, `Layout/IndentationConsistency`, `Layout/CommentIndentation` |
+| [HTML の構造](#72-html-の構造による指摘) | 上の cop に加えて `Layout/BlockEndNewline`, `Layout/LineLength` |
+| [HTML の行が空行に見える](#73-html-の行が空行に見える指摘) | `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` |
 
-- 位置合わせの cop が勧める修正も、出力を変えることがある。`Layout/BlockEndNewline` に従って `<% items.each do |i| %><p><%= i %></p><% end %>` の `<% end %>` を次の行に移すと、`<p>1</p><p>2</p><p>3</p>` の間に改行が入る【実測】
-- 1 つのタグの中の Ruby の配置（複数行のメソッド呼び出しの引数の位置など）は、Ruby のファイルと同じく RuboCop が検査できる
+### 7.1 開始タグの幅による指摘
+
+Ruby のコードは開始タグの後ろから始まります。`<%` と空白は 3 文字、`<%=` や `<%-` と空白は 4 文字なので、タグの位置を揃えて書いても、開始タグが違えば Ruby の位置は 1 文字ずれます。
+
+| ERB | Ruby の位置 | 指摘 |
+|---|---|---|
+| `<%= form_with(model: user) do \|f\| %>`⏎`  <%= f.text_field :name %>`⏎`<% end %>` | `form_with` は 4 桁目、`end` は 3 桁目 | `Layout/BlockAlignment`、`Layout/IndentationWidth`（3 文字） |
+| `<% if admin %>`⏎`  <%= badge %>`⏎`<% end %>` | 本文の `badge` が `if` から 3 文字下がる | `Layout/IndentationWidth` |
+| `<% title = "Users" %>`⏎`<%= title %>` | 並んだ 2 つの文が 1 文字ずれる | `Layout/IndentationConsistency` |
+| `<%- if admin -%>`⏎`  <p>admin</p>`⏎`<% end %>` | `if` は 4 桁目、`end` は 3 桁目 | `Layout/EndAlignment` |
+
+- 値を出力するブロック（`form_with`、`link_to`、`content_for` など）は `<%=` で開き、`<% end %>` で閉じる。タグをどう揃えて書いても、ブロックの開始と `end` は必ず 1 文字ずれる。cop に従うには `<%  end %>` のように、タグの中の空白で位置を合わせるしかない
+- このずれは ERB の構文から来るもので、書き手が書いたものではない。区切りの `;`（4 章）と同じ性質を持つ
+- 実際のビュー 333 ファイルで、開始タグの幅を揃えて（`<%=` と `<%-` を `<%` にして）から検査すると、`Layout/BlockAlignment` は 91 件から 1 件に、`Layout/IndentationWidth` は 217 件から 131 件に、`Layout/IndentationConsistency` は 484 件から 464 件に減る【実測】
+- 1 つのタグの中の Ruby の配置（複数行のメソッド呼び出しの引数の位置など）は、開始タグの幅に左右されない。Ruby のファイルと同じく RuboCop が検査できる
+
+### 7.2 HTML の構造による指摘
+
+ERB のインデントは、HTML の入れ子に従います。Ruby から見ると、タグの位置は HTML の深さの分だけ動きます。
+
+| ERB | 指摘 |
+|---|---|
+| `<% if admin %>`⏎`  <div>`⏎`    <% count = 1 %>`⏎`  </div>`⏎`  <% total = 2 %>`⏎`<% end %>` | `Layout/IndentationWidth`（4 文字）、`Layout/IndentationConsistency`（`count` と `total` の深さが違う） |
+| `<% items.each do \|i\| %>`⏎`  <li>`⏎`    <% i %>`⏎`  </li>`⏎`<% end %>` | `Layout/IndentationWidth`（4 文字） |
+
+- 開始タグの幅を揃えても残る指摘は、ほとんどがこの種類になる。実際のビューで揃えても残る `Layout/BlockAlignment` の 1 件は、`<% end %>` を HTML の上で 2 文字ずらして書いたもの（conference-app の `talks/index.html.erb`）で、HTML のインデントの誤りでもある【実測】
+- タグを HTML の後ろに続けて書くと、Ruby の位置は HTML の長さで決まる。rails の `rescues/_source.html.erb` は、`<pre>` の中で `<div class="line…">` の後ろに `<% if source.is_a?(Array) -%>` を書き、`<% else -%>` と `<% end -%>` を行頭に書いている（`Layout/ElseAlignment`、`Layout/EndAlignment`）。`<pre>` の中では空白が出力に出るので、cop に従ってインデントすると出力が変わる【実測】
+- `Layout/BlockEndNewline` に従って `<% items.each do |i| %><p><%= i %></p><% end %>` の `<% end %>` を次の行に移すと、`<p>1</p><p>2</p><p>3</p>` の間に改行が入る【実測】
+- `Layout/LineLength` は、HTML だけの行も、HTML とタグが混ざる行も、HTML の長さを含めて数える
+- HTML の構造に合わせたインデントや改行を検査し、整形するのは herb-format / herb-lint の領域になる
+
+### 7.3 HTML の行が空行に見える指摘
+
+HTML だけの行を空行にした Ruby では、空行の cop が HTML の行を空行と見ます。実際のビュー 333 ファイルで、`Herb.extract_ruby` の結果から空白だけの行の空白を除いて検査すると、`Layout/EmptyLines` が 1,247 件、`Layout/EmptyLinesAroundBlockBody` が 123 件出る（[repro/semantics/ruby/blank_lines.rb](repro/semantics/ruby/blank_lines.rb)）【実測】。
+
+- HTML の行を空白のまま残すと空行の cop は出ないが、その空白に `Layout/TrailingWhitespace` が反応する（4 章）
+- 5 章と同じく、HTML の存在が Ruby から見えないことによる指摘でもある
 
 ## 8. 理想の姿【推測】
 
@@ -153,10 +188,10 @@ ERB のインデントや空行は、Ruby の構造ではなく HTML の構造�
 | 区切りへの指摘 | 区切りの位置の文字への指摘だけを捨て、cop そのものは止めない。タグの中に書いたコードは検査する |
 | HTML が見えないことによる指摘 | HTML の存在を Ruby に残し、cop を止めない |
 | ERB の書き方に合わない指摘 | 従うと出力が変わる指摘は出さない。出力が変わらないものは、チームのスタイルとして選べる。ERB での書き方は、herb-lint の `erb-prefer-do-end-blocks` のように ERB のルールとして示す |
-| ERB のツールが担う指摘 | RuboCop はタグの中の Ruby、ERB のツールは HTML の構造と配置、と境界がはっきりしている |
+| 配置への指摘 | 開始タグの幅によるずれは、ERB の構文から来るものとして指摘しない（Ruby の位置ではなく開始タグの位置で測れば、タグを揃えて書いたかは検査できる）。HTML の構造に従う配置は ERB のツール、1 つのタグの中の Ruby の配置は RuboCop、と境界がはっきりしている |
 
-- cop の本来の検査を削らずに済むのは、区切りへの指摘と、HTML が見えないことによる指摘。どちらも、ERB をどう Ruby にするかで決まる
-- ERB の書き方に合わない指摘と、ERB のツールが担う指摘は、Ruby への変換をどう工夫しても残る。ERB と Ruby の書き方の違い、RuboCop と ERB のツールの役割の違いから来る
+- cop の本来の検査を削らずに済むのは、区切りへの指摘、HTML が見えないことによる指摘、配置への指摘のうち開始タグの幅と空行によるもの。どれも ERB の構文や、ERB をどう Ruby にするかから来る
+- ERB の書き方に合わない指摘と、HTML の構造に従う配置への指摘は、Ruby への変換をどう工夫しても残る。ERB と Ruby の書き方の違い、RuboCop と ERB のツールの役割の違いから来る
 - 止める範囲は、ファイル全体よりも誤りになる場所だけのほうが、本来の検査を残せる
 
 ## 9. 今後の検討事項
