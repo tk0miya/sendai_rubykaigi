@@ -136,11 +136,19 @@ $ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cach
     --format emacs "$TMPDIR/layout"                                         # "$TMPDIR/views"、"$TMPDIR/views_norm" も同じように検査して件数を比べる
 $ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
     --only Layout/EmptyLines,Layout/EmptyLinesAroundBlockBody semantics/ruby/blank_lines.rb
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Lint/Void semantics/ruby/kept_literal.rb semantics/ruby/kept_if.rb
+$ ruby semantics/extract_ruby.rb work/views "$TMPDIR/views_empty" empty   # HTML を空白にする方式で、空白だけの行を空行にする
+$ MARKER=1 BUNDLE_GEMFILE="$RUBOCOP_HERB/Gemfile" bundle exec ruby semantics/extract_ruby.rb work/views "$TMPDIR/views_marker" empty
+$ BUNDLE_GEMFILE="$PWD/tools/rubocop-erb-0.8/Gemfile" bundle exec rubocop --cache false -c plain_ruby/.rubocop.yml \
+    --only Layout/EmptyLines,Layout/EmptyLinesAroundBlockBody --format emacs "$TMPDIR/views_empty" \
+    | ruby semantics/empty_lines_by_line.rb work/views "$TMPDIR/views_empty"   # "$TMPDIR/views_marker" も同じように数える
+$ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.html.erb   # タグの中の空行だけを指摘する
 ```
 
-- `semantics/ruby/` は、ERB と同じ形の Ruby。`blank_*.rb` は HTML を空白にした形、`kept_*.rb` は HTML を出力の文（`_erbout << "<p>x</p>"`）として残した形。`if_semicolon.rb`、`next.rb`、`cond_assign.rb` は、タグに跨がる構造を Ruby にした形。`blank_lines.rb` は、HTML だけの行を空行にした形
-- `semantics/layout/` は、第 3 部 7 章の配置への指摘の ERB。`extract_ruby.rb` は herb gem の `Herb.extract_ruby` で、元の ERB と文字位置の揃った Ruby を作る。`norm` を付けると `<%=` と `<%-` を `<%` にしてから Ruby にする
-- 第 3 部 7.3 節の空行の件数は、`$TMPDIR/views` の空白だけの行から空白を除いてから、空行の cop で検査した数
+- `semantics/ruby/` は、ERB と同じ形の Ruby。`blank_*.rb` は HTML を空白にした形、`kept_*.rb` は HTML を出力の文（`_erbout << "<p>x</p>"`）として残した形。`if_semicolon.rb`、`next.rb`、`cond_assign.rb` は、タグに跨がる構造を Ruby にした形。`blank_lines.rb` は、HTML だけの行を空行にした形。`kept_literal.rb` は、HTML を文字列リテラルだけにした形
+- `semantics/layout/` は、第 3 部 7 章の配置への指摘の ERB。`extract_ruby.rb` は herb gem の `Herb.extract_ruby` で、元の ERB と文字位置の揃った Ruby を作る。`norm` を付けると `<%=` と `<%-` を `<%` にしてから Ruby にする。`empty` を付けると空白だけの行を空行にする。`MARKER=1` を付けると tk0miya-rubocop-herb のマーカー方式で Ruby にする
+- `empty_lines.html.erb` は、タグの中、HTML の後ろ、ブロックの本文の前後に空行を置いた ERB。`empty_lines_by_line.rb` は、空行の cop の指摘を、元の ERB の行（HTML の行、タグの外の空行、タグの中の空行）で分けて数える
 - `tools/rubocop-erb-0.8/Gemfile` は rubocop 1.92.1 を使うために借りているだけで、rubocop-erb は読み込まない（`plain_ruby/.rubocop.yml` はプラグインを使わない）
 - `render.rb`、`count_structures.rb`、`extract_ruby.rb` は、actionview 8.1.4.1 と herb 0.11.1 の gem で確かめた
 

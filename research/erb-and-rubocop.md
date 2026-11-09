@@ -87,6 +87,7 @@ ERB では、HTML だけの本文も出力の文になり、空ではありま�
 | `Style/IdenticalConditionalBranches` | 分岐の最後の出力タグの後ろに HTML がある | HTML の前の出力を、分岐の外に移せると見る |
 
 - `Lint/EmptyConditionalBody`、`Style/EmptyElse`、`Lint/EmptyWhen`、`Lint/DuplicateBranch`、`Style/RedundantCondition` は、HTML を空白にした Ruby では出て、HTML を出力の文（`_erbout << "<p>x</p>"`）として残した Ruby では出ない（[repro/semantics/ruby/](repro/semantics/ruby/)）【実測】
+- HTML は出力の文として残す必要がある。文字列リテラルだけ（`"<p>x</p>"`）にすると、`Lint/Void` が出る（[repro/semantics/ruby/kept_literal.rb](repro/semantics/ruby/kept_literal.rb)）【実測】
 - この分類の cop は、ERB でも本来検出したい問題（本当に空の `else`、`=` を書き忘れた `<% count + 1 %>` など）を見つける。HTML の存在を Ruby に残せば、cop を止めずに済む
 - tk0miya-rubocop-herb は HTML を識別子として書き込むが、識別子を置けない短いテキスト（`|` 1 文字など）は空白のままなので、この分類の cop を本文が HTML の分岐でだけ止めている（[第 2 部 3.3 節](tk0miya-rubocop-herb.md#33-マーカーの限界実測出典)）
 
@@ -135,13 +136,13 @@ ERB では HTML の中に制御構造を埋め込むので、Ruby とは違う�
 
 ## 7. 配置への指摘
 
-ERB の中の Ruby の位置は、Ruby の構造ではなく、開始タグの幅と HTML の構造で決まります。Ruby の位置や空行を見る cop は、このどちらかに反応します。表の例は [repro/semantics/layout/](repro/semantics/layout/) の ERB を、元の ERB と文字位置が揃った Ruby にして確かめました（herb gem の `Herb.extract_ruby`。[repro/semantics/extract_ruby.rb](repro/semantics/extract_ruby.rb)）【実測】。
+ERB の中の Ruby の位置は、Ruby の構造ではなく、開始タグの幅と HTML の構造で決まります。Ruby の位置を見る cop は、このどちらかに反応します。空行を見る cop は、HTML の行と ERB の本当の空行の両方に反応します。表の例は [repro/semantics/layout/](repro/semantics/layout/) の ERB を、元の ERB と文字位置が揃った Ruby にして確かめました（herb gem の `Herb.extract_ruby`。[repro/semantics/extract_ruby.rb](repro/semantics/extract_ruby.rb)）【実測】。
 
 | 原因 | cop |
 |---|---|
 | [開始タグの幅](#71-開始タグの幅による指摘) | `Layout/EndAlignment`, `Layout/BlockAlignment`, `Layout/BeginEndAlignment`, `Layout/ElseAlignment`, `Layout/CaseIndentation`, `Layout/RescueEnsureAlignment`, `Layout/IndentationWidth`, `Layout/IndentationConsistency`, `Layout/CommentIndentation` |
 | [HTML の構造](#72-html-の構造による指摘) | 上の cop に加えて `Layout/BlockEndNewline`, `Layout/LineLength` |
-| [HTML の行が空行に見える](#73-html-の行が空行に見える指摘) | `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` |
+| [空行](#73-空行への指摘) | `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` |
 
 ### 7.1 開始タグの幅による指摘
 
@@ -174,12 +175,29 @@ ERB のインデントは、HTML の入れ子に従います。Ruby から見る
 - `Layout/LineLength` は、HTML だけの行も、HTML とタグが混ざる行も、HTML の長さを含めて数える
 - HTML の構造に合わせたインデントや改行を検査し、整形するのは herb-format / herb-lint の領域になる
 
-### 7.3 HTML の行が空行に見える指摘
+### 7.3 空行への指摘
 
-HTML だけの行を空行にした Ruby では、空行の cop が HTML の行を空行と見ます。実際のビュー 333 ファイルで、`Herb.extract_ruby` の結果から空白だけの行の空白を除いて検査すると、`Layout/EmptyLines` が 1,247 件、`Layout/EmptyLinesAroundBlockBody` が 123 件出る（[repro/semantics/ruby/blank_lines.rb](repro/semantics/ruby/blank_lines.rb)）【実測】。
+ERB を Ruby にすると、性質の違う空行が混ざります。
 
+| 空行 | 元の ERB | 性質 |
+|---|---|---|
+| 変換で生まれる空行 | HTML だけの行 | HTML が Ruby から見えないことによる（5 章と同じ） |
+| ERB の本当の空行（タグの外） | 空行 | テキストで、出力の一部（6.3 節の先頭と末尾の空行と同じ） |
+| ERB の本当の空行（タグの中） | 複数行のタグの中の空行 | Ruby のコードの空行 |
+
+実際のビュー 333 ファイルを Ruby にし、空白だけの行の空白を除いて空行の cop で検査しました。指摘の行（`Layout/EmptyLines` は、続いた空行の 2 行目以降）が元の ERB で何だったかで分けると、次のようになります（[repro/semantics/empty_lines_by_line.rb](repro/semantics/empty_lines_by_line.rb)）【実測】。
+
+| Ruby にする方式 | cop | HTML の行 | 空行（タグの外） | 空行（タグの中） |
+|---|---|---|---|---|
+| HTML を空白にする（`Herb.extract_ruby`） | `Layout/EmptyLines` | 1,113 | 134 | 0 |
+| 同上 | `Layout/EmptyLinesAroundBlockBody` | 123 | 0 | 0 |
+| マーカーを置く（tk0miya-rubocop-herb） | `Layout/EmptyLines` | 505 | 76 | 0 |
+| 同上 | `Layout/EmptyLinesAroundBlockBody` | 13 | 0 | 0 |
+
+- 件数は、Ruby にする方式で変わる。tk0miya-rubocop-herb は要素の開始タグの位置にだけマーカー（`div;` など）を置くので、閉じタグだけの行（`</div>`）などは空行になり、変換で生まれる空行は残る
+- タグの外の空行は出力の一部なので、Ruby の規範で直すものではない。ERB の空行は herb-lint（`erb-no-extra-newline`）が検査する
+- タグの中の空行は Ruby のコードの空行なので、RuboCop が検査できる。tk0miya-rubocop-herb は、空行の cop の指摘を 1 つのタグの中のものだけ残す。[repro/semantics/empty_lines.html.erb](repro/semantics/empty_lines.html.erb) では、`<%` 〜 `%>` の中の連続した空行にだけ `Layout/EmptyLines` が出て、HTML の後ろやブロックの本文の前後の空行には出ない【実測】
 - HTML の行を空白のまま残すと空行の cop は出ないが、その空白に `Layout/TrailingWhitespace` が反応する（4 章）
-- 5 章と同じく、HTML の存在が Ruby から見えないことによる指摘でもある
 
 ## 8. 理想の姿【推測】
 
@@ -188,9 +206,10 @@ HTML だけの行を空行にした Ruby では、空行の cop が HTML の行�
 | 区切りへの指摘 | 区切りの位置の文字への指摘だけを捨て、cop そのものは止めない。タグの中に書いたコードは検査する |
 | HTML が見えないことによる指摘 | HTML の存在を Ruby に残し、cop を止めない |
 | ERB の書き方に合わない指摘 | 従うと出力が変わる指摘は出さない。出力が変わらないものは、チームのスタイルとして選べる。ERB での書き方は、herb-lint の `erb-prefer-do-end-blocks` のように ERB のルールとして示す |
-| 配置への指摘 | 開始タグの幅によるずれは、ERB の構文から来るものとして指摘しない（Ruby の位置ではなく開始タグの位置で測れば、タグを揃えて書いたかは検査できる）。HTML の構造に従う配置は ERB のツール、1 つのタグの中の Ruby の配置は RuboCop、と境界がはっきりしている |
+| 配置への指摘 | 開始タグの幅によるずれは、ERB の構文から来るものとして指摘しない（Ruby の位置ではなく開始タグの位置で測れば、タグを揃えて書いたかは検査できる）。HTML の構造に従う配置と、タグの外の空行は ERB のツール、1 つのタグの中の Ruby の配置と空行は RuboCop、と境界がはっきりしている |
 
-- cop の本来の検査を削らずに済むのは、区切りへの指摘、HTML が見えないことによる指摘、配置への指摘のうち開始タグの幅と空行によるもの。どれも ERB の構文や、ERB をどう Ruby にするかから来る
+- cop の本来の検査を削らずに済むのは、区切りへの指摘、HTML が見えないことによる指摘、配置への指摘のうち開始タグの幅によるもの。どれも ERB の構文や、ERB をどう Ruby にするかから来る
+- 空行への指摘は、Ruby への変換の工夫では解決しない。タグの外の空行は出力の一部だからで、タグの中は RuboCop、タグの外は ERB のツール、という境界で分ける
 - ERB の書き方に合わない指摘と、HTML の構造に従う配置への指摘は、Ruby への変換をどう工夫しても残る。ERB と Ruby の書き方の違い、RuboCop と ERB のツールの役割の違いから来る
 - 止める範囲は、ファイル全体よりも誤りになる場所だけのほうが、本来の検査を残せる
 
