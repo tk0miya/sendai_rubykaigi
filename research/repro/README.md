@@ -7,7 +7,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 
 | パス | 内容 |
 |---|---|
-| `cases/` | 検証用 ERB（74 ファイル）。[ケースの一覧](#ケースの一覧) |
+| `cases/` | 検証用 ERB（75 ファイル）。[ケースの一覧](#ケースの一覧) |
 | `plain_ruby/` | 比較用の Ruby。`cases/control_flow/` のいくつかのケースと同じ内容を、普通の Ruby として書いたもの |
 | `tools/TOOL/` | ツールごとの `Gemfile` と設定 |
 | `package.json`, `.herb.yml` | herb-lint / herb-format（`@herb-tools/linter`、`@herb-tools/formatter`） |
@@ -170,6 +170,7 @@ $ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.h
 | `safe_navigation` | `<% if user && user.admin? %>` | rubocop 1.86.2 以降の rubocop-erb 0.7 系で `user&&.admin?`（構文エラー）になる |
 | `single_line_block` | `<%= cache "fragment" do %>…<% end %>` を 1 行で | HTML を空白にすると `Style/SingleLineDoEndBlock` が出る |
 | `unused_block_arg` | `<% items.each do \|i\| %>` の本文が HTML | `i` の未使用（`Lint/UnusedBlockArgument`）。本文を空と見なすと出ない |
+| `unused_block_arg_output` | `<% items.each_with_index do \|item, i\| %>` の本文に出力タグ | `i` の未使用（`Lint/UnusedBlockArgument`）。タグ単位ではブロック全体が見えないので出ない |
 | `form_block` | `<%= form_with … do \|f\| %>` | ブロック付きの出力タグ |
 | `trim` | `<%-` / `-%>` | トリムのあるタグでも位置がずれないか |
 

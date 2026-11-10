@@ -20,6 +20,8 @@ cases/control_flow/unless_else.html.erb:2:4: R: [Correctable] Herb/Linting: [erb
 cases/control_flow/unless_else.html.erb:4:4: R: Herb/Linting: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/control_flow/unused_block_arg.html.erb:1:19: E: Herb/Linting: [erb-no-unused-block-argument] Block argument `i` is never used. Remove it and write `<% items.each do %>`, or prefix it with an underscore as `_i` to show it is intentionally unused.
 cases/control_flow/unused_block_arg.html.erb:1:19: W: [Correctable] Lint/UnusedBlockArgument: Unused block argument - `i`. You can omit the argument if you don't care about it.
+cases/control_flow/unused_block_arg_output.html.erb:1:36: E: Herb/Linting: [erb-no-unused-block-argument] Block argument `i` is never used. Use `each` instead of `each_with_index`, or prefix it with an underscore as `_i` to show it is intentionally unused.
+cases/control_flow/unused_block_arg_output.html.erb:1:36: W: [Correctable] Lint/UnusedBlockArgument: Unused block argument - `i`. If it's necessary, use `_` or `_i` as an argument name to indicate that it won't be used.
 cases/erb_comment/leading.html.erb:1:1: C: Herb/IgnoredCopDirective: rubocop-herb ignores this rubocop directive because ERB tags or HTML follow it on the same line. Place them on a separate line.
 cases/erb_comment/leading.html.erb:1:53: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
 cases/erb_comment/multiline_comment.html.erb:3:1: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.

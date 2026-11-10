@@ -77,34 +77,49 @@
 
 ### 6. 見逃し
 
-| ERB | 結果 |
-|---|---|
-| `<% if foo == nil %>` | erb_lint は見逃す（タグを跨ぐ `if` の条件式が検査されない） |
-| `<% if !user.nil? %>` | erb_lint、rubocop-erb 0.7 系とも見逃す（`Style/NegatedIf`） |
-| `<% unused = 1 %>`（どこでも使わない変数） | erb_lint、rubocop-erb 0.7 系とも見逃す。前のタグで定義した変数が見えず、使っている変数まで `Lint/UselessAssignment` になるので、この cop を止めている（erb_lint は README が無効化を推奨、0.7 系は除外） |
-| `end` の抜け | `Lint/Syntax` を除外しているので気づけない（rubocop-erb 0.7 系） |
+| ERB | erb_lint（推奨設定）・rubocop-erb 0.7 系が見逃す指摘 | 見逃す理由 |
+|---|---|---|
+| `<% items.each_with_index do \|item, i\| %>`（`i` を使わない） | `Lint/UnusedBlockArgument` | タグを跨ぐブロックが見えない |
+| `<% unused = 1 %>`（どこでも使わない変数） | `Lint/UselessAssignment` | タグを跨ぐ変数が見えないので、使っている変数まで指摘される。そのため cop を止めざるを得ない（erb_lint は README が無効化を推奨、0.7 系は既定で除外） |
+| `end` の抜け | `Lint/Syntax` | タグを跨ぐ構文を検査できない（0.7 系は cop を除外） |
 
-- ノート: 誤検知になる cop を止めるので、その cop が見つけるべき問題も見逃す。rubocop-erb 0.7 系は 53 個の cop を除外している
-- 出典: [comparison.md 3 章、5.1 節](../research/comparison.md#3-タグ単位の方式)（`cases/variables/cross_tag_variables`）
+- 3 つとも、スライド 5 の「失われる文脈」（制御構造、変数スコープ）から来る
+- 出典: [comparison.md 3 章、5.1 節](../research/comparison.md#3-タグ単位の方式)（`cases/control_flow/unused_block_arg_output`、`cases/variables/cross_tag_variables`、`cases/syntax/missing_end`）
 
 ## 2. 文書全体へ（1:30）
 
 ### 7. 文書全体を 1 本の Ruby にする
 
 - rubocop-erb 0.8 系（2026-10-29）が、タグ単位から文書全体の変換に切り替えた（[r7kamura/rubocop-erb#70](https://github.com/r7kamura/rubocop-erb/pull/70)）
-- Herb の `Herb.extract_ruby` で、HTML を空白に置き換え、ERB タグの中身を元の位置に残した 1 本の Ruby にする
 - Herb 本家でも、同じ方式の rubocop-herb の PR が出ている（[marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260)。Draft）
-- 図: 同じ ERB が、空白入りの 1 本の Ruby になる様子
+- HTML を空白に置き換え、ERB タグの中身を元の位置に残して、ファイル全体を 1 本の Ruby にする
+- スライド 3 の ERB は、次の Ruby になる（行末の空白は省略）
+
+```erb
+<% if foo == nil %>
+  <p>yes</p>
+<% else %>
+<% end %>
+```
+
+↓
+
+```ruby
+   if foo == nil  ;
+
+   else  ;
+   end  ;
+```
+
 - ノート: 文書全体方式そのものは ruumba が先行していたが、普及せず 2021 年にメンテが止まった。質問されたら答える
 
 ### 8. タグを跨いで検査できるようになった
 
 - スライド 3 の ERB に、0.8 系では `Style/NilComparison` が出る（0 件 → 1 件）。ただし空の `else` の `Style/EmptyElse` は出ない（スライド 11 で回収する）
-- パート 1 の見逃し・誤検知は、0.8 系では起きない
-  - `<% if !user.nil? %>` に `Style/NegatedIf` が出る
-  - 前のタグで定義した変数が見えるので、`Lint/UselessAssignment` を止めずに、本当に使わない `<% unused = 1 %>` を検出する
-  - `Lint/Syntax` を除外しない
-- 実際のビュー 333 ファイルで、タグを跨いで読めるようになって新しく見つかる指摘（`Lint/AssignmentInCondition` など）
+- スライド 6 の見逃しは、0.8 系ではどれも検出される
+  - `<% items.each_with_index do |item, i| %>` に `Lint/UnusedBlockArgument`
+  - 前のタグで定義した変数が見えるので、`Lint/UselessAssignment` を止めずに、本当に使わない `<% unused = 1 %>` だけを検出する
+  - `end` の抜けに `Lint/Syntax`
 - → 「改善は進んでいる」
 
 ## 3. それでも残る 4 つの問題（3:15）
@@ -116,7 +131,7 @@
 <p><% count + 1 %> items</p>    →   count + 1
 ```
 
-- `Herb.extract_ruby` は ERB タグの中身以外を空白にするので、出力する `<%=` と出力しない `<%` が同じ Ruby になる。HTML だけの本文と、本当に空の本文も同じ Ruby になる
+- ERB タグの中身以外を空白にするので、出力する `<%=` と出力しない `<%` が同じ Ruby になる。HTML だけの本文と、本当に空の本文も同じ Ruby になる
 - cop には区別する手がかりがない → 誤検知を出すか、cop を除外して見逃すかの二択
 - 0.8 系は 65 個の cop を除外している（誤検知を避けるため）
 - 残る問題は 4 つに分けられる。前半 2 つは変換で生まれるもの、後半 2 つは ERB と Ruby の書き方の違いによるもの

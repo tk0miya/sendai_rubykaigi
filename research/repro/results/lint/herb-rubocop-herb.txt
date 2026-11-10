@@ -57,6 +57,10 @@ cases/control_flow/unless_else.html.erb:5:7: C: [Correctable] Layout/ExtraSpacin
 cases/control_flow/unused_block_arg.html.erb:1:4: W: Lint/EmptyBlock: Empty block detected.
 cases/control_flow/unused_block_arg.html.erb:1:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/unused_block_arg.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg_output.html.erb:1:36: W: [Correctable] Lint/UnusedBlockArgument: Unused block argument - `i`. If it's necessary, use `_` or `_i` as an argument name to indicate that it won't be used.
+cases/control_flow/unused_block_arg_output.html.erb:1:38: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg_output.html.erb:2:20: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/unused_block_arg_output.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/erb_comment/after_if.html.erb:2:9: W: [Correctable] Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
 cases/erb_comment/after_if.html.erb:2:16: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/erb_comment/after_if.html.erb:4:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.

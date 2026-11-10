@@ -41,6 +41,12 @@ cases/control_flow/trim.html.erb:2:10: Layout/TrailingEmptyLines: Final newline 
 cases/control_flow/unused_block_arg.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/control_flow/unused_block_arg.html.erb:1:3: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/unused_block_arg.html.erb:1:13: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/unused_block_arg_output.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unused_block_arg_output.html.erb:1:3: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unused_block_arg_output.html.erb:1:24: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/unused_block_arg_output.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unused_block_arg_output.html.erb:2:10: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unused_block_arg_output.html.erb:2:19: Layout/TrailingEmptyLines: Final newline missing.
 cases/erb_comment/multiline_tag.html.erb:2:0: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/erb_comment/multiline_tag.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/erb_comment/multiline_tag.html.erb:3:4: Layout/CommentIndentation: Incorrect indentation detected (column 4 instead of 0).
