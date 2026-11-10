@@ -124,49 +124,83 @@
 
 ## 3. それでも残る 4 つの問題（3:15）
 
-### 9. `<%=` と HTML が Ruby から消える
+### 9. 空白にした Ruby では、cop が ERB を区別できない
 
-```erb
-<p><%= count + 1 %> items</p>   →   count + 1
-<p><% count + 1 %> items</p>    →   count + 1
-```
-
-- ERB タグの中身以外を空白にするので、出力する `<%=` と出力しない `<%` が同じ Ruby になる。HTML だけの本文と、本当に空の本文も同じ Ruby になる
-- cop には区別する手がかりがない → 誤検知を出すか、cop を除外して見逃すかの二択
-- 0.8 系は 65 個の cop を除外している（誤検知を避けるため）
-- 残る問題は 4 つに分けられる。前半 2 つは変換で生まれるもの、後半 2 つは ERB と Ruby の書き方の違いによるもの
+- スライド 7 の Ruby には、ERB の情報（HTML、区切りの位置、ERB の書き方、配置）が残っていない
+- cop は、ERB として正しいものと直すべきものを区別できない → 誤検知を出すか、cop を除外して見逃すかの二択
+- 0.8 系は誤検知を避けるため、65 個の cop を除外している
+- 除外の理由は 4 つに分けられる。前半 2 つは変換で生まれるもの、後半 2 つは ERB と Ruby の書き方の違いによるもの
+  1. 区切りへの指摘
+  2. HTML が見えないことによる指摘
+  3. ERB の書き方に合わない指摘
+  4. 配置への指摘
 - ノート: 0.8 系の PR は、除外した cop を「ERB の文脈を理解させる PR で今後有効に戻す」としている
+- 出典: [erb-and-rubocop.md 3 章](../research/erb-and-rubocop.md#3-4-つの分類)
 
 ### 10. 変換で生まれる問題 1: 区切りへの指摘
 
-- ERB の区切りの位置に変換で書いた `;` や空白に、cop が反応する（`Style/Semicolon`、`Style/IfWithSemicolon`、`Layout/ExtraSpacing` など）
-- 0.8 系はこれらを除外する → タグの中に書いた本当の問題も見逃す
-  - 例: `<%= render    partial:  "form" %>` の余分な空白（実際のビューで 4 件）
+```erb
+<div class="<% if admin? %>admin<% end %>">
+```
+
+↓
+
+```ruby
+               if admin?  ;        end  ;
+```
+
+- 区切りの位置に変換で書いた `;` や空白に、cop が反応する
+  - 例: よく見かける 1 行の `if` に、`Style/IfWithSemicolon`（`if admin?;` を三項演算子にせよ）が出る。`;` は書き手が書いたものではない
+- 0.8 系は `Style/IfWithSemicolon`、`Style/Semicolon`、`Layout/ExtraSpacing` などを除外する → タグの中に書いた本当の問題も見逃す
+  - 例: `<%= render    partial:  "form" %>` の余分な空白（`Layout/ExtraSpacing`）
 
 ### 11. 変換で生まれる問題 2: HTML が見えないことによる指摘
 
-- HTML を空白にすると、HTML だけの本文が空に見える（`Lint/EmptyConditionalBody`、`Lint/EmptyBlock`、`Style/EmptyElse` など）。`<%=` の値を使わない式と見る（`Lint/Void`、`Style/SymbolProc`）
-- 0.8 系はこれらを除外する → ERB として直すべきものも見逃す。スライド 3 の空の `else` に `Style/EmptyElse` が出ないのはこのため
+```erb
+<% if user.admin? %>
+  <p>Good morning, <%= user.name %></p>
+<% else %>
+  <p>Hello, <%= user.name %></p>
+<% end %>
+```
+
+↓
+
+```ruby
+   if user.admin?  ;
+                       user.name  ;
+   else  ;
+                user.name  ;
+   end  ;
+```
+
+- HTML を空白にすると、HTML だけが違う分岐が同じに見え、HTML だけの本文が空に見える
+  - 例: 上の ERB に `Lint/DuplicateBranch`（両方の分岐が同じ）が出る
+- 0.8 系は `Lint/DuplicateBranch`、`Lint/EmptyConditionalBody`、`Style/EmptyElse` などを除外する → 直すべきものも見逃す
 
 | ERB として正しい | 直すべき（0.8 系は見逃す） |
 |---|---|
-| `<p><%= count + 1 %> items</p>` | `<p><% count + 1 %> items</p>`（`=` の書き忘れ） |
-| `<% if user.admin? %>` `You are an administrator.` `<% end %>` | `<% if user.admin? %>` `<% end %>` |
+| 分岐ごとに挨拶の HTML が違う（上の ERB） | 両方の分岐が `<%= user.name %>` だけ（`Lint/DuplicateBranch`） |
+| `<% if user.admin? %>`⏎`  You are an administrator.`⏎`<% end %>` | `<% if user.admin? %>`⏎`<% end %>`（`Lint/EmptyConditionalBody`） |
 
+- スライド 3 の空の `else` に `Style/EmptyElse` が出ないのもこのため
 - 出典: [comparison.md 5.2 節](../research/comparison.md#52-erb-として正しいものと直すべきものの区別)の `cases/marker/`
 
 ### 12. ERB 特有の問題 1: ERB の書き方に合わない指摘
 
-- Ruby の規範で、ERB の自然な書き方を直させる
-- 0.8 系は除外していない → 誤検知が出る
-  - `<%= cache "fragment" do %>This bit is cached<% end %>` に `Style/SingleLineDoEndBlock`（実際のビューで 10 件）と `Style/BlockDelimiters`（8 件）
-  - `Style/SingleLineDoEndBlock` に従って複数行にすると、出力に改行と空白が入る（`content_for(:title)` が `"Hello B"` から `"  Hello B\n"` に変わる）
-  - `Style/BlockDelimiters` が勧める `{ … }` は、ERB では避ける書き方（herb-lint の `erb-prefer-do-end-blocks`）
+```erb
+<%= link_to(user_path(user)) do %>Profile<% end %>
+```
+
+- Ruby の規範で、ERB の自然な書き方を直させる。0.8 系は除外していない → 誤検知が出る
+  - `Style/BlockDelimiters`: 1 行のブロックは `{ … }` にせよ → `<%= link_to(user_path(user)) { %>Profile<% } %>` は、ERB では避ける書き方（herb-lint の `erb-prefer-do-end-blocks`）
+  - `Style/SingleLineDoEndBlock`: 複数行にせよ → 従うと、リンクの文字列の前後に改行と空白が入る（`<a href="/users/1">\n  Profile\n</a>`）
 - 出典: [erb-and-rubocop.md 6 章](../research/erb-and-rubocop.md#6-erb-の書き方に合わない指摘)
 
 ### 13. ERB 特有の問題 2: 配置への指摘
 
 - ERB の中の Ruby の位置は、Ruby の構造ではなく、開始タグの幅と HTML の構造で決まる
+- 開始タグの幅: `<%=` は 4 文字、`<%` は 3 文字なので、`form_with` と `end` は必ず 1 文字ずれる（`Layout/BlockAlignment`）
 
 ```erb
 <%= form_with(model: user) do |f| %>
@@ -174,8 +208,16 @@
 <% end %>
 ```
 
-- `<%=` は 4 文字、`<%` は 3 文字なので、`form_with` と `end` は必ず 1 文字ずれる（`Layout/BlockAlignment`）
-- インデントは HTML の入れ子に従う。`<pre>` の中では、cop に従ってインデントすると出力が変わる
+- HTML の入れ子: インデントは HTML の入れ子に従うので、`render` が `if` から 5 文字下がる（`Layout/IndentationWidth`）
+
+```erb
+<% if admin %>
+  <div class="admin">
+    <%= render "admin" %>
+  </div>
+<% end %>
+```
+
 - 0.8 系は Layout の cop を 37 個除外する → 1 つのタグの中の Ruby の配置（複数行の `link_to` の引数の揃えなど）も見逃す
 - 出典: [erb-and-rubocop.md 7 章](../research/erb-and-rubocop.md#7-配置への指摘)
 
@@ -215,7 +257,7 @@ div;
 - 区切りへの指摘: 変換で書いた文字（タグの終わりに補った `;`、`_ =`、区切りの位置の空白）への指摘だけを捨てる。cop は止めない
   - → `<% a = 1; b = 2 %>` のようにタグの中に書いた `;` や、`<%= render    partial: … %>` の余分な空白は検出できる
 - HTML が見えないことによる指摘: HTML を識別子として書き込むので、cop は止めない
-  - → `<% count + 1 %>` の `=` の書き忘れ、本当に空の `if` / `else` は検出できる
+  - → 両方の分岐が同じ `if`、本当に空の `if` / `else` は検出できる
 - ファイル全体で除外する cop は 9 個（0.8 系は 65 個）
 - ノート: 短すぎて識別子を置けないテキスト（`|` 1 文字など）は空白のままなので、本文が HTML の分岐でだけ、この分類の cop を止めている
 
@@ -247,12 +289,11 @@ div;
 
 | ERB | rubocop-erb 0.8 系 | tk0miya-rubocop-herb |
 |---|---|---|
-| `<p><% count + 1 %> items</p>` | 見逃す（`Lint/Void` を除外） | `Lint/Void` |
+| `<% if user.admin? %><%= user.name %><% else %><%= user.name %><% end %>` | 見逃す（除外） | `Lint/DuplicateBranch` |
 | `<% if user.admin? %><% end %>` | 見逃す（除外） | `Lint/EmptyConditionalBody` |
 | `<% if @part && @part.mime_type %>` | 見逃す（除外） | `Style/SafeNavigation` → `@part&.mime_type` |
 | `<%= render    partial:  "form" %>` | 見逃す（除外） | `Layout/ExtraSpacing` |
-| `<%= cache "fragment" do %>…<% end %>` | `Style/SingleLineDoEndBlock`（誤検知） | 出ない |
-| `<p><%= count + 1 %> items</p>` | 出ない | 出ない |
+| `<%= link_to(user_path(user)) do %>Profile<% end %>` | `Style/BlockDelimiters`、`Style/SingleLineDoEndBlock`（誤検知） | 出ない |
 
 - デモ: 1 つの ERB に 0.8 系と tk0miya-rubocop-herb をかけて並べる（録画にしておく）
 - 出典: [comparison.md 5.2 節、5.4 節](../research/comparison.md#5-同じ入力での比較)
