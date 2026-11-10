@@ -242,19 +242,42 @@
 ### 15. 文書全体方式の精度を上げる
 
 - 文書全体方式で、誤検知も見逃しも減らすために、RuboCop のプラグイン rubocop-herb（tk0miya/rubocop-herb）を作った
+  - Herb の AST（HTML + ERB の統合 AST）から、文字位置を変えずに Ruby を組み立てる
+  - `rubocop` コマンドからそのまま動く。offense の位置も、元の ERB の行がそのまま出る
 - 4 つの問題へのアプローチ
 
-| 問題 | アプローチ |
-|---|---|
-| 区切りへの指摘 | ERB タグの外（変換で書いた `;` や空白）への指摘だけを捨てる。cop は止めない |
-| HTML が見えないことによる指摘 | 変換のルールを変えて、`<%=` と HTML を Ruby の上に残す。cop は止めない |
-| ERB の書き方に合わない指摘 | ERB と Ruby の書き方が食い違う行だけで cop を止める。ERB の書き方は herb-lint に任せる |
-| 配置への指摘 | 同上。1 つのタグの中の Ruby の配置は RuboCop、HTML の構造に従う配置は herb-lint / herb-format |
+| 問題 | アプローチ | スライド |
+|---|---|---|
+| 区切りへの指摘 | ERB タグの外への指摘を捨てる | 16 |
+| HTML が見えないことによる指摘 | `<%=` と HTML を Ruby に残す | 17 |
+| ERB の書き方に合わない指摘 | RuboCop と ERB のツールの境界を引く | 18 |
+| 配置への指摘 | RuboCop と ERB のツールの境界を引く | 18 |
 
-- 前半 2 つは「変換で生まれる問題を、変換の側で直す」、後半 2 つは「RuboCop と ERB のツールの境界を引く」
-- 以降のスライドで、それぞれを説明する
+- 前半 2 つは、変換で生まれる問題なので、変換の側で直す。cop は止めない
+- 後半 2 つは、変換では直らないので、RuboCop と ERB のツールの境界を引く
+- その結果、ファイル全体で除外する cop は 9 個（0.8 系は 65 個）
+- ノート: ファイル全体を 1 fragment（`offset: 0`）にして、ruby_extractors API の「連続した 1 区間」の制約を回避している。同じプロセス内で動くので、キャッシュ・`--parallel`・`rubocop:disable` がそのまま使える
 
-### 16. アイデア: ERB の意味を Ruby の上に残す
+### 16. 区切りへの指摘: ERB タグの外への指摘を捨てる
+
+```erb
+<div class="<% if admin? %>admin<% end %>">
+```
+
+↓
+
+```ruby
+div;           if admin?;          end;
+```
+
+- 変換では、文を区切るために、ERB タグの外（タグの終わり）に `;` を書く
+- ERB タグの外への指摘は、書き手が書いていない文字への指摘なので捨てる。cop は止めない
+  - → 上の ERB に `Style/IfWithSemicolon` は出ない
+  - → `<% a = 1; b = 2 %>` のようにタグの中に書いた `;` や、`<%= render    partial: … %>` の余分な空白は検出できる
+- 変換結果は rubocop-herb `4cbe906` の `bin/erb2ruby` の出力（行末の空白は省略。スライド 17 も同じ）
+- 出典: `cases/control_flow/attr_if`
+
+### 17. HTML が見えないことによる指摘: `<%=` と HTML を Ruby に残す
 
 ```erb
 <div class="user">
@@ -276,32 +299,24 @@ div;
    end;
 ```
 
-- Herb の AST（HTML + ERB の統合 AST）から、文字位置を変えずに Ruby を組み立てる
-- `<%=` は `_ =` に → 「出力する」という意味が残る
-- HTML のタグやテキストは、元の位置に識別子（`div;`、`_a;`）として書き込む → 「本文がある」ことが見える
-- RuboCop のプラグインとして、`rubocop` コマンドからそのまま動く。offense の位置も、元の ERB の行がそのまま出る
-- 変換結果は rubocop-herb `4cbe906` の `bin/erb2ruby` の出力（行末の空白は省略）
-- ノート: ファイル全体を 1 fragment（`offset: 0`）にして、ruby_extractors API の「連続した 1 区間」の制約を回避している。同じプロセス内で動くので、キャッシュ・`--parallel`・`rubocop:disable` がそのまま使える
-
-### 17. 変換で生まれる問題は、変換で解決する
-
-- 区切りへの指摘: 変換で書いた文字（タグの終わりに補った `;`、`_ =`、区切りの位置の空白）への指摘だけを捨てる。cop は止めない
-  - → `<% a = 1; b = 2 %>` のようにタグの中に書いた `;` や、`<%= render    partial: … %>` の余分な空白は検出できる
-- HTML が見えないことによる指摘: HTML を識別子として書き込むので、cop は止めない
-  - → 両方の分岐が同じ `if`、本当に空の `if` / `else` は検出できる
-- ファイル全体で除外する cop は 9 個（0.8 系は 65 個）
+- 変換のルールを変えて、ERB の意味を Ruby の上に残す。cop は止めない
+  - `<%=` は `_ =` に → 「出力する」という意味が残る
+  - HTML のタグやテキストは、元の位置に識別子（`div;`、`_a;`）として書き込む → 「本文がある」ことが見える。識別子は位置ごとに別の名前として扱うので、HTML が違う分岐は別の分岐に見える
+  - → 両方の分岐が同じ `if`（`Lint/DuplicateBranch`）、本当に空の `if` / `else`（`Lint/EmptyConditionalBody`、`Style/EmptyElse`）は検出できる
+- 書き込んだ `_ =` や識別子は ERB タグの外にあるので、それへの指摘はスライド 16 と同じく捨てる
 - ノート: 短すぎて識別子を置けないテキスト（`|` 1 文字など）は空白のままなので、本文が HTML の分岐でだけ、この分類の cop を止めている
 
-### 18. ERB 特有の問題は、境界を引いて分担する
+### 18. ERB の書き方・配置への指摘: RuboCop と ERB のツールの境界を引く
 
 - ERB の書き方と配置への指摘は、変換をどう工夫しても残る（ERB と Ruby の書き方の違い、RuboCop と ERB のツールの役割の違い）
-- 誤りになる**その行だけ**で cop を止める
-  - タグに跨がるブロックの `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`
-  - タグに跨がる `<% end %>` や本文の `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中の Ruby の配置は検査する
-- ERB の書き方や HTML の構造は、ERB のツール（herb-lint / herb-format）に任せる
+- 境界: 1 つの ERB タグの中の Ruby は RuboCop、ERB の書き方と HTML の構造は ERB のツール（herb-lint / herb-format）
+- RuboCop の側では、ERB と食い違う**その行だけ**で cop を止める
+  - ERB の書き方: タグに跨がるブロックの `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`
+  - 配置: タグに跨がる `<% end %>` や本文の `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中の Ruby の配置は検査する
+- ERB のツールの側は herb-lint に任せる
   - `Herb/Linting` cop が herb-lint の結果を RuboCop の offense として報告する
   - `rubocop` 1 つで、Ruby の lint と HTML / ERB の lint が並ぶ。設定は `.rubocop.yml`、`.herb.yml` や `herb:disable` もそのまま効く
-- 図: 1 つの ERB の、タグの中の Ruby は RuboCop、HTML と ERB の構造は herb-lint、という境界
+- 図: 1 つの ERB の、タグの中の Ruby は RuboCop、ERB の書き方と HTML の構造は herb-lint、という境界
 - ノート: HTML のルールを自前で作り直さず、活発に開発されている herb-lint に任せるのがポイント
 
 ### 19. Before / After（rubocop-erb 0.8 系と並べる）
