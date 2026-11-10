@@ -16,7 +16,7 @@
 - 文書全体方式の例は、リリース済みで誰でも使える rubocop-erb 0.8 系にする。Herb 本家の PR（marcoroth/herb#2260）は 1 行だけ触れる
 - 0.8 系の扱いは批判ではなく構造の話にする。「`<%=` と HTML の意味がない Ruby では cop が区別できないので、誤検知を出すか、除外して見逃すしかない」。0.8 系の PR 自身が「除外した cop は ERB の文脈を理解させる PR で今後有効に戻す」としているので、その先を試したのが tk0miya-rubocop-herb、とつなげる
 - 既存ツールの問題は、どれも検証用 ERB（`research/repro/cases/`）か実際のビュー（rails/rails、kaigionrails/conference-app の 333 ファイル）で実測したものだけを見せる
-- 「すべての問題を解決した」とは言わない。変換で生まれる問題は変換で解決し、ERB 特有の問題は RuboCop と ERB のツールの境界を引いて分担する、と 2 段で話す。herb-lint / herb-format の修正は検査しないので、そのバグ（`erb-comment-syntax` が複数行のタグのコードをコメントにする）もそのまま適用される（[comparison.md](../research/comparison.md#発表に向けて)）
+- 「すべての問題を解決した」とは言わない。変換で生まれる問題は変換で解決し、ERB 特有の問題は ERB の構文で決まる部分を検査の対象から外す（書き手が 1 つのタグの中に書いたコードだけを検査する）、と 2 段で話す。herb-lint / herb-format との統合は、4 つの問題とは別のプラスアルファとして話す。herb-lint / herb-format の修正は検査しないので、そのバグ（`erb-comment-syntax` が複数行のタグのコードをコメントにする）もそのまま適用される（[comparison.md](../research/comparison.md#発表に向けて)）
 
 ## 時間配分
 
@@ -25,11 +25,11 @@
 | 0. 導入 | 2 | 0:45 |
 | 1. タグ単位の lint は不完全だった | 4 | 2:15 |
 | 2. 文書全体へ | 2 | 1:30 |
-| 3. それでも残る 4 つの問題 | 6 | 3:45 |
-| 4. tk0miya-rubocop-herb | 5 | 3:45 |
-| 5. autocorrect の歩み | 2 | 1:30 |
+| 3. それでも残る 4 つの問題 | 6 | 3:30 |
+| 4. tk0miya-rubocop-herb | 6 | 4:15 |
+| 5. autocorrect の歩み | 2 | 1:15 |
 | 6. 現状とまとめ | 2 | 1:15 |
-| 合計 | 23 | 14:45 |
+| 合計 | 24 | 14:45 |
 
 ## 0. 導入（0:45）
 
@@ -122,7 +122,7 @@
   - `end` の抜けに `Lint/Syntax`
 - → 「改善は進んでいる」
 
-## 3. それでも残る 4 つの問題（3:45）
+## 3. それでも残る 4 つの問題（3:30）
 
 ### 9. 空白にした Ruby では、cop が ERB を区別できない
 
@@ -237,7 +237,7 @@
 - 出典: [comparison.md 4.2 節、4.3 節、5.2 節](../research/comparison.md#4-文書全体を-1-本の-ruby-にする方式)
 - ノート: Herb 本家の PR は Draft。除外の一覧はレビューで変わりうる
 
-## 4. tk0miya-rubocop-herb（3:45）
+## 4. tk0miya-rubocop-herb（4:15）
 
 ### 15. 文書全体方式の精度を上げる
 
@@ -248,17 +248,18 @@
 
 | 問題 | アプローチ | スライド |
 |---|---|---|
-| 区切りへの指摘 | ERB タグの外への指摘を捨てる | 16 |
+| 区切りへの指摘 | 変換で書いた文字への指摘を捨てる | 16 |
 | HTML が見えないことによる指摘 | `<%=` と HTML を Ruby に残す | 17 |
-| ERB の書き方に合わない指摘 | RuboCop と ERB のツールの境界を引く | 18 |
-| 配置への指摘 | RuboCop と ERB のツールの境界を引く | 18 |
+| ERB の書き方に合わない指摘 | タグの中に書いたコードだけを検査する | 18 |
+| 配置への指摘 | タグの中に書いたコードだけを検査する | 18 |
 
 - 前半 2 つは、変換で生まれる問題なので、変換の側で直す。cop は止めない
-- 後半 2 つは、変換では直らないので、RuboCop と ERB のツールの境界を引く
+- 後半 2 つは、変換では直らないので、ERB の構文で形が決まる部分（タグに跨がる構造）では cop を止め、書き手が 1 つのタグの中に書いたコードは検査を続ける
+- 4 つに共通する考え方: 書き手が書いたものだけを指摘する
 - その結果、ファイル全体で除外する cop は 9 個（0.8 系は 65 個）
 - ノート: ファイル全体を 1 fragment（`offset: 0`）にして、ruby_extractors API の「連続した 1 区間」の制約を回避している。同じプロセス内で動くので、キャッシュ・`--parallel`・`rubocop:disable` がそのまま使える
 
-### 16. 区切りへの指摘: ERB タグの外への指摘を捨てる
+### 16. 区切りへの指摘: 変換で書いた文字への指摘を捨てる
 
 ```erb
 <div class="<% if admin? %>admin<% end %>">
@@ -271,7 +272,7 @@ div;           if admin?;          end;
 ```
 
 - 変換では、文を区切るために、ERB タグの外（タグの終わり）に `;` を書く
-- ERB タグの外への指摘は、書き手が書いていない文字への指摘なので捨てる。cop は止めない
+- 変換で書いた文字への指摘は、書き手が書いていない文字への指摘なので捨てる。cop は止めない
   - → 上の ERB に `Style/IfWithSemicolon` は出ない
   - → `<% a = 1; b = 2 %>` のようにタグの中に書いた `;` や、`<%= render    partial: … %>` の余分な空白は検出できる
 - 変換結果は rubocop-herb `4cbe906` の `bin/erb2ruby` の出力（行末の空白は省略。スライド 17 も同じ）
@@ -303,21 +304,21 @@ div;
   - `<%=` は `_ =` に → 「出力する」という意味が残る
   - HTML のタグやテキストは、元の位置に識別子（`div;`、`_a;`）として書き込む → 「本文がある」ことが見える。識別子は位置ごとに別の名前として扱うので、HTML が違う分岐は別の分岐に見える
   - → 両方の分岐が同じ `if`（`Lint/DuplicateBranch`）、本当に空の `if` / `else`（`Lint/EmptyConditionalBody`、`Style/EmptyElse`）は検出できる
-- 書き込んだ `_ =` や識別子は ERB タグの外にあるので、それへの指摘はスライド 16 と同じく捨てる
+- 書き込んだ `_ =` や識別子も変換で書いた文字なので、それへの指摘はスライド 16 と同じく捨てる
 - ノート: 短すぎて識別子を置けないテキスト（`|` 1 文字など）は空白のままなので、本文が HTML の分岐でだけ、この分類の cop を止めている
 
-### 18. ERB の書き方・配置への指摘: RuboCop と ERB のツールの境界を引く
+### 18. ERB の書き方・配置への指摘: タグの中に書いたコードだけを検査する
 
-- ERB の書き方と配置への指摘は、変換をどう工夫しても残る（ERB と Ruby の書き方の違い、RuboCop と ERB のツールの役割の違い）
-- 境界: 1 つの ERB タグの中の Ruby は RuboCop、ERB の書き方と HTML の構造は ERB のツール（herb-lint / herb-format）
-- RuboCop の側では、ERB と食い違う**その行だけ**で cop を止める
-  - ERB の書き方: タグに跨がるブロックの `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`
-  - 配置: タグに跨がる `<% end %>` や本文の `Layout/EndAlignment`、`Layout/IndentationWidth` など → 1 つのタグの中の Ruby の配置は検査する
-- ERB のツールの側は herb-lint に任せる
-  - `Herb/Linting` cop が herb-lint の結果を RuboCop の offense として報告する
-  - `rubocop` 1 つで、Ruby の lint と HTML / ERB の lint が並ぶ。設定は `.rubocop.yml`、`.herb.yml` や `herb:disable` もそのまま効く
-- 図: 1 つの ERB の、タグの中の Ruby は RuboCop、ERB の書き方と HTML の構造は herb-lint、という境界
-- ノート: HTML のルールを自前で作り直さず、活発に開発されている herb-lint に任せるのがポイント
+- ERB の書き方と配置への指摘は、変換をどう工夫しても残る。形が ERB の構文（タグに跨がる構造、開始タグの幅、HTML の入れ子）で決まるから
+- そこで、タグに跨がる構造では、その行だけで cop を止める。1 つのタグの中に書いたコードは検査を続ける
+
+| 問題 | 止める（ERB の構文で決まる） | 検査を続ける（書き手が書いた） |
+|---|---|---|
+| ERB の書き方 | `<%= link_to(path) do %>Profile<% end %>` の `Style/BlockDelimiters`、`Style/SingleLineDoEndBlock` | `<% items.each do \|i\| foo(i) end %>` には両方出る |
+| 配置 | `<%= form_with … do \|f\| %>` 〜 `<% end %>` の `Layout/BlockAlignment`、タグに跨がる本文の `Layout/IndentationWidth` | 1 つのタグの中の Ruby の配置（複数行の `link_to` の引数の揃えなど） |
+
+- 問題を解決したのではなく、ERB 特有の部分を検査の対象から外した。ただし、止める範囲は ERB の構文で決まる部分だけなので、Layout の cop を 37 個まとめて除外する 0.8 系より、見逃しが少ない
+- 出典: [tk0miya-rubocop-herb.md 5.2 節、5.3 節](../research/tk0miya-rubocop-herb.md#5-erb-で止めている-cop出典)
 
 ### 19. Before / After（rubocop-erb 0.8 系と並べる）
 
@@ -344,9 +345,21 @@ div;
 - デモ: 1 つの ERB に 0.8 系と tk0miya-rubocop-herb をかけて並べる（録画にしておく）
 - 出典: [comparison.md 5.2 節、5.4 節](../research/comparison.md#5-同じ入力での比較)
 
-## 5. autocorrect の歩み（1:30）
+### 20. rubocop をフロントエンドに、HTML + ERB の検査と整形も統合する
 
-### 20. タグ単位 → 文書全体 → 修正後の ERB の検査
+- 4 つの問題とは別に、RuboCop が扱わない HTML + ERB 特有の問題も、同じ `rubocop` で扱える
+  - `Herb/Linting` cop: herb-lint の結果を RuboCop の offense として報告する。`rubocop -a` / `-A` で herb-lint の修正も適用する
+    - 例: `<div><span></div>` → `E: Herb/Linting: [parser-no-errors] Opening tag <span> at (1:6) doesn't have a matching closing tag </span> in the same scope. (MISSING_CLOSING_TAG_ERROR)`
+  - `Herb/Formatting` cop: `.herb.yml` で formatter を有効にすると、herb-format の整形を `rubocop -A` で行う
+- 設定は `.rubocop.yml` と `.herb.yml`、実行は `rubocop` だけ。`.herb.yml` や `herb:disable` もそのまま効く
+- Ruby の lint（RuboCop）、HTML + ERB の lint（herb-lint）、整形（herb-format）が、`rubocop` 1 つの実行と 1 つの出力にまとまる → タイトルの "Unified Ecosystem"
+- 図: 1 つの ERB が、Ruby は RuboCop、HTML + ERB は herb-lint / herb-format に分かれ、`rubocop` の 1 つの出力に合流する
+- ノート: HTML + ERB のルールを自前で作り直さず、活発に開発されている herb-lint / herb-format に任せるのがポイント
+- 出典: [tk0miya-rubocop-herb.md 7 章](../research/tk0miya-rubocop-herb.md#7-tk0miya-rubocop-herb-の-cop)
+
+## 5. autocorrect の歩み（1:15）
+
+### 21. タグ単位 → 文書全体 → 修正後の ERB の検査
 
 | 時代 | autocorrect |
 |---|---|
@@ -356,7 +369,7 @@ div;
 
 - 出典: [comparison.md 5.3 節](../research/comparison.md#53-autocorrect実測)
 
-### 21. 修正後の ERB を検査する
+### 22. 修正後の ERB を検査する
 
 - 問題: Ruby では空白でも、ERB では区切りや HTML の部分を corrector が書き換える
   - 例: `Lint/Void` が `<% 1 %>` の `1` を左の空白ごと消す → `<% ` も消え、` %>` だけが残る
@@ -366,27 +379,27 @@ div;
 
 ## 6. 現状とまとめ（1:15）
 
-### 22. 現状と今後
+### 23. 現状と今後
 
 - できていること: RuboCop の cop の autocorrect は、検証用 ERB でも実際のビュー 333 ファイルでもテンプレートを壊さなかった
 - 既知の問題: `Herb/Linting` が適用する herb-lint の修正は検査しない。`erb-comment-syntax` の修正が複数行のタグのコードをコメントにするバグも、`rubocop -a` で適用される
-- 制約: herb-lint は TypeScript（Node.js）製なので、`Herb/Linting` cop が Node.js の子プロセスで herb-lint を起動する。Node.js と `@herb-tools/linter` が必要
-- 今後: Herb の linter / formatter を Rust で書き直す計画がある（動くプロトタイプあり、未リリース）。実現すれば、子プロセスを介さずに herb-lint のルールを呼べ、Node.js も要らなくなる
+- 制約: herb-lint / herb-format は TypeScript（Node.js）製なので、`Herb/Linting` / `Herb/Formatting` cop が Node.js の子プロセスで起動する。Node.js と `@herb-tools/linter`（整形には `@herb-tools/formatter`）が必要
+- 今後: Herb の linter / formatter を Rust で書き直す計画がある（動くプロトタイプあり、未リリース）。実現すれば、子プロセスを介さずに herb-lint / herb-format を呼べ、Node.js も要らなくなる
 - 出典: [v0.9 のリリース記事](https://herb-tools.dev/blog/whats-new-in-herb-v0-9)、[herb#1239 のコメント](https://github.com/marcoroth/herb/issues/1239#issuecomment-4013290572)
 - ノート: 「構想」ではなく「プロトタイプがある段階」と言える。リリース時期は表明されていないので言わない
 
-### 23. まとめ
+### 24. まとめ
 
 - タグ単位の lint は、文脈を失うので見逃し・誤検知・壊れる autocorrect が起きていた
 - 文書全体方式への移行で、タグを跨いで検査できるようになった（rubocop-erb 0.8 系）
 - それでも `<%=` と HTML の意味が消えるため、誤検知か見逃しの二択が残る
-- tk0miya-rubocop-herb は、ERB の意味を Ruby に残し、RuboCop と ERB のツールの境界を引くことで、その先を試している
+- tk0miya-rubocop-herb は、ERB の意味を Ruby に残し、書き手が書いたコードだけを検査することで、その先を試している
+- さらに、`rubocop` をフロントエンドに、Ruby の lint、HTML + ERB の lint と整形を 1 つにまとめる
 - 今こそ、ERB でもモダンな開発を
 - リポジトリの URL
 
 ## 発表までに決めること・確かめること
 
 - **プロポーザルとの差**: プロポーザルは「フォーマット」「Ruby LSP」「Steep」を実演すると書いているが、トークは lint を主軸にする。フォーマット・LSP・Steep を付け足すかは、構成の分量と時間の余裕を見て決める。プロポーザルの成果物に挙げた herb-tools-ruby は、Rust 版 Herb の計画を受けて開発を止めたので扱わない
-- **スライド 18 の herb-lint の裏付け**: 「ERB の書き方は herb-lint に任せる」と言うので、対応するルール（`erb-prefer-do-end-blocks` など）を具体的に 1 つ見せられるようにする。HTML の構造に従う配置も、herb-lint / herb-format でどこまで検査できるかを確かめる
 - **gem 名**: rubygems に Marco Roth 氏の `rubocop-herb` 0.0.1 があり衝突している。まとめで「インストールしてください」と言うなら、公開名を決めておく
 - **デモ**: ライブか録画か。15 分ならスライド 19 の Before / After を録画で見せるのが安全
