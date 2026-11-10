@@ -383,10 +383,13 @@ div;
 
 ## 7. 現状とまとめ（1:15）
 
-### 23. 現状と今後
+### 23. 現状と課題
 
 - できていること: RuboCop の cop の autocorrect は、検証用 ERB でも実際のビュー 333 ファイルでもテンプレートを壊さなかった
-- 既知の問題: `Herb/Linting` が適用する herb-lint の修正は検査しない。`erb-comment-syntax` の修正が複数行のタグのコードをコメントにするバグも、`rubocop -a` で適用される
+- 課題
+  - 問題ごとに細かく対策を実装しているので、RuboCop と密結合になっている。変換で書いた文字への指摘を捨てる cop が 22 個、行単位で止める cop が 20 個あり、どれも cop ごとの誤検知の形に合わせている。RuboCop の更新や新しい cop のたびに追従が要る
+  - 短いテキスト（おおむね 3 文字以下）には識別子を置けず、空白のままになる。そこでは空白にする方式と同じ誤検知が出る。例: `<% if user %>`⏎`  |<% user.touch %>`⏎`<% end %>` の `|` が見えず、`Style/SafeNavigation`（`&.` にせよ）が出る（`cases/marker/safe_navigation_short`）
+  - `Herb/Linting` が適用する herb-lint の修正は検査しない。`erb-comment-syntax` の修正が複数行のタグのコードをコメントにするバグも、`rubocop -a` で適用される
 - 制約: herb-lint / herb-format は TypeScript（Node.js）製なので、`Herb/Linting` / `Herb/Formatting` cop が Node.js の子プロセスで起動する。Node.js と `@herb-tools/linter`（整形には `@herb-tools/formatter`）が必要
 - 今後: Herb の linter / formatter を Rust で書き直す計画がある（動くプロトタイプあり、未リリース）。実現すれば、子プロセスを介さずに herb-lint / herb-format を呼べ、Node.js も要らなくなる
 - 出典: [v0.9 のリリース記事](https://herb-tools.dev/blog/whats-new-in-herb-v0-9)、[herb#1239 のコメント](https://github.com/marcoroth/herb/issues/1239#issuecomment-4013290572)
