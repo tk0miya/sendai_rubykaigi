@@ -12,7 +12,7 @@
   1. これまでのツール（タグ単位）は不完全だった
   2. 改善が進んでいる（文書全体方式への移行）
   3. tk0miya-rubocop-herb は、残る問題への解決策の萌芽
-- 流れ: タグ単位 → 文書全体（rubocop-erb 0.8 系）→ それでも残る 4 つの問題 → tk0miya-rubocop-herb の対策 → autocorrect の歩み → 現状
+- 流れ: タグ単位 → 文書全体（rubocop-erb 0.8 系）→ それでも残る 4 つの問題 → tk0miya-rubocop-herb の対策（ここまでが Ruby パートの lint の精度の話）→ ERB ファイル全体へ（herb-lint / herb-format との統合）→ autocorrect の歩み → 現状
 - 文書全体方式の例は、リリース済みで誰でも使える rubocop-erb 0.8 系にする。Herb 本家の PR（marcoroth/herb#2260）は 1 行だけ触れる
 - 0.8 系の扱いは批判ではなく構造の話にする。「`<%=` と HTML の意味がない Ruby では cop が区別できないので、誤検知を出すか、除外して見逃すしかない」。0.8 系の PR 自身が「除外した cop は ERB の文脈を理解させる PR で今後有効に戻す」としているので、その先を試したのが tk0miya-rubocop-herb、とつなげる
 - 既存ツールの問題は、どれも検証用 ERB（`research/repro/cases/`）か実際のビュー（rails/rails、kaigionrails/conference-app の 333 ファイル）で実測したものだけを見せる
@@ -26,9 +26,10 @@
 | 1. タグ単位の lint は不完全だった | 4 | 2:15 |
 | 2. 文書全体へ | 2 | 1:30 |
 | 3. それでも残る 4 つの問題 | 6 | 3:30 |
-| 4. tk0miya-rubocop-herb | 6 | 4:15 |
-| 5. autocorrect の歩み | 2 | 1:15 |
-| 6. 現状とまとめ | 2 | 1:15 |
+| 4. tk0miya-rubocop-herb: Ruby パートの lint の精度を上げる | 5 | 3:30 |
+| 5. Ruby パートから ERB ファイル全体へ | 1 | 0:45 |
+| 6. autocorrect の歩み | 2 | 1:15 |
+| 7. 現状とまとめ | 2 | 1:15 |
 | 合計 | 24 | 14:45 |
 
 ## 0. 導入（0:45）
@@ -237,7 +238,7 @@
 - 出典: [comparison.md 4.2 節、4.3 節、5.2 節](../research/comparison.md#4-文書全体を-1-本の-ruby-にする方式)
 - ノート: Herb 本家の PR は Draft。除外の一覧はレビューで変わりうる
 
-## 4. tk0miya-rubocop-herb（4:15）
+## 4. tk0miya-rubocop-herb: Ruby パートの lint の精度を上げる（3:30）
 
 ### 15. 文書全体方式の精度を上げる
 
@@ -345,9 +346,12 @@ div;
 - デモ: 1 つの ERB に 0.8 系と tk0miya-rubocop-herb をかけて並べる（録画にしておく）
 - 出典: [comparison.md 5.2 節、5.4 節](../research/comparison.md#5-同じ入力での比較)
 
+## 5. Ruby パートから ERB ファイル全体へ（0:45）
+
 ### 20. rubocop をフロントエンドに、HTML + ERB の検査と整形も統合する
 
-- 4 つの問題とは別に、RuboCop が扱わない HTML + ERB 特有の問題も、同じ `rubocop` で扱える
+- ここまでは、ERB の Ruby パートの lint の精度の話。ここからは ERB ファイル全体の話
+- RuboCop が扱わない HTML + ERB 特有の問題も、同じ `rubocop` で扱える
   - `Herb/Linting` cop: herb-lint の結果を RuboCop の offense として報告する。`rubocop -a` / `-A` で herb-lint の修正も適用する
     - 例: `<div><span></div>` → `E: Herb/Linting: [parser-no-errors] Opening tag <span> at (1:6) doesn't have a matching closing tag </span> in the same scope. (MISSING_CLOSING_TAG_ERROR)`
   - `Herb/Formatting` cop: `.herb.yml` で formatter を有効にすると、herb-format の整形を `rubocop -A` で行う
@@ -357,7 +361,7 @@ div;
 - ノート: HTML + ERB のルールを自前で作り直さず、活発に開発されている herb-lint / herb-format に任せるのがポイント
 - 出典: [tk0miya-rubocop-herb.md 7 章](../research/tk0miya-rubocop-herb.md#7-tk0miya-rubocop-herb-の-cop)
 
-## 5. autocorrect の歩み（1:15）
+## 6. autocorrect の歩み（1:15）
 
 ### 21. タグ単位 → 文書全体 → 修正後の ERB の検査
 
@@ -377,7 +381,7 @@ div;
 - cop を個別に除外しなくても、未知の cop の壊れ方も止められる
 - 確実でない修正はせず、指摘だけ残す（誤検知ゼロを最優先）
 
-## 6. 現状とまとめ（1:15）
+## 7. 現状とまとめ（1:15）
 
 ### 23. 現状と今後
 
