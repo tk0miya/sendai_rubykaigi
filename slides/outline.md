@@ -51,11 +51,12 @@
 ```erb
 <% if foo == nil %>
   <p>yes</p>
+<% else %>
 <% end %>
 ```
 
 - erb_lint（推奨設定）: 0 件
-- 同じ内容の `.rb`: `Style/NilComparison`
+- 同じ内容の `.rb`: `Style/NilComparison`、`Style/EmptyElse`
 - ノート: 「ERB の Ruby は、思ったほど lint されていない」と問いかける
 
 ### 4. よく使われている ERB の linter
@@ -78,7 +79,8 @@
 
 | ERB | 結果 |
 |---|---|
-| `<% if foo == nil %>` / `<% if !user.nil? %>` | 見逃す（タグを跨ぐ `if` の条件式が検査されない） |
+| `<% if foo == nil %>` | erb_lint は見逃す（タグを跨ぐ `if` の条件式が検査されない） |
+| `<% if !user.nil? %>` | erb_lint、rubocop-erb 0.7 系とも見逃す（`Style/NegatedIf`） |
 | `<% total = items.sum(&:price) %>` + `<%= total %>` | `Lint/UselessAssignment`（誤検知） |
 | `<%= "hello" %>` | `Style/FrozenStringLiteralComment` がタグごとに出る |
 | `end` の抜け | `Lint/Syntax` を除外しているので気づけない（rubocop-erb 0.7 系） |
