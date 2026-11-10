@@ -8,6 +8,12 @@ cases/comment/ruby_comment.html.erb:1:6: C: Style/CommentAnnotation: Annotation 
 cases/comment/ruby_comment.html.erb:1:10: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/comment/ruby_comment.html.erb:2:5: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/comment/ruby_comment.html.erb:2:8: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/attr_if.html.erb:1:16: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/attr_if.html.erb:1:16: C: [Correctable] Style/IfWithSemicolon: Do not use `if admin?;` - use a ternary operator instead.
+cases/control_flow/attr_if.html.erb:1:25: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/attr_if.html.erb:1:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/attr_if.html.erb:1:40: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/attr_if.html.erb:2:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/control_flow/case_when.html.erb:1:4: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/case_when.html.erb:1:15: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/control_flow/case_when.html.erb:2:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
@@ -81,6 +87,13 @@ cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Pr
 cases/control_flow/single_line_block.html.erb:1:24: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
 cases/control_flow/single_line_block.html.erb:1:26: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_block.html.erb:1:52: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/control_flow/single_line_link_to.html.erb:1:5: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/single_line_link_to.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_link_to.html.erb:1:5: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/single_line_link_to.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_link_to.html.erb:1:32: C: [Correctable] Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/control_flow/single_line_link_to.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_link_to.html.erb:1:49: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/control_flow/trim.html.erb:1:5: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/trim.html.erb:1:25: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/control_flow/trim.html.erb:2:11: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
@@ -468,6 +481,14 @@ cases/style/empty_lines.html.erb:4:1: C: [Correctable] Layout/EmptyLines: Extra 
 cases/style/empty_lines.html.erb:5:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/empty_lines.html.erb:6:5: C: [Correctable] Layout/IndentationConsistency: Inconsistent indentation detected.
 cases/style/empty_lines.html.erb:6:6: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/html_nesting.html.erb:1:4: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/html_nesting.html.erb:1:4: C: [Correctable] Style/IfUnlessModifier: Favor modifier `if` usage when having a single-line body. Another good alternative is the usage of control flow `&&`/`||`.
+cases/style/html_nesting.html.erb:1:12: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/html_nesting.html.erb:2:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:23: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/html_nesting.html.erb:4:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/style/html_nesting.html.erb:5:7: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/multiline_tag.html.erb:1:1: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/multiline_tag.html.erb:2:3: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/style/multiline_tag.html.erb:2:3: C: [Correctable] Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.

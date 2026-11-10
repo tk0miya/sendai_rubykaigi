@@ -2,6 +2,9 @@ cases/comment/commented_out_end.html.erb:1:4: F: Lint/Syntax: expected an `end` 
 cases/comment/commented_out_end.html.erb:1:55: F: Lint/Syntax: unexpected end-of-input, assuming it is closing the parent top level context (Using Ruby 3.4 parser; configure using `TargetRubyVersion` parameter, under `AllCops`)
 cases/comment/commented_out_output.html.erb:1:4: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - `name`.
 cases/comment/ruby_comment.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/attr_if.html.erb:1:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/attr_if.html.erb:1:28: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/attr_if.html.erb:1:39: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/case_when.html.erb:1:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/case_when.html.erb:2:4: W: Lint/EmptyWhen: Avoid `when` branches without a body.
 cases/control_flow/case_when.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
@@ -47,6 +50,12 @@ cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Pr
 cases/control_flow/single_line_block.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_block.html.erb:1:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_block.html.erb:1:51: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_link_to.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_link_to.html.erb:1:5: W: Lint/EmptyBlock: Empty block detected.
+cases/control_flow/single_line_link_to.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_link_to.html.erb:1:32: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_link_to.html.erb:1:35: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_link_to.html.erb:1:48: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/trim.html.erb:1:25: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/trim.html.erb:2:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/trim.html.erb:3:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
@@ -250,6 +259,10 @@ cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:8: C: [Correctable
 cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/style/empty_lines.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/empty_lines.html.erb:4:1: C: [Correctable] Layout/EmptyLines: Extra blank line detected.
+cases/style/html_nesting.html.erb:1:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/style/html_nesting.html.erb:5:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/multiline_tag.html.erb:5:10: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.

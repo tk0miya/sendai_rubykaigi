@@ -32,6 +32,9 @@ cases/control_flow/single_line_block.html.erb:1:0: Style/FrozenStringLiteralComm
 cases/control_flow/single_line_block.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/single_line_block.html.erb:1:10: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/control_flow/single_line_block.html.erb:1:20: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/single_line_link_to.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/single_line_link_to.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/single_line_link_to.html.erb:1:28: Layout/TrailingEmptyLines: Final newline missing.
 cases/control_flow/trim.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/control_flow/trim.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/trim.html.erb:1:14: Layout/TrailingEmptyLines: Final newline missing.
@@ -278,6 +281,10 @@ cases/style/empty_lines.html.erb:1:8: Layout/TrailingEmptyLines: Final newline m
 cases/style/empty_lines.html.erb:6:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/empty_lines.html.erb:6:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/style/empty_lines.html.erb:6:5: Layout/TrailingEmptyLines: Final newline missing.
+cases/style/html_nesting.html.erb:3:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/html_nesting.html.erb:3:8: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/html_nesting.html.erb:3:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:22: Layout/TrailingEmptyLines: Final newline missing.
 cases/style/multiline_tag.html.erb:1:0: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/multiline_tag.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/multiline_tag.html.erb:2:2: Layout/InitialIndentation: Indentation of first line in file detected.

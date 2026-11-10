@@ -10,6 +10,8 @@ cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilCompa
 cases/control_flow/single_line_block.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
 cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_link_to.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_link_to.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
 cases/control_flow/unless_else.html.erb:1:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
 cases/control_flow/unused_block_arg_output.html.erb:1:36: W: [Correctable] Lint/UnusedBlockArgument: Unused block argument - `i`. If it's necessary, use `_` or `_i` as an argument name to indicate that it won't be used.
 cases/erb_comment/after_if.html.erb:2:9: W: Lint/LiteralAsCondition: Literal `'hello'` appeared as a condition.
@@ -52,6 +54,7 @@ cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/Stri
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
 cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.

@@ -37,6 +37,7 @@ cases/rubocop_disable/multiline_tag.html.erb:6:5: C: [Correctable] Style/StringL
 cases/rubocop_disable/ruby_comment_tag.html.erb:1:4: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
 cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
 cases/style/ruby_style.html.erb:1:30: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.

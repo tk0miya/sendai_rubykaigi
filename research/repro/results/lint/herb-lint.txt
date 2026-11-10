@@ -36,6 +36,7 @@ cases/rubocop_disable/ruby_comment_tag.html.erb:1:0: error: [erb-comment-syntax]
 cases/rubocop_disable/ruby_comment_tag.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a"`. Use `a` instead.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"a" # rubocop:disable Style/StringLiterals`. Use `a` instead.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:4: error: [erb-prefer-direct-output] Avoid outputting string literal `"b"`. Use `b` instead.
+cases/style/html_nesting.html.erb:3:15: info: [actionview-prefer-qualified-partial-path] The partial `admin` is looked up relative to the directory of the template rendering it. Moving this template changes which file that resolves to, and renaming the partial means hunting for callers that never spell its full name. Write the full path from the view root so it resolves to the same file from any template, and a search for that path finds every caller.
 cases/syntax/missing_close.html.erb:1:5: error: [parser-no-errors] Opening tag `<span>` at (1:6) doesn't have a matching closing tag `</span>` in the same scope. (`MISSING_CLOSING_TAG_ERROR`)
 cases/syntax/missing_end.html.erb:1:0: error: [parser-no-errors] `<% if %>` started here but never closed with an end tag. The end tag may be in a different scope. (`MISSING_ERB_END_TAG_ERROR`)
 cases/syntax/missing_end.html.erb:1:3: error: [parser-no-errors] conditional_term: expected an `end` to close the conditional clause (`RUBY_PARSE_ERROR`)

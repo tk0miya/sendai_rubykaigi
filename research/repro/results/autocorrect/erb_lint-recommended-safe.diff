@@ -160,6 +160,15 @@
  <%= "a" # rubocop:disable Style/StringLiterals %>
 -<%= "b" %>
 +<%= 'b' %>
+--- cases/style/html_nesting.html.erb
++++ cases/style/html_nesting.html.erb
+@@ -1,5 +1,5 @@
+ <% if admin %>
+   <div class="admin">
+-    <%= render "admin" %>
++    <%= render 'admin' %>
+   </div>
+ <% end %>
 --- cases/style/multiline_tag.html.erb
 +++ cases/style/multiline_tag.html.erb
 @@ -1,5 +1,4 @@
