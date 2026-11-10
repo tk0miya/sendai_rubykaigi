@@ -74,19 +74,18 @@
   - 制御構造（`if` 〜 `end` がタグを跨ぐ）
   - 変数スコープ（前のタグで定義した変数）
   - ファイル（タグ 1 つが 1 ファイル扱い）
-- ノート: erb_lint は README に "parsed and analyzed independently" と明記。不完全な文（`<% if foo %>` など）は黙ってスキップされ、PR #457 によると断片の約 38%。RuboCop の ruby_extractors API は「1 fragment = 元ファイル上の連続した 1 区間」なので、タグを跨ぐ文を 1 つにまとめられない（rubocop-erb#6）
 
-### 6. 見逃しと誤検知
+### 6. 見逃し
 
 | ERB | 結果 |
 |---|---|
 | `<% if foo == nil %>` | erb_lint は見逃す（タグを跨ぐ `if` の条件式が検査されない） |
 | `<% if !user.nil? %>` | erb_lint、rubocop-erb 0.7 系とも見逃す（`Style/NegatedIf`） |
-| `<% total = items.sum(&:price) %>` + `<%= total %>` | `Lint/UselessAssignment`（誤検知） |
-| `<%= "hello" %>` | `Style/FrozenStringLiteralComment` がタグごとに出る |
+| `<% unused = 1 %>`（どこでも使わない変数） | erb_lint、rubocop-erb 0.7 系とも見逃す。前のタグで定義した変数が見えず、使っている変数まで `Lint/UselessAssignment` になるので、この cop を止めている（erb_lint は README が無効化を推奨、0.7 系は除外） |
 | `end` の抜け | `Lint/Syntax` を除外しているので気づけない（rubocop-erb 0.7 系） |
 
-- ノート: erb_lint の README は誤検知になる cop の無効化を推奨。rubocop-erb 0.7 系は 53 個の cop を除外している
+- ノート: 誤検知になる cop を止めるので、その cop が見つけるべき問題も見逃す。rubocop-erb 0.7 系は 53 個の cop を除外している
+- 出典: [comparison.md 3 章、5.1 節](../research/comparison.md#3-タグ単位の方式)（`cases/variables/cross_tag_variables`）
 
 ## 2. 文書全体へ（1:30）
 
@@ -103,7 +102,7 @@
 - スライド 3 の ERB に、0.8 系では `Style/NilComparison` が出る（0 件 → 1 件）。ただし空の `else` の `Style/EmptyElse` は出ない（スライド 11 で回収する）
 - パート 1 の見逃し・誤検知は、0.8 系では起きない
   - `<% if !user.nil? %>` に `Style/NegatedIf` が出る
-  - 前のタグで定義した変数が見えるので、`Lint/UselessAssignment` の誤検知が出ない
+  - 前のタグで定義した変数が見えるので、`Lint/UselessAssignment` を止めずに、本当に使わない `<% unused = 1 %>` を検出する
   - `Lint/Syntax` を除外しない
 - 実際のビュー 333 ファイルで、タグを跨いで読めるようになって新しく見つかる指摘（`Lint/AssignmentInCondition` など）
 - → 「改善は進んでいる」
