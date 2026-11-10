@@ -58,6 +58,7 @@
 - erb_lint（推奨設定）: 0 件
 - 同じ内容の `.rb`: `Style/NilComparison`、`Style/EmptyElse`
 - ノート: 「ERB の Ruby は、思ったほど lint されていない」と問いかける
+- この ERB はトークを通して使う例にする。スライド 8（rubocop-erb 0.8 系）とスライド 17（tk0miya-rubocop-herb）で同じ ERB をもう一度見せ、検出できる指摘が 0 → 1 → 2 件と増えていくことを示す
 
 ### 4. よく使われている ERB の linter
 
@@ -99,8 +100,9 @@
 
 ### 8. タグを跨いで検査できるようになった
 
+- スライド 3 の ERB に、0.8 系では `Style/NilComparison` が出る（0 件 → 1 件）。ただし空の `else` の `Style/EmptyElse` は出ない（スライド 11 で回収する）
 - パート 1 の見逃し・誤検知は、0.8 系では起きない
-  - `<% if foo == nil %>` に `Style/NilComparison` が出る
+  - `<% if !user.nil? %>` に `Style/NegatedIf` が出る
   - 前のタグで定義した変数が見えるので、`Lint/UselessAssignment` の誤検知が出ない
   - `Lint/Syntax` を除外しない
 - 実際のビュー 333 ファイルで、タグを跨いで読めるようになって新しく見つかる指摘（`Lint/AssignmentInCondition` など）
@@ -130,7 +132,7 @@
 ### 11. 変換で生まれる問題 2: HTML が見えないことによる指摘
 
 - HTML を空白にすると、HTML だけの本文が空に見える（`Lint/EmptyConditionalBody`、`Lint/EmptyBlock`、`Style/EmptyElse` など）。`<%=` の値を使わない式と見る（`Lint/Void`、`Style/SymbolProc`）
-- 0.8 系はこれらを除外する → ERB として直すべきものも見逃す
+- 0.8 系はこれらを除外する → ERB として直すべきものも見逃す。スライド 3 の空の `else` に `Style/EmptyElse` が出ないのはこのため
 
 | ERB として正しい | 直すべき（0.8 系は見逃す） |
 |---|---|
@@ -216,6 +218,18 @@ div;
 - ノート: HTML のルールを自前で作り直さず、活発に開発されている herb-lint に任せるのがポイント
 
 ### 17. Before / After（rubocop-erb 0.8 系と並べる）
+
+- まずスライド 3 の ERB をもう一度見せる
+
+| ツール | `Style/NilComparison` | `Style/EmptyElse` |
+|---|---|---|
+| erb_lint（推奨設定） | 出ない | 出ない |
+| rubocop-erb 0.8 系 | 出る | 出ない |
+| tk0miya-rubocop-herb | 出る | 出る |
+| 同じ内容の `.rb` | 出る | 出る |
+
+- → tk0miya-rubocop-herb で、`.rb` と同じ指摘が ERB でも出るようになった
+- ほかの例
 
 | ERB | rubocop-erb 0.8 系 | tk0miya-rubocop-herb |
 |---|---|---|
