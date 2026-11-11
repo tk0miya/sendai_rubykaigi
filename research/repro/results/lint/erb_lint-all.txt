@@ -32,6 +32,15 @@ cases/control_flow/single_line_block.html.erb:1:0: Style/FrozenStringLiteralComm
 cases/control_flow/single_line_block.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/single_line_block.html.erb:1:10: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/control_flow/single_line_block.html.erb:1:20: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/single_line_block_in_tag.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/single_line_block_in_tag.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/single_line_block_in_tag.html.erb:1:4: Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block_in_tag.html.erb:1:29: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block_in_tag.html.erb:1:32: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block_in_tag.html.erb:1:45: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/single_line_link_to.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/single_line_link_to.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/single_line_link_to.html.erb:1:28: Layout/TrailingEmptyLines: Final newline missing.
 cases/control_flow/trim.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/control_flow/trim.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/trim.html.erb:1:14: Layout/TrailingEmptyLines: Final newline missing.
@@ -41,6 +50,12 @@ cases/control_flow/trim.html.erb:2:10: Layout/TrailingEmptyLines: Final newline 
 cases/control_flow/unused_block_arg.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/control_flow/unused_block_arg.html.erb:1:3: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/control_flow/unused_block_arg.html.erb:1:13: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/unused_block_arg_output.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unused_block_arg_output.html.erb:1:3: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unused_block_arg_output.html.erb:1:24: Layout/TrailingEmptyLines: Final newline missing.
+cases/control_flow/unused_block_arg_output.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/control_flow/unused_block_arg_output.html.erb:2:10: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/control_flow/unused_block_arg_output.html.erb:2:19: Layout/TrailingEmptyLines: Final newline missing.
 cases/erb_comment/multiline_tag.html.erb:2:0: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/erb_comment/multiline_tag.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/erb_comment/multiline_tag.html.erb:3:4: Layout/CommentIndentation: Incorrect indentation detected (column 4 instead of 0).
@@ -195,6 +210,11 @@ cases/output/same_line_tags.html.erb:1:4: Layout/InitialIndentation: Indentation
 cases/output/same_line_tags.html.erb:1:5: Layout/TrailingEmptyLines: Final newline missing.
 cases/output/same_line_tags.html.erb:1:12: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/same_line_tags.html.erb:1:13: Layout/TrailingEmptyLines: Final newline missing.
+cases/output/spacing_in_tag.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/spacing_in_tag.html.erb:1:7: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/spacing_in_tag.html.erb:1:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:22: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:33: Layout/TrailingEmptyLines: Final newline missing.
 cases/output/string_literal.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/output/string_literal.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/string_literal.html.erb:1:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
@@ -265,6 +285,13 @@ cases/rubocop_disable/trailing_ruby_comment.html.erb:1:49: Layout/TrailingEmptyL
 cases/rubocop_disable/trailing_ruby_comment.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/rubocop_disable/trailing_ruby_comment.html.erb:2:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/rubocop_disable/trailing_ruby_comment.html.erb:2:5: Layout/TrailingEmptyLines: Final newline missing.
+cases/style/argument_alignment.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/argument_alignment.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/argument_alignment.html.erb:1:12: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:2:6: Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:8: Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:3:20: Layout/TrailingEmptyLines: Final newline missing.
 cases/style/empty_lines.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/empty_lines.html.erb:1:3: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/style/empty_lines.html.erb:1:3: Lint/UselessAssignment: Useless assignment to variable - `a`.
@@ -272,6 +299,10 @@ cases/style/empty_lines.html.erb:1:8: Layout/TrailingEmptyLines: Final newline m
 cases/style/empty_lines.html.erb:6:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/empty_lines.html.erb:6:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/style/empty_lines.html.erb:6:5: Layout/TrailingEmptyLines: Final newline missing.
+cases/style/html_nesting.html.erb:3:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/style/html_nesting.html.erb:3:8: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/style/html_nesting.html.erb:3:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:22: Layout/TrailingEmptyLines: Final newline missing.
 cases/style/multiline_tag.html.erb:1:0: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/style/multiline_tag.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/style/multiline_tag.html.erb:2:2: Layout/InitialIndentation: Indentation of first line in file detected.

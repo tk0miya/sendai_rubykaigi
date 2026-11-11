@@ -210,6 +210,17 @@ tk0miya-rubocop-herb は、ERB で誤検知になる cop を 3 つの方法で�
 | `Layout/EmptyComment` | 複数行の ERB コメントの 1 行目が、空のコメントになる |
 | `Layout/EmptyLines`, `Layout/EmptyLinesAroundArguments`, `Layout/EmptyLinesAroundBeginBody`, `Layout/EmptyLinesAroundBlockBody`, `Layout/EmptyLinesAroundClassBody`, `Layout/EmptyLinesAroundExceptionHandlingKeywords`, `Layout/EmptyLinesAroundMethodBody`, `Layout/EmptyLinesAroundModuleBody` | タグの間の空行（HTML の中の空行は herb-lint の `erb-no-extra-newline` に任せる） |
 
+例えば `<p><%= link_to "Home",  root_path %></p>`（[repro/cases/output/spacing_in_tag.html.erb](repro/cases/output/spacing_in_tag.html.erb)）は `p; _ = link_to "Home",  root_path;  p;  ` になります。この Ruby を `.rb` のファイルとして RuboCop にかけると、`Style/Semicolon`、`Layout/ExtraSpacing`、`Layout/TrailingWhitespace` の指摘が 6 件出ます。tk0miya-rubocop-herb が報告するのは、タグの中に書いた余分な空白への 1 件だけです【実測】。
+
+| 位置 | 変換後の Ruby で反応する文字 | cop | 結果 |
+|---|---|---|---|
+| 1:2 | `<p>` から書いた `p;` の `;` | `Style/Semicolon` | 捨てる |
+| 1:23 | `"Home",  root_path` の余分な空白（タグの中に書いたもの） | `Layout/ExtraSpacing` | 報告する |
+| 1:34 | タグの終わりに補った `;` | `Style/Semicolon` | 捨てる |
+| 1:35 | `%>` の位置の空白 | `Layout/ExtraSpacing` | 捨てる |
+| 1:38 | `</p>` から書いた `p;` の `;` | `Style/Semicolon` | 捨てる |
+| 1:39 | 行末の、`</p>` の位置の空白 | `Layout/TrailingWhitespace` | 捨てる |
+
 1 つのタグの中に書いたコードは、Ruby のファイルと同じく検査されます【実測】。
 
 | ERB | 結果 |
@@ -289,7 +300,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 
 `Lint/Void` は、`CorrectionAdjuster` が切り詰めるので適用されます。`<p>a</p>`⏎`<% 1 %>`⏎`<%= b %>` は `-a` で `<% %>` になり、`Herb/EmptyErbTag` が行ごと消します。`<% 1; foo %>` は `<%; foo %>` になります（出力は変わらない）。
 
-検証用 ERB（74 ファイル）では、`Herb/Linting` を外すと、`-a` で 26 ファイル、`-A` で 31 ファイルが書き換わり、HTML が変わったファイルもパースエラーが増えたファイルも 0 でした。実際のビュー 333 ファイルでは、`-a`、`-A` とも HTML が変わったファイルもパースエラーが増えたファイルも 0 でした（[第 1 部 5.3 節](comparison.md#53-autocorrect実測)）。`Herb/Linting` も含めると HTML が変わるファイルが出ますが、どれも herb-lint の修正によるものです（[7.1 節](#71-herblinting)）。
+検証用 ERB（81 ファイル）では、`Herb/Linting` を外すと、`-a` で 31 ファイル、`-A` で 36 ファイルが書き換わり、HTML が変わったファイルもパースエラーが増えたファイルも 0 でした。実際のビュー 333 ファイルでは、`-a`、`-A` とも HTML が変わったファイルもパースエラーが増えたファイルも 0 でした（[第 1 部 5.3 節](comparison.md#53-autocorrect実測)）。`Herb/Linting` も含めると HTML が変わるファイルが出ますが、どれも herb-lint の修正によるものです（[7.1 節](#71-herblinting)）。
 
 ## 7. tk0miya-rubocop-herb の cop
 

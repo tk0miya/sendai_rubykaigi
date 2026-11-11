@@ -7,7 +7,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 
 | パス | 内容 |
 |---|---|
-| `cases/` | 検証用 ERB（74 ファイル）。[ケースの一覧](#ケースの一覧) |
+| `cases/` | 検証用 ERB（81 ファイル）。[ケースの一覧](#ケースの一覧) |
 | `plain_ruby/` | 比較用の Ruby。`cases/control_flow/` のいくつかのケースと同じ内容を、普通の Ruby として書いたもの |
 | `tools/TOOL/` | ツールごとの `Gemfile` と設定 |
 | `package.json`, `.herb.yml` | herb-lint / herb-format（`@herb-tools/linter`、`@herb-tools/formatter`） |
@@ -169,7 +169,11 @@ $ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.h
 | `cond_assign` | `if` / `else` の各分岐で `<% x = 1 %>` | `Style/ConditionalAssignment` は ERB には合わない |
 | `safe_navigation` | `<% if user && user.admin? %>` | rubocop 1.86.2 以降の rubocop-erb 0.7 系で `user&&.admin?`（構文エラー）になる |
 | `single_line_block` | `<%= cache "fragment" do %>…<% end %>` を 1 行で | HTML を空白にすると `Style/SingleLineDoEndBlock` が出る |
+| `single_line_link_to` | `<%= link_to(user_path(user)) do %>Profile<% end %>` を 1 行で | `Style/SingleLineDoEndBlock` と `Style/BlockDelimiters`（`{ … }` にせよ）が出る。どちらも ERB には合わない |
+| `single_line_block_in_tag` | `<%= link_to(user_path(user)) do "Profile" end %>` | 1 つのタグの中に 1 行で書いた `do … end` には、`Style/SingleLineDoEndBlock` と `Style/BlockDelimiters` が出るか（`single_line_link_to` と対になる） |
+| `attr_if` | `<div class="<% if admin? %>admin<% end %>">` | 区切りに補った `;` に `Style/IfWithSemicolon` が反応する |
 | `unused_block_arg` | `<% items.each do \|i\| %>` の本文が HTML | `i` の未使用（`Lint/UnusedBlockArgument`）。本文を空と見なすと出ない |
+| `unused_block_arg_output` | `<% items.each_with_index do \|item, i\| %>` の本文に出力タグ | `i` の未使用（`Lint/UnusedBlockArgument`）。タグ単位ではブロック全体が見えないので出ない |
 | `form_block` | `<%= form_with … do \|f\| %>` | ブロック付きの出力タグ |
 | `trim` | `<%-` / `-%>` | トリムのあるタグでも位置がずれないか |
 
@@ -189,6 +193,7 @@ $ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.h
 | `link_to_class` | `<%= link_to "x", path, class: 'btn' %>` | erb_lint の autocorrect で `<%=` が消える |
 | `raw_output` | `<%== raw_html %>` | ruumba が `<%= raw raw_html %>` に書き換える |
 | `same_line_tags` | `<%= a %><%= b %>` | 補った `;` への `Style/Semicolon` |
+| `spacing_in_tag` | `<p><%= link_to "Home",  root_path %></p>` | 変換で書いた `;` や空白への指摘を捨て、タグの中に書いた余分な空白（`Layout/ExtraSpacing`）だけを報告するか |
 | `two_tags_line` | `<td><%= user.name %></td><td><%= user.email %></td>` | 同じ行のタグの間の HTML を `Layout/ExtraSpacing` が消す |
 | `one_tag_line` | `<li><%= link_to "a", a_path %></li>` | 行に 1 つだけのタグ |
 | `attr` | 属性値の中のタグ | 属性値の中のタグも位置がずれないか |
@@ -201,6 +206,8 @@ $ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.h
 | `ruby_style` | `<%= link_to( 'Home',root_path ) %>` など | herb-lint はスタイル違反を見ない |
 | `multiline_tag` | `<%`⏎`  x = 1`⏎`  y = 2`⏎`%>` | erb_lint の推奨設定でも、`Layout/LeadingEmptyLines` の修正で `<%` が消える |
 | `empty_lines` | タグの間に空行を含む HTML | HTML の中の空行に `Layout/EmptyLines` が出るか |
+| `argument_alignment` | `<%= link_to "Profile",`⏎`      user_path(user),`⏎`        class: "btn" %>` | 1 つのタグの中の引数の揃えに `Layout/ArgumentAlignment` が出るか（Layout の cop を除外すると見逃す） |
+| `html_nesting` | `<% if admin %>` の中の `<div>` の中に `<%= render "admin" %>` | HTML の入れ子に従うインデントに `Layout/IndentationWidth` が出る |
 
 ### `syntax/`: 構文エラー
 

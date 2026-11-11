@@ -9,6 +9,12 @@
  <% # note %>
 -<%= foo %>
 +<%= foo%>
+--- cases/control_flow/attr_if.html.erb
++++ cases/control_flow/attr_if.html.erb
+@@ -1,2 +1,2 @@
+-<div class="<% if admin? %>admin<% end %>">
++<div class="<% if admin?%> end%>">
+ </div>
 --- cases/control_flow/case_when.html.erb
 +++ cases/control_flow/case_when.html.erb
 @@ -1,6 +1,6 @@
@@ -93,6 +99,20 @@
 +<%= cache 'fragment' do
 + %>This bit is cached<% 
 +end%>
+--- cases/control_flow/single_line_block_in_tag.html.erb
++++ cases/control_flow/single_line_block_in_tag.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do "Profile" end %>
++<%= link_to(user_path(user)) do
++ 'Profile' 
++end%>
+--- cases/control_flow/single_line_link_to.html.erb
++++ cases/control_flow/single_line_link_to.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do %>Profile<% end %>
++<%= link_to(user_path(user)) do
++ %>Profile<% 
++end%>
 --- cases/control_flow/trim.html.erb
 +++ cases/control_flow/trim.html.erb
 @@ -1,3 +1,3 @@
@@ -122,6 +142,15 @@
 +<% items.each do |i|%>
    <li>item</li>
 -<% end %>
++<% end%>
+--- cases/control_flow/unused_block_arg_output.html.erb
++++ cases/control_flow/unused_block_arg_output.html.erb
+@@ -1,3 +1,3 @@
+-<% items.each_with_index do |item, i| %>
+-  <li><%= item.name %></li>
+-<% end %>
++<% items.each_with_index do |item, _i|%>
++  <li><%= item.name%></li>
 +<% end%>
 --- cases/erb_comment/after_if.html.erb
 +++ cases/erb_comment/after_if.html.erb
@@ -474,6 +503,11 @@
 @@ -1 +1 @@
 -<%= a %><%= b %>
 +<%= a%> b%>
+--- cases/output/spacing_in_tag.html.erb
++++ cases/output/spacing_in_tag.html.erb
+@@ -1 +1 @@
+-<p><%= link_to "Home",  root_path %></p>
++<p><%= link_to 'Home', root_path%></p>
 --- cases/output/string_literal.html.erb
 +++ cases/output/string_literal.html.erb
 @@ -1 +1 @@
@@ -537,6 +571,14 @@
 -<%= "b" %>
 + # rubocop:disable Style/StringLiterals %>
 +<%= 'b'%>
+--- cases/style/argument_alignment.html.erb
++++ cases/style/argument_alignment.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to "Profile",
++<%= link_to 'Profile',
+       user_path(user),
+-        class: "btn" %>
++        class: 'btn'%>
 --- cases/style/empty_lines.html.erb
 +++ cases/style/empty_lines.html.erb
 @@ -1,6 +1,5 @@
@@ -547,6 +589,17 @@
  
  </p>
  <%= a %>
+--- cases/style/html_nesting.html.erb
++++ cases/style/html_nesting.html.erb
+@@ -1,5 +1,5 @@
+-<% if admin %>
++<% if admin%>
+   <div class="admin">
+-    <%= render "admin" %>
++    <%= render 'admin'%>
+   </div>
+-<% end %>
++<% end%>
 --- cases/style/multiline_tag.html.erb
 +++ cases/style/multiline_tag.html.erb
 @@ -2,4 +2,4 @@

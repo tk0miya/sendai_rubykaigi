@@ -38,6 +38,27 @@
 +<%= cache 'fragment' do
 + %>This bit is cached<% 
 +end %>
+--- cases/control_flow/single_line_block_in_tag.html.erb
++++ cases/control_flow/single_line_block_in_tag.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do "Profile" end %>
++<%= link_to(user_path(user)) do
++ 'Profile' 
++end %>
+--- cases/control_flow/single_line_link_to.html.erb
++++ cases/control_flow/single_line_link_to.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do %>Profile<% end %>
++<%= link_to(user_path(user)) do
++ %>Profile<% 
++end %>
+--- cases/control_flow/unused_block_arg_output.html.erb
++++ cases/control_flow/unused_block_arg_output.html.erb
+@@ -1,3 +1,3 @@
+-<% items.each_with_index do |item, i| %>
++<% items.each_with_index do |item, _i| %>
+   <li><%= item.name %></li>
+ <% end %>
 --- cases/marker/empty_else_ng.html.erb
 +++ cases/marker/empty_else_ng.html.erb
 @@ -1,4 +1,4 @@
@@ -126,6 +147,11 @@
  <%== raw_html %>
 -<%= "hello" %>
 +<%= 'hello' %>
+--- cases/output/spacing_in_tag.html.erb
++++ cases/output/spacing_in_tag.html.erb
+@@ -1 +1 @@
+-<p><%= link_to "Home",  root_path %></p>
++<p><%= link_to 'Home',  root_path %></p>
 --- cases/output/string_literal.html.erb
 +++ cases/output/string_literal.html.erb
 @@ -1 +1 @@
@@ -157,6 +183,23 @@
  <%= "a" # rubocop:disable Style/StringLiterals %>
 -<%= "b" %>
 +<%= 'b' %>
+--- cases/style/argument_alignment.html.erb
++++ cases/style/argument_alignment.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to "Profile",
++<%= link_to 'Profile',
+       user_path(user),
+-        class: "btn" %>
++        class: 'btn' %>
+--- cases/style/html_nesting.html.erb
++++ cases/style/html_nesting.html.erb
+@@ -1,5 +1,5 @@
+ <% if admin %>
+   <div class="admin">
+-    <%= render "admin" %>
++    <%= render 'admin' %>
+   </div>
+ <% end %>
 --- cases/style/ruby_style.html.erb
 +++ cases/style/ruby_style.html.erb
 @@ -1,3 +1,3 @@

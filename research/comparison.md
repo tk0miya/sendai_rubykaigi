@@ -126,7 +126,7 @@ return unless source.valid_syntax?
 | `<%= "hello" %>`（`cases/output/string_literal`） | `Layout/InitialIndentation`、`Layout/TrailingEmptyLines`、`Style/FrozenStringLiteralComment` が**タグごとに**出る |
 | `<% total = items.sum(&:price) %>` + `<p><%= total %></p>`（`cases/variables/cross_tag_variables`） | `Lint/UselessAssignment` が出る。次のタグで使っているので誤検知 |
 
-`cases/` の 74 ファイルでは、`Style/FrozenStringLiteralComment` が 94 件、`Layout/TrailingEmptyLines` が 89 件、`Layout/InitialIndentation` が 89 件、`Lint/UselessAssignment` が 15 件出ます。
+`cases/` の 81 ファイルでは、`Style/FrozenStringLiteralComment` が 101 件、`Layout/TrailingEmptyLines` が 96 件、`Layout/InitialIndentation` が 96 件、`Lint/UselessAssignment` が 15 件出ます。
 
 README はこれらの cop を無効化するよう推奨しています（InitialIndentation, LineLength, TrailingEmptyLines, TrailingWhitespace, FileName, FrozenStringLiteralComment, UselessAssignment, Rails/OutputSafety）。issue [#126](https://github.com/Shopify/erb_lint/issues/126) ではメンテナが UselessAssignment について「this is normal … Consider disabling this cop」と回答しています。
 
@@ -140,6 +140,7 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 | `<% if !foo.nil? then %>…<% elsif bar == nil %>…<% else %><% end %>`（`cases/control_flow/if_then_elsif_else`） | 0 件 | `Style/MultilineIfThen`, `Style/NilComparison`, `Style/EmptyElse` |
 | `<% unless !x %><% end %>`（同上） | 0 件 | `Style/NegatedUnless`, `Lint/EmptyConditionalBody` |
 | `<% items.each do \|i\| %>…<% end %>`（`i` 未使用。`cases/control_flow/unused_block_arg`） | 0 件 | `Lint/UnusedBlockArgument` |
+| `<% items.each_with_index do \|item, i\| %>`⏎`<li><%= item.name %></li>`⏎`<% end %>`（`i` 未使用。`cases/control_flow/unused_block_arg_output`） | 0 件 | `Lint/UnusedBlockArgument` |
 
 `if` の条件式が検査されない問題は issue [#332](https://github.com/Shopify/erb_lint/issues/332) として報告されています（open）。
 
@@ -153,7 +154,7 @@ README はこれらの cop を無効化するよう推奨しています（Initi
 | 推奨設定 | `<% count = items.size %>`⏎`<p><%= count -1 %></p>` | `<%= count(-1) %>`（前のタグの変数が見えず、メソッド呼び出しと解釈する。rubocop-erb 0.7 系と同じ） |
 
 - `<%=` や `<%` が消え、マジックコメントが HTML 本文に挿入される
-- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える。`cases/` の 74 ファイルでは、推奨設定の `-a` で 6 ファイル（`<%` の直後で改行する複数行のタグと、`<% # … %>` のタグ）の `<%` が消え、全 cop の設定では書き換えた 49 ファイルすべてで HTML が変わる
+- 推奨設定でも、README のリストに入っていない `Layout/LeadingEmptyLines` の修正で `<%` が消える。`cases/` の 81 ファイルでは、推奨設定の `-a` で 6 ファイル（`<%` の直後で改行する複数行のタグと、`<% # … %>` のタグ）の `<%` が消え、全 cop の設定では書き換えた 49 ファイルすべてで HTML が変わる
 - 同系統の issue: [#142](https://github.com/Shopify/erb_lint/issues/142)（2019 年から open）, [#228](https://github.com/Shopify/erb_lint/issues/228), [#326](https://github.com/Shopify/erb_lint/issues/326), [#331](https://github.com/Shopify/erb_lint/issues/331), [#383](https://github.com/Shopify/erb_lint/issues/383), [#461](https://github.com/Shopify/erb_lint/issues/461)。修正 PR [#413](https://github.com/Shopify/erb_lint/pull/413) も open のまま
 
 #### RuboCop 以外の機能【出典】
@@ -204,6 +205,7 @@ r7kamura 氏自身が issue [#6](https://github.com/r7kamura/rubocop-erb/issues/
 |---|---|
 | `<% if !user.nil? %>…<% end %>` | `Style/NegatedIf` が出ない（`if` が削られるため）。削った後の条件式は検査するので、`<% if foo == nil %>` の `Style/NilComparison` は出る |
 | `<% if !foo.nil? then %>` / `<% unless !x %>` | `Style/MultilineIfThen`、`Style/NegatedUnless` が出ない |
+| `<% items.each_with_index do \|item, i\| %>`⏎`<li><%= item.name %></li>`⏎`<% end %>`（`cases/control_flow/unused_block_arg_output`） | `i` の未使用（`Lint/UnusedBlockArgument`）が出ない（`do \|item, i\|` が削られるため） |
 | `<%= items.map do \|i\| %>…<% end.join(", ") %>` | 構文エラーになる断片が黙って無視される |
 | `<% result = if foo %>…<% end %>` | 同上 |
 | `end` の抜け（`cases/syntax/missing_end`） | `Lint/Syntax` を除外しているので出ない |
@@ -262,7 +264,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 **空白で埋めたことによる Layout 系の誤検知**
 
-- `cases/` の 74 ファイルのうち 69 ファイルで、`Layout/TrailingWhitespace` が計 243 件、`Layout/InitialIndentation` が計 65 件出た
+- `cases/` の 81 ファイルのうち 76 ファイルで、`Layout/TrailingWhitespace` が計 257 件、`Layout/InitialIndentation` が計 72 件出た
 - ほかに `Layout/IndentationConsistency`, `Layout/ExtraSpacing`, `Layout/SpaceBeforeSemicolon`, `Layout/BlockAlignment`, `Layout/EndAlignment` なども出る
 - `<%= a %><%= b %>` に補った `;` にも `Style/Semicolon` が出る
 - `<%%= link_to "a", a_path %>`（エスケープしたタグ。中身は Ruby ではない）も正規表現でタグとして取り出すので、`Lint/Syntax` が出る
@@ -270,7 +272,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 **autocorrect が当てにならない**
 
-- 推奨設定のまま `--auto-correct` すると、`cases/` の 74 ファイルで「1122 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
+- 推奨設定のまま `--auto-correct` すると、`cases/` の 81 ファイルで「1197 offenses corrected」と表示されるが、ERB ファイルは 1 つも書き換わらない。Layout 系の修正でマーカー行がずれ、`Parser#replace` が `nil` を返して黙って書き戻しを諦めるため
 - ソースにも "auto-correct is still experimental and can cause invalid ruby to be generated when extracting ruby from ERBs" というコメントがある
 - `--only` で Style 系の cop に絞ると修正は反映される（`--only Style/NilComparison,Style/NegatedIf,Style/StringLiterals` で 19 ファイル）。ただし、関係のない `<%== raw_html %>` が `<%= raw raw_html %>` に書き換わる。解析前の `<%==` → `<%= raw` の置換がそのまま書き戻されるため
 - autocorrect のときはマーカー行を挿入したコードを検査するので、lint のときとは結果が変わる。例えば `Style/SymbolProc` は autocorrect のときには検出されない（ブロックの中身にマーカー行が入るため）
@@ -377,11 +379,11 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 ### 5.1 検証用 ERB での結果【実測】
 
-[repro/cases/](repro/cases/) の 74 ファイルに、各ツールをかけた結果です（`bin/lint TOOL`。結果の全体は [repro/results/lint/](repro/results/lint/)）。tk0miya-rubocop-herb は `Herb/Linting` を外しています。
+[repro/cases/](repro/cases/) の 81 ファイルに、各ツールをかけた結果です（`bin/lint TOOL`。結果の全体は [repro/results/lint/](repro/results/lint/)）。tk0miya-rubocop-herb は `Herb/Linting` を外しています。
 
 | | erb_lint（全 cop） | erb_lint（推奨設定） | rubocop-erb 0.7.2 | ruumba | rubocop-erb 0.8.2 | herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|---|---|---|
-| offense の数 | 335 | 43 | 46 | 518 | 65 | 283 | 87 |
+| offense の数 | 366 | 53 | 54 | 559 | 75 | 310 | 98 |
 
 主なケースの結果です。「誤」は誤検知、「—」は何も出ないことを表します。
 
@@ -391,6 +393,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 | `control_flow/negated_if`（`<% if !user.nil? %>`） | — | — | `Style/NegatedIf`、`Lint/EmptyConditionalBody`（誤） | `Style/NegatedIf` | `Style/NegatedIf` | `Style/NegatedIf` |
 | `control_flow/if_then_elsif_else`（`then`、`elsif bar == nil`、本当に空の `else` と `unless !x`） | — | `Style/NilComparison` だけ | `Style/MultilineIfThen`、`Style/NilComparison`、`Style/NegatedUnless`、`Style/EmptyElse` と、`Lint/EmptyConditionalBody` 3 件（うち 2 件は HTML の本文への誤検知） | `Style/MultilineIfThen`、`Style/NilComparison`、`Style/NegatedUnless`（空の本文は除外） | 0.8.2 と同じ | 0.8.2 の 3 つと、`Style/EmptyElse`、`Lint/EmptyConditionalBody` |
 | `control_flow/unused_block_arg`（`\|i\|` が未使用、本文は HTML） | — | — | `Lint/EmptyBlock`（誤） | — | `Lint/EmptyBlock`（誤） | `Lint/UnusedBlockArgument` |
+| `control_flow/unused_block_arg_output`（`each_with_index` の `\|i\|` が未使用、本文に出力タグ） | — | — | `Lint/UnusedBlockArgument` | `Lint/UnusedBlockArgument` | `Lint/UnusedBlockArgument` | `Lint/UnusedBlockArgument` |
 | `control_flow/case_when`（`when` の本文が HTML） | — | — | `Lint/EmptyWhen`（誤） | — | `Lint/EmptyWhen`（誤） | — |
 | `control_flow/single_line_block`（1 行の `<%= cache … do %>…<% end %>`） | — | — | `Style/SingleLineDoEndBlock` など（誤） | `Style/SingleLineDoEndBlock`、`Style/BlockDelimiters`（誤） | 0.8.2 と同じと `Lint/EmptyBlock`（誤） | — |
 | `control_flow/cond_assign`（各分岐で `<% x = 1 %>`） | — | — | `Style/ConditionalAssignment`（ERB に合わない） | 同左 | 同左 | — |
@@ -406,7 +409,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 | `comment/commented_out_output`（`<% name = user.name # … %><%= name %>`） | — | — | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` | `Lint/UselessAssignment` |
 
 - erb_lint の全 cop の設定では、このほかに `Lint/UselessAssignment` の誤検知と、タグごとの `Style/FrozenStringLiteralComment` などが出る（[3.1 節](#31-erb_lintrubocop-linter)）
-- ruumba は、このほかに Layout 系の誤検知が多数出る（[4.1 節](#41-ruumba)）。herb-rubocop-herb は、ほぼすべての ERB タグに `Layout/ExtraSpacing` が出る（187 件）
+- ruumba は、このほかに Layout 系の誤検知が多数出る（[4.1 節](#41-ruumba)）。herb-rubocop-herb は、ほぼすべての ERB タグに `Layout/ExtraSpacing` が出る（203 件）
 - `comment/commented_out_output` の `Lint/UselessAssignment` は誤検知ではない。ERB はテンプレートを行を保ったまま Ruby にコンパイルするので、行末のコメントは後ろの `<%= name %>` までコメントにし、`name` は本当に使われない。文書全体を変換するツールはどれもこれを再現する。この書き方自体は、herb-lint の `erb-no-trailing-comment` ルール（[marcoroth/herb#2871](https://github.com/marcoroth/herb/pull/2871)。`@herb-tools/linter` 0.11.2 で入った。検証環境の 0.11.1 にはない）が報告する
 - herb-lint（`bin/lint herb-lint`）は RuboCop の cop を実行しないので、`Style/NilComparison` などは出ない。`end` の抜け、未使用の変数とブロック引数、本当に空の分岐は検出する（[4.4 節](#44-herbherb-lint--herb-format)）
 
@@ -468,24 +471,24 @@ herb-rubocop-herb と tk0miya-rubocop-herb で、`Layout/ExtraSpacing` を除い
 
 ### 5.3 autocorrect【実測】
 
-検証用 ERB（74 ファイル）と実際のビュー（333 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる。結果の全体は [repro/results/autocorrect/](repro/results/autocorrect/) と [repro/results/views/](repro/results/views/)）。
+検証用 ERB（81 ファイル）と実際のビュー（333 ファイル）で、`-a` と `-A` の前後を比べた結果です（`bin/autocorrect`。[html_changes.rb](repro/bin/html_changes.rb) で、HTML は空白の違いを無視して比べる。結果の全体は [repro/results/autocorrect/](repro/results/autocorrect/) と [repro/results/views/](repro/results/views/)）。
 
 | | 検証用 ERB: 書き換わった / HTML が変わった / パースエラーが増えた | 実際のビュー: 書き換わった / HTML が変わった / パースエラーが増えた |
 |---|---|---|
-| erb_lint（全 cop）`-a` | 49 / 49 / 49 | — |
-| erb_lint（推奨設定）`-a` | 25 / 6 / 6 | — |
-| rubocop-erb 0.7.2 `-a` | 25 / 0 / 0 | 143 / 0 / 0 |
-| rubocop-erb 0.7.2 `-A` | 27 / 0 / 1 | 143 / 0 / 2 |
+| erb_lint（全 cop）`-a` | 55 / 55 / 55 | — |
+| erb_lint（推奨設定）`-a` | 29 / 6 / 6 | — |
+| rubocop-erb 0.7.2 `-a` | 29 / 0 / 0 | 143 / 0 / 0 |
+| rubocop-erb 0.7.2 `-A` | 31 / 0 / 1 | 143 / 0 / 2 |
 | ruumba `--auto-correct` | 0 / 0 / 0（黙って書き戻さない） | — |
-| rubocop-erb 0.8.2 `-a` | 26 / 0 / 0 | 143 / 0 / 0 |
-| rubocop-erb 0.8.2 `-A` | 26 / 0 / 0 | 145 / 0 / 0 |
-| herb-rubocop-herb `-a` | 67 / 22 / 17 | 251 / 63 / 59 |
-| herb-rubocop-herb `-A` | 67 / 25 / 17 | 251 / 63 / 56 |
-| tk0miya-rubocop-herb `-a` | 31 / 9 / 0 | 140 / 0 / 0 |
-| tk0miya-rubocop-herb `-A` | 37 / 9 / 0 | 142 / 0 / 0 |
+| rubocop-erb 0.8.2 `-a` | 32 / 0 / 0 | 143 / 0 / 0 |
+| rubocop-erb 0.8.2 `-A` | 32 / 0 / 0 | 145 / 0 / 0 |
+| herb-rubocop-herb `-a` | 74 / 23 / 18 | 251 / 63 / 59 |
+| herb-rubocop-herb `-A` | 74 / 26 / 18 | 251 / 63 / 56 |
+| tk0miya-rubocop-herb `-a` | 36 / 9 / 0 | 140 / 0 / 0 |
+| tk0miya-rubocop-herb `-A` | 42 / 9 / 0 | 142 / 0 / 0 |
 
 - rubocop-erb 0.7.2 の `-A` でパースエラーが増えたのは `control_flow/safe_navigation`（`user&&.admin?`）
-- tk0miya-rubocop-herb の検証用 ERB の値は `Herb/Linting` を含み、HTML が変わった 9 ファイルは、どれも herb-lint の修正（`<%= "hello" %>` を `hello` にする `erb-prefer-direct-output` など）によるもの。`Herb/Linting` を外すと `-a` が 26 / 0 / 0、`-A` が 31 / 0 / 0 になる。実際のビューの値は `Herb/Linting` を外したもので、含めると `-a` が 232 / 30 / 0、`-A` が 234 / 30 / 0（herb-lint 単体の `--fix` でも、HTML が変わるのは 30 ファイル）。[第 2 部 7.1 節](tk0miya-rubocop-herb.md#71-herblinting)
+- tk0miya-rubocop-herb の検証用 ERB の値は `Herb/Linting` を含み、HTML が変わった 9 ファイルは、どれも herb-lint の修正（`<%= "hello" %>` を `hello` にする `erb-prefer-direct-output` など）によるもの。`Herb/Linting` を外すと `-a` が 31 / 0 / 0、`-A` が 36 / 0 / 0 になる。実際のビューの値は `Herb/Linting` を外したもので、含めると `-a` が 232 / 30 / 0、`-A` が 234 / 30 / 0（herb-lint 単体の `--fix` でも、HTML が変わるのは 30 ファイル）。[第 2 部 7.1 節](tk0miya-rubocop-herb.md#71-herblinting)
 - `html_changes.rb` は HTML とパースエラーしか見ないので、Ruby の意味が変わる修正（`count(-1)`、出力がなくなる `Style/SymbolProc` など）は数えていない
 
 修正の中身です。

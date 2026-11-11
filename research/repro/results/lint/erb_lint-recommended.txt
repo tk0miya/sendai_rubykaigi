@@ -1,5 +1,8 @@
 cases/comment/ruby_comment.html.erb:1:3: Layout/CommentIndentation: Incorrect indentation detected (column 3 instead of 0).
 cases/control_flow/single_line_block.html.erb:1:10: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block_in_tag.html.erb:1:4: Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block_in_tag.html.erb:1:29: Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block_in_tag.html.erb:1:32: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/erb_comment/multiline_tag.html.erb:3:4: Layout/CommentIndentation: Incorrect indentation detected (column 4 instead of 0).
 cases/erb_comment/multiline_tag.html.erb:3:4: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
 cases/marker/empty_else_ng.html.erb:2:14: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
@@ -19,6 +22,8 @@ cases/output/escaped_tag.html.erb:2:12: Style/StringLiterals: Prefer single-quot
 cases/output/link_to_class.html.erb:1:12: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/one_tag_line.html.erb:1:16: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/raw_output.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:22: Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/string_literal.html.erb:1:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/symbol_proc_map.html.erb:1:13: Style/SymbolProc: Pass `&:name` as an argument to `map` instead of a block.
 cases/rubocop_disable/erb_comment.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
@@ -33,6 +38,11 @@ cases/rubocop_disable/multiline_tag.html.erb:6:4: Style/StringLiterals: Prefer s
 cases/rubocop_disable/ruby_comment_tag.html.erb:1:3: Layout/CommentIndentation: Incorrect indentation detected (column 3 instead of 0).
 cases/rubocop_disable/ruby_comment_tag.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:1:12: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:2:6: Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:8: Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/html_nesting.html.erb:3:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/multiline_tag.html.erb:2:2: Layout/LeadingEmptyLines: Unnecessary blank line at the beginning of the source.
 cases/style/ruby_style.html.erb:1:12: Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:19: Layout/SpaceAfterComma: Space missing after comma.

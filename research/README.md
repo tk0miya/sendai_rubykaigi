@@ -32,7 +32,7 @@
 - rubocop 1.92.1、herb 0.11.1（herb-rubocop-herb だけは gemspec が固定している 0.11.0）、ruby 4.0.5、node v26.9.0
 - rubocop 系の設定は、どれも `NewCops: enable`、`TargetRubyVersion: 3.4`。erb_lint と ruumba は README の推奨設定、tk0miya-rubocop-herb はリポジトリの `config/develop/rubocop.yml`
 - 入力は 2 つ
-  - 検証用 ERB: [repro/cases/](repro/cases/) の 74 ファイル。どのツールも同じファイルにかけた
+  - 検証用 ERB: [repro/cases/](repro/cases/) の 81 ファイル。どのツールも同じファイルにかけた
   - 実際のビュー: rails/rails `0f591639b8` と kaigionrails/conference-app `25a02cc` の `*.html.erb`（333 ファイル）
 
 ## まとめ
