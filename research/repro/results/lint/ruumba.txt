@@ -420,6 +420,10 @@ cases/output/same_line_tags.html.erb:1:6: C: [Correctable] Layout/SpaceBeforeSem
 cases/output/same_line_tags.html.erb:1:7: C: [Correctable] Style/Semicolon: Do not use semicolons to terminate expressions.
 cases/output/same_line_tags.html.erb:1:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/same_line_tags.html.erb:1:15: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+cases/output/spacing_in_tag.html.erb:1:8: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/spacing_in_tag.html.erb:1:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:34: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/output/string_literal.html.erb:1:5: C: [Correctable] Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/string_literal.html.erb:1:12: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.

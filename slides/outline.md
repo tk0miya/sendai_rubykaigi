@@ -263,21 +263,30 @@
 ### 16. 区切りへの指摘: 変換で書いた文字への指摘を捨てる
 
 ```erb
-<div class="<% if admin? %>admin<% end %>">
+<p><%= link_to "Home",  root_path %></p>
 ```
 
-↓
+↓ 変換
 
 ```ruby
-div;           if admin?;          end;
+p; _ = link_to "Home",  root_path;  p;
 ```
 
-- 変換では、文を区切るために、タグの終わり（`%>` の前の空白の位置）に `;` を書く。タグの中身の文字位置は変えないので、`if` も `end` も元の ERB と同じ桁にある
-- 変換で書いた文字への指摘は、書き手が書いていない文字への指摘なので捨てる。cop は止めない
-  - → 上の ERB に `Style/IfWithSemicolon` は出ない
-  - → `<% a = 1; b = 2 %>` のようにタグの中に書いた `;` や、`<%= render    partial: … %>` の余分な空白は検出できる
-- 変換結果は rubocop-herb `4cbe906` の `bin/erb2ruby` の出力（行末の空白は省略。スライド 17 も同じ）
-- 出典: `cases/control_flow/attr_if`
+- RuboCop は、変換後の Ruby に対して指摘を出す。そのうち、変換で書いた文字（HTML から書いた `p;`、タグの終わりの `;`、区切りの位置の空白）への指摘は、書き手が書いていないので捨てる。cop は止めない
+
+| 指摘の位置 | cop | 結果 |
+|---|---|---|
+| HTML の部分: `<p>` から書いた `p;` の `;` | `Style/Semicolon` | 捨てる |
+| ERB タグの中: `"Home",  root_path` の余分な空白 | `Layout/ExtraSpacing` | **報告する** |
+| 境界: タグの終わりに補った `;` | `Style/Semicolon` | 捨てる |
+| 境界: `%>` の位置の空白 | `Layout/ExtraSpacing` | 捨てる |
+| HTML の部分: `</p>` から書いた `p;` の `;` | `Style/Semicolon` | 捨てる |
+| HTML の部分: 行末の、`</p>` の位置の空白 | `Layout/TrailingWhitespace` | 捨てる |
+
+- 6 件のうち、書き手がタグの中に書いた余分な空白への 1 件だけが残る。0.8 系は `Layout/ExtraSpacing` を除外しているので、この 1 件も見逃す
+- 図: ERB と変換後の Ruby を上下に揃え、6 つの指摘の位置を色分けする（捨てる指摘と残る指摘）
+- 変換結果は rubocop-herb `4cbe906` の `bin/erb2ruby` の出力（行末の空白は省略。スライド 17 も同じ）。6 件は、変換後の Ruby を `.rb` のファイルとして RuboCop にかけた結果（`--only Style/Semicolon,Layout/ExtraSpacing,Layout/TrailingWhitespace`）
+- 出典: [tk0miya-rubocop-herb.md 5.2 節](../research/tk0miya-rubocop-herb.md#52-変換で書いた文字への指摘を除く-cop)、`cases/output/spacing_in_tag`
 
 ### 17. HTML が見えないことによる指摘: `<%=` と HTML を Ruby に残す
 

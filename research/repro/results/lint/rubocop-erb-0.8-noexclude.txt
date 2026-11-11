@@ -834,6 +834,14 @@ cases/output/same_line_tags.html.erb:1:9: C: Layout/ExtraSpacing: Unnecessary sp
 cases/output/same_line_tags.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/same_line_tags.html.erb:1:14: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
 cases/output/same_line_tags.html.erb:1:16: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/spacing_in_tag.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/spacing_in_tag.html.erb:1:8: C: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/spacing_in_tag.html.erb:1:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:34: C: Layout/SpaceBeforeSemicolon: Space found before semicolon.
+cases/output/spacing_in_tag.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:36: C: Style/Semicolon: Do not use semicolons to terminate expressions.
+cases/output/spacing_in_tag.html.erb:1:37: C: Layout/TrailingWhitespace: Trailing whitespace detected.
 cases/output/string_literal.html.erb:1:1: C: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/string_literal.html.erb:1:5: C: Layout/InitialIndentation: Indentation of first line in file detected.

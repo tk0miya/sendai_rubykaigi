@@ -46,6 +46,7 @@ cases/output/escaped_tag.html.erb:2:13: C: [Correctable] Style/StringLiterals: P
 cases/output/link_to_class.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/one_tag_line.html.erb:1:17: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/raw_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/erb_comment.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/multiline_range.html.erb:8:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

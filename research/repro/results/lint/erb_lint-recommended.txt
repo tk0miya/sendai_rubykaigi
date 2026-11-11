@@ -19,6 +19,8 @@ cases/output/escaped_tag.html.erb:2:12: Style/StringLiterals: Prefer single-quot
 cases/output/link_to_class.html.erb:1:12: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/one_tag_line.html.erb:1:16: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/raw_output.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:22: Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/string_literal.html.erb:1:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/symbol_proc_map.html.erb:1:13: Style/SymbolProc: Pass `&:name` as an argument to `map` instead of a block.
 cases/rubocop_disable/erb_comment.html.erb:2:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

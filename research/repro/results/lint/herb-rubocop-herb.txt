@@ -231,6 +231,9 @@ cases/output/raw_output.html.erb:2:12: C: [Correctable] Layout/ExtraSpacing: Unn
 cases/output/same_line_tags.html.erb:1:6: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/same_line_tags.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/same_line_tags.html.erb:1:14: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:23: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:34: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/string_literal.html.erb:1:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/output/string_literal.html.erb:1:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/output/symbol_proc_map.html.erb:1:14: C: [Correctable] Style/SymbolProc: Pass `&:name` as an argument to `map` instead of a block.

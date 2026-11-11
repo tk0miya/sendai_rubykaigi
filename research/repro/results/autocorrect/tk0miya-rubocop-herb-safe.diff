@@ -178,6 +178,11 @@
  <%== raw_html %>
 -<%= "hello" %>
 +hello
+--- cases/output/spacing_in_tag.html.erb
++++ cases/output/spacing_in_tag.html.erb
+@@ -1 +1 @@
+-<p><%= link_to "Home",  root_path %></p>
++<p><%= link_to 'Home', root_path %></p>
 --- cases/output/string_literal.html.erb
 +++ cases/output/string_literal.html.erb
 @@ -1 +1 @@

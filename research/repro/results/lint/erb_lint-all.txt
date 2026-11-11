@@ -204,6 +204,11 @@ cases/output/same_line_tags.html.erb:1:4: Layout/InitialIndentation: Indentation
 cases/output/same_line_tags.html.erb:1:5: Layout/TrailingEmptyLines: Final newline missing.
 cases/output/same_line_tags.html.erb:1:12: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/same_line_tags.html.erb:1:13: Layout/TrailingEmptyLines: Final newline missing.
+cases/output/spacing_in_tag.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+cases/output/spacing_in_tag.html.erb:1:7: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/output/spacing_in_tag.html.erb:1:15: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/output/spacing_in_tag.html.erb:1:22: Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/output/spacing_in_tag.html.erb:1:33: Layout/TrailingEmptyLines: Final newline missing.
 cases/output/string_literal.html.erb:1:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/output/string_literal.html.erb:1:4: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/output/string_literal.html.erb:1:4: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.

@@ -7,7 +7,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 
 | パス | 内容 |
 |---|---|
-| `cases/` | 検証用 ERB（78 ファイル）。[ケースの一覧](#ケースの一覧) |
+| `cases/` | 検証用 ERB（79 ファイル）。[ケースの一覧](#ケースの一覧) |
 | `plain_ruby/` | 比較用の Ruby。`cases/control_flow/` のいくつかのケースと同じ内容を、普通の Ruby として書いたもの |
 | `tools/TOOL/` | ツールごとの `Gemfile` と設定 |
 | `package.json`, `.herb.yml` | herb-lint / herb-format（`@herb-tools/linter`、`@herb-tools/formatter`） |
@@ -192,6 +192,7 @@ $ bin/lint tk0miya-rubocop-herb --only Layout/EmptyLines semantics/empty_lines.h
 | `link_to_class` | `<%= link_to "x", path, class: 'btn' %>` | erb_lint の autocorrect で `<%=` が消える |
 | `raw_output` | `<%== raw_html %>` | ruumba が `<%= raw raw_html %>` に書き換える |
 | `same_line_tags` | `<%= a %><%= b %>` | 補った `;` への `Style/Semicolon` |
+| `spacing_in_tag` | `<p><%= link_to "Home",  root_path %></p>` | 変換で書いた `;` や空白への指摘を捨て、タグの中に書いた余分な空白（`Layout/ExtraSpacing`）だけを報告するか |
 | `two_tags_line` | `<td><%= user.name %></td><td><%= user.email %></td>` | 同じ行のタグの間の HTML を `Layout/ExtraSpacing` が消す |
 | `one_tag_line` | `<li><%= link_to "a", a_path %></li>` | 行に 1 つだけのタグ |
 | `attr` | 属性値の中のタグ | 属性値の中のタグも位置がずれないか |

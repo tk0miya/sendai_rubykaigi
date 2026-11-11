@@ -395,6 +395,13 @@
 +# frozen_string_literal: true
 +b
 + %>
+--- cases/output/spacing_in_tag.html.erb
++++ cases/output/spacing_in_tag.html.erb
+@@ -1 +1,3 @@
+-<p><%= link_to "Home",  root_path %></p>
++# frozen_string_literal: true
++link_to 'Home', root_path
++ %></p>
 --- cases/output/string_literal.html.erb
 +++ cases/output/string_literal.html.erb
 @@ -1 +1,3 @@
