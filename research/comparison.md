@@ -223,6 +223,19 @@ r7kamura 氏自身が issue [#6](https://github.com/r7kamura/rubocop-erb/issues/
 
 ## 4. 文書全体を 1 本の Ruby にする方式
 
+### RuboCop の ruby_extractors と `offset: 0`【出典】
+
+rubocop-erb 0.8 系、herb-rubocop-herb、tk0miya-rubocop-herb は、いずれも ruby_extractors API でファイル全体を 1 つの fragment（`offset: 0`）として返します。ruby_extractors API はもともとタグごとのコード片を `offset` 付きで返す使い方（rubocop-erb 0.7 系、[3.2 節](#32-rubocop-erb-07-系)）を念頭に置いたもので、文書全体を `offset: 0` で置き換える使い方は想定されていませんでした。
+
+- この使い方で autocorrect が動くのは RuboCop 1.84.0（2026-01-27）以降。tk0miya 氏が tk0miya-rubocop-herb を作る中で報告した [rubocop/rubocop#14779](https://github.com/rubocop/rubocop/issues/14779) を、ydakuka 氏のコミット `991a5c459` が修正した
+- 修正は `lib/rubocop/cop/team.rb` で、fragment の corrector を元のファイルの corrector に統合するときの分岐。1.84.0 より前は `offset` が正なら `import!`、0 なら `merge!` を使う。1.84.0 以降は source buffer が同じなら `merge!`、違えば `import!` を使う
+- 3 つのツールとも、取り出した Ruby から新しい `ProcessedSource` を作るので、fragment の buffer は元のファイルと別になる。1.84.0 より前の RuboCop では、`offset: 0` のこの fragment が `merge!` に回り、autocorrect でクラッシュする
+- rubocop-erb は 0.8.0 で `offset: 0` の方式に切り替えた PR [#70](https://github.com/r7kamura/rubocop-erb/pull/70) で、RuboCop の依存を `'~> 1.72', '>= 1.72.1'` から `'~> 1.84'` に上げている。PR とコミットで #14779 への言及はない
+- herb-rubocop-herb の gemspec は `">= 1.72.1", "< 2"` で、1.84.0 より前の RuboCop も許す。その組み合わせでは autocorrect で同じクラッシュが起きるはず【推測】（試していない）
+- tk0miya-rubocop-herb の gemspec は `">= 1.90.0"` で、修正の入った RuboCop だけを許す
+
+3 つのツールの文書全体を 1 本の Ruby にする方式は、どれも #14779 の修正の上に成り立っています。
+
 ### 4.1 ruumba
 
 - リポジトリ: https://github.com/ericqweinstein/ruumba
@@ -300,7 +313,7 @@ ERB では、本文が HTML だけの `if` やブロックはごく普通に書�
 
 `lib/rubocop/erb/ruby_extractor.rb`（`lib/` 全体で 386 行）。
 
-- `.erb` のファイルで `Herb.extract_ruby` を呼び、ファイル全体を 1 つの fragment（`offset: 0`）として返す。変換の結果は herb-rubocop-herb と同じで、`<%= foo %>` は `foo  ;`、HTML は空白、`<%# … %>` と `<% # … %>` の中身も空白になる（[1 章](#1-erb-から-ruby-を取り出す-2-つの方式)）
+- `.erb` のファイルで `Herb.extract_ruby` を呼び、ファイル全体を 1 つの fragment（`offset: 0`）として返す。変換の結果は herb-rubocop-herb と同じで、`<%= foo %>` は `foo  ;`、HTML は空白、`<%# … %>` と `<% # … %>` の中身も空白になる（[1 章](#1-erb-から-ruby-を取り出す-2-つの方式)）。autocorrect には RuboCop 1.84.0 以降が要る（[4 章の冒頭](#rubocop-の-ruby_extractors-と-offset-0出典)）
 - HTML のマルチバイト文字は、`extract_ruby` が出すバイト数の空白を 1 文字の空白に戻し、文字位置を元の ERB と揃える
 - `ERBSource`（`ProcessedSource` のサブクラス）が、元の ERB と `Herb.parse` の結果を持ち、各 ERB タグの範囲を引けるようにする
 
@@ -341,7 +354,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 - `<%=` も `<%` も空白になる。`<%= foo %>` は、ただの式 `foo;` になる
 - `<%# … %>` と、`<% # … %>` のように `#` で始まる 1 行のタグの中身は、空白になる。`<%%` も空白になる
 - HTML のマルチバイト文字は、バイト数の空白に置き換わる。`position_preserving_ruby` が元の 1 文字を 1 文字の空白に戻し、文字位置を元の ERB と揃える
-- `Extractor` は、ファイル全体を 1 つの fragment として返す。ERB 以外のファイルでは `nil` を返して、RuboCop の通常の処理に任せる。Ruby が空のファイルでは `[]` を返し、何も検査しない
+- `Extractor` は、ファイル全体を 1 つの fragment（`offset: 0`）として返す。autocorrect には RuboCop 1.84.0 以降が要るが、gemspec はそれより前も許す（[4 章の冒頭](#rubocop-の-ruby_extractors-と-offset-0出典)）。ERB 以外のファイルでは `nil` を返して、RuboCop の通常の処理に任せる。Ruby が空のファイルでは `[]` を返し、何も検査しない
 - autocorrect の結果を検査する仕組みはない
 
 `AllCops/Include` に `**/*.erb` と `**/*.herb` を加え、次の 48 個の cop を同じパターンのファイルから除外しています。
@@ -1025,7 +1038,7 @@ autocorrect については、壊す修正を捨てる仕組みがあり、検�
 - rubocop-erb: https://github.com/r7kamura/rubocop-erb （`lib/rubocop/erb/ruby_extractor.rb`、`lib/rubocop/erb/corrector.rb`、`config/default.yml`、issues [#5](https://github.com/r7kamura/rubocop-erb/issues/5), [#6](https://github.com/r7kamura/rubocop-erb/issues/6), [#84](https://github.com/r7kamura/rubocop-erb/issues/84)、PRs [#70](https://github.com/r7kamura/rubocop-erb/pull/70), [#74](https://github.com/r7kamura/rubocop-erb/pull/74), [#77](https://github.com/r7kamura/rubocop-erb/pull/77), [#81](https://github.com/r7kamura/rubocop-erb/pull/81), [#82](https://github.com/r7kamura/rubocop-erb/pull/82)）
 - herb-rubocop-herb: https://github.com/marcoroth/herb/pull/2260 （`gems/rubocop-herb/lib/rubocop/herb/plugin.rb`、`gems/rubocop-herb/config/default.yml`）、[marcoroth/herb#1619](https://github.com/marcoroth/herb/issues/1619)
 - ruumba: https://github.com/ericqweinstein/ruumba （`lib/ruumba/parser.rb`、`lib/ruumba/analyzer.rb`、`lib/ruumba/rubocop_runner.rb`、`bin/ruumba`、README）
-- RuboCop ruby_extractors API: https://github.com/rubocop/rubocop/pull/10839 、[#14954](https://github.com/rubocop/rubocop/pull/14954)
+- RuboCop ruby_extractors API: https://github.com/rubocop/rubocop/pull/10839 、[#14779](https://github.com/rubocop/rubocop/issues/14779)（`lib/rubocop/cop/team.rb`、コミット `991a5c459`）、[#14954](https://github.com/rubocop/rubocop/pull/14954)
 - Herb: https://github.com/marcoroth/herb （`src/analyze/parse_errors.c`、`javascript/packages/formatter/src/format-printer.ts`、issues [#356](https://github.com/marcoroth/herb/issues/356), [#475](https://github.com/marcoroth/herb/issues/475), [#670](https://github.com/marcoroth/herb/issues/670), [#1239](https://github.com/marcoroth/herb/issues/1239), [#2285](https://github.com/marcoroth/herb/issues/2285), [#2867](https://github.com/marcoroth/herb/issues/2867), [#2868](https://github.com/marcoroth/herb/issues/2868)、PRs [#455](https://github.com/marcoroth/herb/pull/455), [#767](https://github.com/marcoroth/herb/pull/767), [#2871](https://github.com/marcoroth/herb/pull/2871)、ブランチ `rust-linter` と `rubocop-herb`）、https://github.com/rails/rails/pull/58552
 - better_html: https://github.com/Shopify/better-html
 - erb-formatter: https://github.com/nebulab/erb-formatter
