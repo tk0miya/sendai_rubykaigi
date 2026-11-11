@@ -47,6 +47,13 @@
 @@ -1 +1 @@
 -<%= cache "fragment" do %>This bit is cached<% end %>
 +<%= cache 'fragment' do %>This bit is cached<% end %>
+--- cases/control_flow/single_line_block_in_tag.html.erb
++++ cases/control_flow/single_line_block_in_tag.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do "Profile" end %>
++<%= link_to(user_path(user)) do
++  'Profile'
++end %>
 --- cases/control_flow/unless_else.html.erb
 +++ cases/control_flow/unless_else.html.erb
 @@ -1,5 +1,7 @@
@@ -274,6 +281,15 @@
 -<%= "b" %>
 +a
 +b
+--- cases/style/argument_alignment.html.erb
++++ cases/style/argument_alignment.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to "Profile",
+-      user_path(user),
+-        class: "btn" %>
++<%= link_to 'Profile',
++            user_path(user),
++            class: 'btn' %>
 --- cases/style/html_nesting.html.erb
 +++ cases/style/html_nesting.html.erb
 @@ -1,5 +1,5 @@

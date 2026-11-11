@@ -300,7 +300,7 @@ rubocop-erb 0.8 系の検査（修正の範囲が 1 つのタグの Ruby に収�
 
 `Lint/Void` は、`CorrectionAdjuster` が切り詰めるので適用されます。`<p>a</p>`⏎`<% 1 %>`⏎`<%= b %>` は `-a` で `<% %>` になり、`Herb/EmptyErbTag` が行ごと消します。`<% 1; foo %>` は `<%; foo %>` になります（出力は変わらない）。
 
-検証用 ERB（79 ファイル）では、`Herb/Linting` を外すと、`-a` で 29 ファイル、`-A` で 34 ファイルが書き換わり、HTML が変わったファイルもパースエラーが増えたファイルも 0 でした。実際のビュー 333 ファイルでは、`-a`、`-A` とも HTML が変わったファイルもパースエラーが増えたファイルも 0 でした（[第 1 部 5.3 節](comparison.md#53-autocorrect実測)）。`Herb/Linting` も含めると HTML が変わるファイルが出ますが、どれも herb-lint の修正によるものです（[7.1 節](#71-herblinting)）。
+検証用 ERB（81 ファイル）では、`Herb/Linting` を外すと、`-a` で 31 ファイル、`-A` で 36 ファイルが書き換わり、HTML が変わったファイルもパースエラーが増えたファイルも 0 でした。実際のビュー 333 ファイルでは、`-a`、`-A` とも HTML が変わったファイルもパースエラーが増えたファイルも 0 でした（[第 1 部 5.3 節](comparison.md#53-autocorrect実測)）。`Herb/Linting` も含めると HTML が変わるファイルが出ますが、どれも herb-lint の修正によるものです（[7.1 節](#71-herblinting)）。
 
 ## 7. tk0miya-rubocop-herb の cop
 

@@ -99,6 +99,13 @@
 +<%= cache 'fragment' do
 + %>This bit is cached<% 
 +end%>
+--- cases/control_flow/single_line_block_in_tag.html.erb
++++ cases/control_flow/single_line_block_in_tag.html.erb
+@@ -1 +1,3 @@
+-<%= link_to(user_path(user)) do "Profile" end %>
++<%= link_to(user_path(user)) do
++ 'Profile' 
++end%>
 --- cases/control_flow/single_line_link_to.html.erb
 +++ cases/control_flow/single_line_link_to.html.erb
 @@ -1 +1,3 @@
@@ -564,6 +571,14 @@
 -<%= "b" %>
 + # rubocop:disable Style/StringLiterals %>
 +<%= 'b'%>
+--- cases/style/argument_alignment.html.erb
++++ cases/style/argument_alignment.html.erb
+@@ -1,3 +1,3 @@
+-<%= link_to "Profile",
++<%= link_to 'Profile',
+       user_path(user),
+-        class: "btn" %>
++        class: 'btn'%>
 --- cases/style/empty_lines.html.erb
 +++ cases/style/empty_lines.html.erb
 @@ -1,6 +1,5 @@

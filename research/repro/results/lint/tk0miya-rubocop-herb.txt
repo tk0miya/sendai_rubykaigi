@@ -15,6 +15,9 @@ cases/control_flow/negated_if.html.erb:1:4: C: [Correctable] Style/NegatedIf: Fa
 cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
 cases/control_flow/safe_navigation.html.erb:1:7: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
 cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block_in_tag.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block_in_tag.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block_in_tag.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/control_flow/unless_else.html.erb:1:4: C: Style/UnlessElse: Do not use `unless` with `else`. Rewrite these with the positive case first.
 cases/control_flow/unless_else.html.erb:2:4: R: [Correctable] Herb/Linting: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
 cases/control_flow/unless_else.html.erb:4:4: R: Herb/Linting: [erb-no-duplicate-branch-elements] The `<p>` tag is repeated across all branches with different content. Consider extracting the shared tag outside the conditional.
@@ -103,6 +106,10 @@ cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDire
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: E: [Correctable] Herb/Linting: [erb-prefer-direct-output] Avoid outputting string literal `"b"`. Use `b` instead.
 cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/style/argument_alignment.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:2:7: C: [Correctable] Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:9: C: [Correctable] Layout/ArgumentAlignment: Align the arguments of a method call if they span more than one line.
+cases/style/argument_alignment.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/html_nesting.html.erb:3:16: C: Herb/Linting: [actionview-prefer-qualified-partial-path] The partial `admin` is looked up relative to the directory of the template rendering it. Moving this template changes which file that resolves to, and renaming the partial means hunting for callers that never spell its full name. Write the full path from the view root so it resolves to the same file from any template, and a search for that path finds every caller.
 cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.

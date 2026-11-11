@@ -50,6 +50,10 @@ cases/control_flow/single_line_block.html.erb:1:22: C: Style/BlockDelimiters: Pr
 cases/control_flow/single_line_block.html.erb:1:24: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_block.html.erb:1:27: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_block.html.erb:1:51: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/control_flow/single_line_block_in_tag.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block_in_tag.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block_in_tag.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block_in_tag.html.erb:1:46: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/control_flow/single_line_link_to.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
 cases/control_flow/single_line_link_to.html.erb:1:5: W: Lint/EmptyBlock: Empty block detected.
 cases/control_flow/single_line_link_to.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
@@ -260,6 +264,9 @@ cases/rubocop_disable/trailing_ruby_comment_output.html.erb:1:9: W: Lint/CopDire
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:8: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/rubocop_disable/trailing_ruby_comment.html.erb:1:12: W: Lint/CopDirectiveSyntax: Malformed directive comment detected. Cop names must be separated by commas. Comment in the directive must start with `--`.
+cases/style/argument_alignment.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:3:21: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/empty_lines.html.erb:1:9: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/style/empty_lines.html.erb:4:1: C: [Correctable] Layout/EmptyLines: Extra blank line detected.
 cases/style/html_nesting.html.erb:1:12: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.

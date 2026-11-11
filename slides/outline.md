@@ -321,15 +321,36 @@ p; _ = link_to "Home",  root_path;  p;
 ### 18. ERB の書き方・配置への指摘: タグの中に書いたコードだけを検査する
 
 - ERB の書き方と配置への指摘は、変換をどう工夫しても残る。形が ERB の構文（タグに跨がる構造、開始タグの幅、HTML の入れ子）で決まるから
-- そこで、タグに跨がる構造では、その行だけで cop を止める。1 つのタグの中に書いたコードは検査を続ける
+- そこで、ERB の構文で形が決まる部分（タグに跨がる構造）では、その行だけで cop を止める。書き手が 1 つのタグの中に書いた Ruby は検査を続ける
 
-| 問題 | 止める（ERB の構文で決まる） | 検査を続ける（書き手が書いた） |
-|---|---|---|
-| ERB の書き方 | `<%= link_to(path) do %>Profile<% end %>` の `Style/BlockDelimiters`、`Style/SingleLineDoEndBlock` | `<% items.each do \|i\| foo(i) end %>` には両方出る |
-| 配置 | `<%= form_with … do \|f\| %>` 〜 `<% end %>` の `Layout/BlockAlignment`、タグに跨がる本文の `Layout/IndentationWidth` | 1 つのタグの中の Ruby の配置（複数行の `link_to` の引数の揃えなど） |
+ERB の書き方:
 
-- 問題を解決したのではなく、ERB 特有の部分を検査の対象から外した。ただし、止める範囲は ERB の構文で決まる部分だけなので、Layout の cop を 37 個まとめて除外する 0.8 系より、見逃しが少ない
-- 出典: [tk0miya-rubocop-herb.md 5.2 節、5.3 節](../research/tk0miya-rubocop-herb.md#5-erb-で止めている-cop出典)
+```erb
+<%# タグに跨がる 1 行のブロック: ERB の構文で決まる → 指摘しない %>
+<%= link_to(user_path(user)) do %>Profile<% end %>
+
+<%# 1 つのタグの中に 1 行で書いたブロック: 書き手が書いた → Style/BlockDelimiters、Style/SingleLineDoEndBlock %>
+<%= link_to(user_path(user)) do "Profile" end %>
+```
+
+配置:
+
+```erb
+<%# タグに跨がるブロック: <%= と <% の幅で end がずれる → 指摘しない %>
+<%= form_with model: @user do |f| %>
+  <%= f.text_field :name %>
+<% end %>
+
+<%# 1 つのタグの中の引数の揃え: 書き手が書いた → Layout/ArgumentAlignment %>
+<%= link_to "Profile",
+      user_path(user),
+        class: "btn" %>
+```
+
+- 0.8 系は、タグに跨がる 1 行のブロックに誤検知を出し、Layout の cop を 37 個除外しているので引数の揃えも見逃す
+- 問題を解決したのではなく、ERB 特有の部分を検査の対象から外した。ただし、止める範囲は ERB の構文で決まる部分だけなので、cop をまとめて除外するより見逃しが少ない
+- ノート: ERB のコメントの中に `%>` は書けないので、スライドではコメントではなく注釈の吹き出しにする。1 つのタグの中でも、複数行の `do … end` は RuboCop の推奨どおりなので指摘されない
+- 出典: [tk0miya-rubocop-herb.md 5.2 節、5.3 節](../research/tk0miya-rubocop-herb.md#5-erb-で止めている-cop出典)、`cases/control_flow/single_line_link_to`、`cases/control_flow/single_line_block_in_tag`、`cases/control_flow/form_block`、`cases/style/argument_alignment`
 
 ### 19. Before / After（rubocop-erb 0.8 系と並べる）
 

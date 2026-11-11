@@ -3,6 +3,9 @@ cases/control_flow/if_then_elsif_else.html.erb:3:14: C: [Correctable] Style/NilC
 cases/control_flow/nil_comparison.html.erb:1:11: C: [Correctable] Style/NilComparison: Prefer the use of the `nil?` predicate.
 cases/control_flow/safe_navigation.html.erb:1:7: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
 cases/control_flow/single_line_block.html.erb:1:11: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/control_flow/single_line_block_in_tag.html.erb:1:5: C: [Correctable] Style/SingleLineDoEndBlock: Prefer multiline `do`...`end` block.
+cases/control_flow/single_line_block_in_tag.html.erb:1:30: C: [Correctable] Style/BlockDelimiters: Prefer `{...}` over `do...end` for single-line blocks.
+cases/control_flow/single_line_block_in_tag.html.erb:1:33: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/erb_comment/multiline_tag.html.erb:3:5: W: [Correctable] Lint/RedundantCopDisableDirective: Unnecessary disabling of `Lint/LiteralAsCondition`.
 cases/erb_comment/multiline_tag.html.erb:3:5: W: Lint/MissingCopEnableDirective: Re-enable Lint/LiteralAsCondition cop with `# rubocop:enable` after disabling it.
 cases/erb_comment/trailing_in_tag.html.erb:2:17: W: [Correctable] Lint/RedundantCopDisableDirective: Unnecessary disabling of `Lint/LiteralAsCondition`.
@@ -39,6 +42,8 @@ cases/rubocop_disable/multiline_tag.html.erb:6:5: C: [Correctable] Style/StringL
 cases/rubocop_disable/ruby_comment_tag.html.erb:1:4: W: Lint/MissingCopEnableDirective: Re-enable Style/StringLiterals cop with `# rubocop:enable` after disabling it.
 cases/rubocop_disable/ruby_comment_tag.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/rubocop_disable/trailing_ruby_comment_output.html.erb:2:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:1:13: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cases/style/argument_alignment.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/html_nesting.html.erb:3:16: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
 cases/style/ruby_style.html.erb:1:13: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
 cases/style/ruby_style.html.erb:1:20: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.

@@ -53,6 +53,15 @@
 +# frozen_string_literal: true
 +cache 'fragment'
 + do %>This bit is cached<% end %>
+--- cases/control_flow/single_line_block_in_tag.html.erb
++++ cases/control_flow/single_line_block_in_tag.html.erb
+@@ -1 +1,5 @@
+-<%= link_to(user_path(user)) do "Profile" end %>
++# frozen_string_literal: true
++link_to(user_path(user)) {
++ 'Profile' 
++}
++ %>
 --- cases/control_flow/single_line_link_to.html.erb
 +++ cases/control_flow/single_line_link_to.html.erb
 @@ -1 +1,3 @@
@@ -507,6 +516,17 @@
 + %>
 +# frozen_string_literal: true
 +'b'
++ %>
+--- cases/style/argument_alignment.html.erb
++++ cases/style/argument_alignment.html.erb
+@@ -1,3 +1,5 @@
+-<%= link_to "Profile",
+-      user_path(user),
+-        class: "btn" %>
++# frozen_string_literal: true
++link_to 'Profile',
++            user_path(user),
++            class: 'btn'
 + %>
 --- cases/style/empty_lines.html.erb
 +++ cases/style/empty_lines.html.erb
