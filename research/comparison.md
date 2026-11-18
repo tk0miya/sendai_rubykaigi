@@ -70,7 +70,7 @@ _erbout = +''; _erbout.<< "<p>Hello, ".freeze; _erbout.<<(( user.name ).to_s); _
 | rubocop-erb 0.8 系 | × | ○ (文書全体) | △ (文書全体。65 cop を除外) | ○ | ○ (1 つのタグの Ruby に収まらない修正は捨てる) | × |
 | herb-rubocop-herb (Draft) | × | ○ (文書全体) | △ (文書全体。48 cop を除外。出力・HTML 本文が失われ誤検知) | ○ | × (`-a` でもテンプレートを壊す) | × |
 | ruumba (メンテ停止) | × | ○ (文書全体) | △ (文書全体。出力・HTML 本文が失われ誤検知) | ○ | △ (実験的。黙って書き戻さないことがある) | × |
-| **tk0miya-rubocop-herb** | ◎ (Herb/Linting で herb-lint を実行。Node.js が必要) | ○ (文書全体) | ○ (文書全体。10 cop を除外し、31 cop を行単位で無効化) | ○ | ○ (テンプレートを壊す修正は捨てる) | × |
+| **tk0miya-rubocop-herb** | ◎ (Herb/Linting で herb-lint を実行。Node.js が必要) | ○ (文書全体) | ○ (文書全体。9 cop を除外し、21 cop を行単位で無効化) | ○ | ○ (テンプレートを壊す修正は捨てる) | × |
 | Herb (herb-lint) | ◎ | ◎ (Prism で文書全体) | × | ○ (未使用変数など) | ○ (約 40 ルール) | × |
 | herb-format | ◎ | △ | × (Ruby は trim のみ) | × | ○ (整形) | × |
 | better_html (非推奨) | ○ | △ (タグ単位) | × | × | × | × |
@@ -396,7 +396,7 @@ herb 本体のリポジトリに提案されている RuboCop プラグイン（
 
 | | erb_lint（全 cop） | erb_lint（推奨設定） | rubocop-erb 0.7.2 | ruumba | rubocop-erb 0.8.2 | herb-rubocop-herb | tk0miya-rubocop-herb |
 |---|---|---|---|---|---|---|---|
-| offense の数 | 366 | 53 | 54 | 559 | 75 | 310 | 98 |
+| offense の数 | 366 | 53 | 54 | 559 | 75 | 310 | 88 |
 
 主なケースの結果です。「誤」は誤検知、「—」は何も出ないことを表します。
 
@@ -622,7 +622,7 @@ rails/rails と kaigionrails/conference-app の `*.html.erb`（333 ファイル�
 - 前の 2 つ（109 件）は、Tailwind の長い `class:` の文字列をヘルパーに渡しているものがほとんど。ERB タグの中の Ruby を引数ごとに改行すれば短くできる
 - 残りの 53 件は、タグの外の HTML を改行すれば短くできる（属性を 1 行に 1 つずつ並べるなど）。RuboCop では autocorrect できないが、Herb の formatter（`herb-format`）が `maxLineLength` で属性やテキストを折り返す
 - `herb-format` の `maxLineLength` の既定値は 80（`javascript/packages/formatter/src/options.ts`）で、`Layout/LineLength` の既定値 120 と異なる
-- ERB タグの中の引数の後ろで改行すると、行は短くならず `%>` が次の行に移る。ガードはこの修正を捨てて指摘だけを残すので、上の `f.select` の行は `-a` でも変わらない。ガードを通って適用される修正（`Layout/LineLength` だけをかけた `-a` で 7 ファイルの 12 件）には、ERB に合わない形が残る（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）
+- ERB タグの中の引数の後ろで改行すると、行は短くならず `%>` が次の行に移る。ガードはこの修正を捨てて指摘だけを残すので、上の `f.select` の行は `-a` でも変わらない。ガードを通って適用される修正（`Layout/LineLength` だけをかけた `-a` で 9 ファイルの 14 件）には、ERB に合わない形が残る（[第 2 部 8 章](tk0miya-rubocop-herb.md#8-既知の問題実測推測)）
 
 - 120 桁は RuboCop の既定値で、conference-app は RuboCop を導入していない
 
@@ -956,7 +956,7 @@ Marco Roth 氏の「Herb の linter / formatter を Rust で書き直す」構�
 **誤検知が少ない【実測・出典】**
 
 - erb_lint の `Lint/UselessAssignment` やタグごとの `Style/FrozenStringLiteralComment`、ruumba の `Lint/Void`・`Style/SymbolProc`・`Lint/EmptyConditionalBody`・Layout 系の誤検知は、いずれも出ない
-- ファイル全体で除外する cop は 9 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。変換で書いた文字（`;`、`_ =`、区切りの位置の空白）に反応する 22 個は、ERB タグに書かれたコードの上の offense だけを報告する。それ以外の誤検知になる cop（20 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
+- ファイル全体で除外する cop は 9 個（rubocop-erb は 0.7 系が 53 個、0.8 系が 65 個）。変換で書いた文字（`;`、`_ =`、区切りの位置の空白）に反応する 23 個は、ERB タグに書かれたコードの上の offense だけを報告する。それ以外の誤検知になる cop（21 個）は、HTML を本文に持つ分岐や、ERB タグに跨がる `<% end %>` など、誤検知になる行だけで無効にする
 - rubocop-erb 0.8 系が除外している `Lint/EmptyBlock`、`Style/SymbolProc`、`Style/SafeNavigation` なども、誤検知にならない行では検出する。実際のビューでは、本当に空のブロックや `map { |k| k.to_s }` を検出した（[5.4 節](#54-実際のビュー実測)）
 
 **autocorrect がテンプレートを壊さない【実測・出典】**

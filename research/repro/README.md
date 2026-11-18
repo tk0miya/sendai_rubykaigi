@@ -39,7 +39,7 @@ research の文書で挙げた挙動を確かめるための、検証用 ERB と
 | `rubocop-erb-0.8-noexclude` | 同上 | 0.8.2 が ERB から除外している 65 個の cop のうち、`Rails/Presence` を除く 64 個の除外を外す（`tools/rubocop-erb-0.8/erb-noexclude.yml`） |
 | `herb-rubocop-herb` | [marcoroth/herb#2260](https://github.com/marcoroth/herb/pull/2260) の rubocop-herb（`d0323df`） | `tools/herb-rubocop-herb/pr.yml` |
 | `ruumba` | ruumba 0.1.17 | README の推奨設定（`tools/ruumba/.ruumba.yml`） |
-| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `4cbe9062156f28b95d94d27ebc59ab3f9da35f33` | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
+| `tk0miya-rubocop-herb` | tk0miya/rubocop-herb `c0acab8ed547d2fe9ca2a3d50ad602843d12282c`（`Gemfile.lock` は `4cbe906` のもの） | リポジトリの `config/develop/rubocop.yml` を継承（`tools/tk0miya-rubocop-herb/tk.yml`） |
 | `herb-lint` | @herb-tools/linter | `.herb.yml`（`framework: actionview`） |
 | `herb-format` | @herb-tools/formatter | 同上 |
 | `plain-ruby` | rubocop 1.92.1（`plain_ruby/` だけを検査） | `plain_ruby/.rubocop.yml` |
@@ -53,7 +53,7 @@ $ cd research/repro
 $ for d in tools/*/; do [ -f "$d/Gemfile" ] && (cd "$d" && BUNDLE_FROZEN=true bundle install); done
 $ npm install
 $ git clone https://github.com/tk0miya/rubocop-herb "$TMPDIR/rubocop-herb"
-$ (cd "$TMPDIR/rubocop-herb" && git checkout 4cbe9062156f28b95d94d27ebc59ab3f9da35f33 && bundle install)
+$ (cd "$TMPDIR/rubocop-herb" && git checkout c0acab8ed547d2fe9ca2a3d50ad602843d12282c && git checkout 4cbe906 -- Gemfile.lock && bundle install)
 $ export RUBOCOP_HERB="$TMPDIR/rubocop-herb"
 ```
 
@@ -289,7 +289,7 @@ cop ごとに、ERB として正しいテンプレート（`*_ok`）と、同じ
 | `Lint/DuplicateBranch`（`duplicate_branch`） | `Good morning, <%= user.name %>` と `Hello, <%= user.name %>` | `<%= user.name %>` と `<%= user.name %>` |
 | `Style/CombinableLoops`（`combinable_loops`） | 2 つの `items.each` の間に `Prices:` | 2 つの `items.each` が連続 |
 
-`safe_navigation_short` は、`<% if user %>` の本文が `|<% user.touch %>` のものです。テキストが短くて tk0miya-rubocop-herb がマーカーを置けない例です。
+`safe_navigation_short` は、`<% if user %>` の本文が、行頭から書いた `|<% user.touch %>` のものです。テキストが短く、前に空白もないので、tk0miya-rubocop-herb がマーカーを置けない例です。
 
 組にした比較では、内容に関わらない cop を外して実行します。
 

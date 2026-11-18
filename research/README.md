@@ -26,7 +26,7 @@
 | rubocop-erb 0.8 系 | 0.8.2 | 文書全体（`Herb.extract_ruby`） |
 | marcoroth/herb#2260 の rubocop-herb（以下「herb-rubocop-herb」） | `d0323df360553502e31b14ff570990f907f46b2a`（2026-10-06 時点の PR の head。Draft） | 文書全体（`Herb.extract_ruby`） |
 | ruumba | 0.1.17 | 文書全体（正規表現） |
-| tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」） | `4cbe9062156f28b95d94d27ebc59ab3f9da35f33`（2026-11-09 時点の main と `lib/` が同じ） | 文書全体（Herb の AST から独自に変換） |
+| tk0miya/rubocop-herb（以下「tk0miya-rubocop-herb」） | `c0acab8ed547d2fe9ca2a3d50ad602843d12282c`（2026-11-19 時点の main。`Gemfile.lock` は rubocop 1.92.1 / herb 0.11.1 のものに戻した） | 文書全体（Herb の AST から独自に変換） |
 | herb-lint / herb-format | @herb-tools/linter 0.11.1 / @herb-tools/formatter 0.11.1 | RuboCop を使わない |
 
 - rubocop 1.92.1、herb 0.11.1（herb-rubocop-herb だけは gemspec が固定している 0.11.0）、ruby 4.0.5、node v26.9.0
