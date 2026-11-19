@@ -89,7 +89,7 @@ ERB では、HTML だけの本文も出力の文になり、空ではありま�
 - `Lint/EmptyConditionalBody`、`Style/EmptyElse`、`Lint/EmptyWhen`、`Lint/DuplicateBranch`、`Style/RedundantCondition` は、HTML を空白にした Ruby では出て、HTML を出力の文（`_erbout << "<p>x</p>"`）として残した Ruby では出ない（[repro/semantics/ruby/](repro/semantics/ruby/)）【実測】
 - HTML は出力の文として残す必要がある。文字列リテラルだけ（`"<p>x</p>"`）にすると、`Lint/Void` が出る（[repro/semantics/ruby/kept_literal.rb](repro/semantics/ruby/kept_literal.rb)）【実測】
 - この分類の cop は、ERB でも本来検出したい問題（本当に空の `else`、`=` を書き忘れた `<% count + 1 %>` など）を見つける。HTML の存在を Ruby に残せば、cop を止めずに済む
-- tk0miya-rubocop-herb は HTML を識別子として書き込むが、識別子を置けない短いテキスト（`|` 1 文字など）は空白のままなので、この分類の cop を本文が HTML の分岐でだけ止めている（[第 2 部 3.3 節](tk0miya-rubocop-herb.md#33-マーカーの限界実測出典)）
+- tk0miya-rubocop-herb は HTML を識別子として書き込むが、識別子を置けない短いテキスト（行頭から書いた `|` 1 文字など）は空白のままなので、この分類の cop を本文が HTML の分岐でだけ止めている（[第 2 部 3.3 節](tk0miya-rubocop-herb.md#33-マーカーの限界実測出典)）
 
 ## 6. ERB の書き方に合わない指摘
 

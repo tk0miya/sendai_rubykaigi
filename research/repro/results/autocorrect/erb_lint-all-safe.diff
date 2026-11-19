@@ -244,7 +244,7 @@
 +++ cases/marker/safe_navigation_short.html.erb
 @@ -1,3 +1,5 @@
  <% if user %>
--  |<% user.touch %>
+-|<% user.touch %>
 +# frozen_string_literal: true
 +user.touch
 + %>

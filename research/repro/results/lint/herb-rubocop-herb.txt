@@ -165,7 +165,7 @@ cases/marker/safe_navigation_ok.html.erb:2:28: C: [Correctable] Layout/ExtraSpac
 cases/marker/safe_navigation_ok.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/marker/safe_navigation_short.html.erb:1:4: C: [Correctable] Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.
 cases/marker/safe_navigation_short.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
-cases/marker/safe_navigation_short.html.erb:2:17: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
+cases/marker/safe_navigation_short.html.erb:2:15: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/marker/safe_navigation_short.html.erb:3:7: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/marker/sole_nested_conditional_ng.html.erb:1:11: C: [Correctable] Layout/ExtraSpacing: Unnecessary spacing detected.
 cases/marker/sole_nested_conditional_ng.html.erb:2:6: C: [Correctable] Style/SoleNestedConditional: Consider merging nested conditions into outer `if` conditions.

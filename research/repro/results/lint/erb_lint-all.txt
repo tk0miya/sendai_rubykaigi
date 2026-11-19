@@ -117,8 +117,8 @@ cases/marker/safe_navigation_ok.html.erb:2:0: Style/FrozenStringLiteralComment: 
 cases/marker/safe_navigation_ok.html.erb:2:17: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/marker/safe_navigation_ok.html.erb:2:27: Layout/TrailingEmptyLines: Final newline missing.
 cases/marker/safe_navigation_short.html.erb:2:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
-cases/marker/safe_navigation_short.html.erb:2:6: Layout/InitialIndentation: Indentation of first line in file detected.
-cases/marker/safe_navigation_short.html.erb:2:16: Layout/TrailingEmptyLines: Final newline missing.
+cases/marker/safe_navigation_short.html.erb:2:4: Layout/InitialIndentation: Indentation of first line in file detected.
+cases/marker/safe_navigation_short.html.erb:2:14: Layout/TrailingEmptyLines: Final newline missing.
 cases/marker/sole_nested_conditional_ng.html.erb:3:0: Style/FrozenStringLiteralComment: Missing frozen string literal comment.
 cases/marker/sole_nested_conditional_ng.html.erb:3:8: Layout/InitialIndentation: Indentation of first line in file detected.
 cases/marker/sole_nested_conditional_ng.html.erb:3:16: Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
