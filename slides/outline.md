@@ -12,6 +12,8 @@
   1. これまでのツール（タグ単位）は不完全だった
   2. 改善が進んでいる（文書全体方式への移行）
   3. tk0miya-rubocop-herb は、残る問題への解決策の萌芽
+- スライド 4 の ERB をトークを通して使う。スライド 10（rubocop-erb 0.8 系）とスライド 21（tk0miya-rubocop-herb）でもう一度見せ、検出できる指摘が erb_lint の 0 件・rubocop-erb 0.7 系の 1 件 → 0.8 系の 2 件 → 3 件と増えていくことを示す
+- 見出しだけのスライド（扉）は置かず、フラットに並べる
 - 流れ: タグ単位 → 文書全体（rubocop-erb 0.8 系）→ それでも残る 4 つの問題 → tk0miya-rubocop-herb の対策（ここまでが Ruby パートの lint の精度の話）→ ERB ファイル全体へ（herb-lint / herb-format との統合）→ autocorrect の歩み → 現状
 - 文書全体方式の例は、リリース済みで誰でも使える rubocop-erb 0.8 系にする。Herb 本家の PR（marcoroth/herb#2260）は扱わない
 - 0.8 系の扱いは批判ではなく構造の話にする。「`<%=` と HTML の意味がない Ruby では cop が区別できないので、誤検知を出すか、除外して見逃すしかない」。0.8 系の PR 自身が「除外した cop は ERB の文脈を理解させる PR で今後有効に戻す」としているので、その先を試したのが tk0miya-rubocop-herb、とつなげる
@@ -20,19 +22,19 @@
 
 ## 時間配分
 
-| パート | 枚数 | 時間 |
+| スライド | 内容 | 時間 |
 |---|---|---|
-| 0. 導入 | 2 | 0:45 |
-| 1. タグ単位の lint は不完全だった | 5 | 2:45 |
-| 2. 文書全体へ | 2 | 1:30 |
-| 3. それでも残る 4 つの問題 | 6 | 3:30 |
-| 4. tk0miya-rubocop-herb: Ruby パートの lint の精度を上げる | 5 | 3:30 |
-| 5. Ruby パートから ERB ファイル全体へ | 1 | 0:45 |
-| 6. autocorrect の歩み | 2 | 1:15 |
-| 7. 現状とまとめ | 2 | 1:15 |
-| 合計 | 25 | 15:15 |
+| 1〜2 | 導入 | 0:45 |
+| 3〜8 | タグ単位の lint は不完全だった | 2:15 |
+| 9〜10 | 文書全体へ | 1:30 |
+| 11〜16 | それでも残る 4 つの問題 | 3:30 |
+| 17〜21 | tk0miya-rubocop-herb: Ruby パートの lint の精度を上げる | 3:30 |
+| 22 | Ruby パートから ERB ファイル全体へ | 0:45 |
+| 23〜24 | autocorrect の歩み | 1:15 |
+| 25〜26 | 現状とまとめ | 1:15 |
+| 合計 26 枚 | | 14:45 |
 
-## 0. 導入（0:45）
+## スライド
 
 ### 1. タイトル
 
@@ -45,9 +47,16 @@
 - Steep への ERB 対応の提案（[soutaro/steep#1409](https://github.com/soutaro/steep/issues/1409)）
 - → 「ERB でも Ruby と同じ開発体験がほしい」が動機
 
-## 1. タグ単位の lint は不完全だった（2:45）
-
 ### 3. あなたの ERB に RuboCop は効いていますか?
+
+- ERB ファイルに RuboCop を効かせる gem がある
+  - erb_lint
+  - rubocop-erb
+- どちらも、ERB の中の Ruby コードを RuboCop で検査する
+
+### 4. あなたの ERB に RuboCop は効いていますか?
+
+- 次の ERB に erb_lint / rubocop-erb をかけてみる
 
 ```erb
 <% count = items.size %>
@@ -57,56 +66,73 @@
 <% end %>
 ```
 
-- erb_lint（推奨設定）: 0 件
-- 同じ内容の `.rb`: `Lint/UselessAssignment`（`count` を使っていない）、`Style/NilComparison`、`Style/EmptyElse`
-- この ERB はトークを通して使う例にする。スライド 9（rubocop-erb 0.8 系）とスライド 20（tk0miya-rubocop-herb）で同じ ERB をもう一度見せ、検出できる指摘が 0 → 2 → 3 件と増えていくことを示す
+### 5. あなたの ERB に RuboCop は効いていますか?
 
-### 4. よく使われている ERB の linter
+- 次の ERB に erb_lint / rubocop-erb をかけてみる
 
-- erb_lint（累計 2,250 万 DL）、rubocop-erb（91 万 DL）
-- どちらも、ERB の中の Ruby を RuboCop で検査する
-- 数字は rubygems.org の 2026-10-31 時点の累計 DL
+```erb
+<% count = items.size %>
+<% if foo == nil %>
+  <p>yes</p>
+<% else %>
+<% end %>
+```
 
-### 5. タグ単位で Ruby を取り出す
+- 指摘件数
+  - erb_lint: 0 件
+  - rubocop-erb: 1 件
 
-- ERB タグ 1 つずつを、独立した Ruby として RuboCop にかける（erb_lint、rubocop-erb 0.7 系）
-- 図: スライド 3 の ERB が、`count = items.size` / `if foo == nil` / `else` / `end` という断片の列になる様子
-- 失われる文脈
-  - 制御構造（`if` 〜 `end` がタグを跨ぐ）
-  - 変数スコープ（前のタグで定義した変数）
-  - ファイル（タグ 1 つが 1 ファイル扱い）
+### 6. あなたの ERB に RuboCop は効いていますか?
 
-### 6. なぜ見逃すのか
+- 次の ERB に erb_lint / rubocop-erb をかけてみる
 
-- スライド 3 の ERB で、erb_lint（推奨設定）が 3 つの指摘を見逃す理由
+```erb
+<% count = items.size %>
+<% if foo == nil %>
+  <p>yes</p>
+<% else %>
+<% end %>
+```
 
-| 見逃す指摘 | ERB | 見逃す理由 |
-|---|---|---|
-| `Style/NilComparison` | `<% if foo == nil %>` | タグ 1 つだけでは `end` のない不完全な Ruby なので、構文エラーとして黙ってスキップされる |
-| `Style/EmptyElse` | `<% else %>`⏎`<% end %>` | `<% else %>` も `<% end %>` も単独では不完全な Ruby なのでスキップされ、`else` が空かどうかを確かめられない |
-| `Lint/UselessAssignment` | `<% count = items.size %>` | 後ろのタグが見えないので、使っている変数まで指摘される。そのため README が cop の無効化を推奨している |
+- 指摘件数
+  - erb_lint: 0 件
+  - rubocop-erb: 1 件
+- erb_lint / rubocop-erb は取りこぼしがある
+  - `Lint/UselessAssignment`
+  - `Style/NilComparison`（erb_lint のみ）
+  - `Style/EmptyElse`
+- 出典: [comparison.md 3.1 節、3.2 節](../research/comparison.md#3-タグ単位の方式)。erb_lint は推奨設定、rubocop-erb は 0.7 系の結果
 
-- 前の 2 つは制御構造、最後の 1 つは変数スコープと、どれもスライド 5 の「失われる文脈」から来る
-- 出典: [comparison.md 3.1 節](../research/comparison.md#31-erb_lintrubocop-linter)。スライド 3 の ERB を、erb_lint（推奨設定・全 cop）、rubocop-erb 0.7 系、同じ内容の `.rb` にかけた結果
+### 7. なぜ取りこぼすのか
 
-### 7. ほかにも見逃している
+- ERB タグごとに Lint をかけている
+  - `count = items.size`
+  - `if foo == nil`
+  - `else`
+  - `end`
+- 制御構文が入っていた場合の動きは、ツールごとに異なる
+  - erb_lint: タグごと無視
+  - rubocop-erb: 制御構文（`if`、`else`、`do |xx|` など）を削除して Lint
+- 図: スライド 4 の ERB が、タグごとの断片の列になる様子
+- 出典: erb_lint 0.9.0 の `lib/erb_lint/linters/rubocop.rb`（末尾の `do |x|` を削り、`valid_syntax?` が偽ならスキップ）、rubocop-erb 0.7.2 の `lib/rubocop/erb/keyword_remover.rb`（先頭の `if` / `else` / `end` などと末尾の `then` / `do |x|` を削り、空になったタグは検査しない）
 
-| ERB | erb_lint（推奨設定）・rubocop-erb 0.7 系が見逃す指摘 | 見逃す理由 |
-|---|---|---|
-| `<% items.each_with_index do \|item, i\| %>`⏎`  <li><%= item.name %></li>`⏎`<% end %>`（`i` を使わない） | `Lint/UnusedBlockArgument` | タグを跨ぐブロックが見えない |
-| `<% if !user.nil? %>`⏎`  <p>hi</p>`⏎`<% end %>` | `Style/NegatedIf` | `if` を含むタグは単独では不完全な Ruby。erb_lint はスキップし、0.7 系は `if` を削って条件式だけを検査するので、`if` と否定の組み合わせが見えない |
-| `<% if admin? %>`⏎`  <p>admin</p>`（`end` の抜け） | `Lint/Syntax` | タグを跨ぐ構文を検査できない（0.7 系は cop を除外） |
+### 8. なぜ取りこぼすのか
 
-- どれも、同じ内容の `.rb` なら RuboCop が指摘する
-- 出典: [comparison.md 3 章、5.1 節](../research/comparison.md#3-タグ単位の方式)（`cases/control_flow/unused_block_arg_output`、`cases/control_flow/negated_if`、`cases/syntax/missing_end`）
+- Lint の際に文脈が失われている
+  - 制御構造
+  - 変数スコープ
+  - HTML
+- スライド 4 の取りこぼしとの対応
+  - `Style/NilComparison`、`Style/EmptyElse`: 制御構造（`if` 〜 `end` がタグを跨ぐ）
+  - `Lint/UselessAssignment`: 変数スコープ（後ろのタグで使う変数まで指摘されるので、erb_lint の README は cop の無効化を推奨し、rubocop-erb 0.7 系は除外している）
+- HTML は文書全体方式でも失われ、スライド 12 の誤検知（消えた HTML が産む指摘）につながる
+- 出典: [comparison.md 3.1 節、3.2 節](../research/comparison.md#3-タグ単位の方式)
 
-## 2. 文書全体へ（1:30）
-
-### 8. 文書全体を 1 本の Ruby にする
+### 9. 文書全体を 1 本の Ruby にする
 
 - rubocop-erb 0.8 系（2026-10-29）が、タグ単位から文書全体の変換に切り替えた（[r7kamura/rubocop-erb#70](https://github.com/r7kamura/rubocop-erb/pull/70)）
 - HTML を空白に置き換え、ERB タグの中身を元の位置に残して、ファイル全体を 1 本の Ruby にする
-- スライド 3 の ERB は、次の Ruby になる（行末の空白は省略）
+- スライド 4 の ERB は、次の Ruby になる（行末の空白は省略）
 
 ```erb
 <% count = items.size %>
@@ -127,19 +153,18 @@
 ```
 
 
-### 9. タグを跨いで検査できるようになった
+### 10. タグを跨いで検査できるようになった
 
-- スライド 3 の ERB に、0.8 系では `Style/NilComparison` と `Lint/UselessAssignment` が出る（0 件 → 2 件）
+- スライド 4 の ERB に、0.8 系では `Style/NilComparison` と `Lint/UselessAssignment` が出る（0.7 系の 1 件 → 2 件）
   - タグを跨ぐ変数が見えるので、`Lint/UselessAssignment` を止めずに、本当に使わない `count` だけを検出できる
-  - ただし空の `else` の `Style/EmptyElse` は出ない（スライド 15 で回収する）
-- スライド 7 の見逃しは、0.8 系ではどれも検出される（`Lint/UnusedBlockArgument`、`Style/NegatedIf`、`Lint/Syntax`）
+  - ただし空の `else` の `Style/EmptyElse` は出ない（スライド 16 で回収する）
+- `end` の抜けも `Lint/Syntax` で検出できるようになった（`<% if admin? %>`⏎`  <p>admin</p>`）
+  - 出典: `cases/syntax/missing_end`
 - → 「改善は進んでいる」
 
-## 3. それでも残る 4 つの問題（3:30）
+### 11. 見逃しは減ったが…
 
-### 10. 見逃しは減ったが…
-
-- 文書全体方式で、タグを跨ぐ見逃しは減った。しかし、スライド 8 の Ruby には ERB の情報（HTML、タグの区切り、ERB 風の書き方、ERB のレイアウト）が残っていない
+- 文書全体方式で、タグを跨ぐ見逃しは減った。しかし、スライド 9 の Ruby には ERB の情報（HTML、タグの区切り、ERB 風の書き方、ERB のレイアウト）が残っていない
 - そのため cop は、ERB として正しいものと直すべきものを区別できない。cop をそのまま動かすと、正しい ERB にも指摘が出る（誤検知）
 - この問題は、どのツールの実装かによらず、HTML を空白にして 1 本の Ruby にする方式そのものから来る
 - 問題は 4 つに分けられる。前半 2 つは変換で生まれるもの、後半 2 つは ERB と Ruby の書き方の違いによるもの
@@ -147,11 +172,11 @@
   2. タグ変換への指摘
   3. ERB 風の書き方への指摘
   4. レイアウトへの指摘
-- ツールがこれにどう対処しているかは、スライド 15 でまとめて扱う
-- スライド 11〜14 の指摘は、rubocop-erb 0.8 系から ERB 向けの cop の除外を外した設定（`bin/lint rubocop-erb-0.8-noexclude`）で実測したもの
+- ツールがこれにどう対処しているかは、スライド 16 でまとめて扱う
+- スライド 12〜15 の指摘は、rubocop-erb 0.8 系から ERB 向けの cop の除外を外した設定（`bin/lint rubocop-erb-0.8-noexclude`）で実測したもの
 - 出典: [erb-and-rubocop.md 3 章](../research/erb-and-rubocop.md#3-4-つの分類)
 
-### 11. 消えた HTML が産む指摘
+### 12. 消えた HTML が産む指摘
 
 ```erb
 <% if morning? %>
@@ -181,7 +206,7 @@
 
 - 出典: [comparison.md 5.2 節](../research/comparison.md#52-erb-として正しいものと直すべきものの区別)の `cases/marker/duplicate_branch_*`
 
-### 12. タグ変換への指摘
+### 13. タグ変換への指摘
 
 ```erb
 <div class="<% if admin? %>admin<% end %>">
@@ -200,7 +225,7 @@
 - cop から見ると、変換で書いた空白と書き手が書いた空白は区別できない
 - 出典: `cases/control_flow/attr_if`
 
-### 13. ERB 風の書き方への指摘
+### 14. ERB 風の書き方への指摘
 
 ```erb
 <%= link_to(user_path(user)) do %>Profile<% end %>
@@ -211,7 +236,7 @@
   - `Style/SingleLineDoEndBlock`: 複数行にせよ → 従うと、リンクの文字列の前後に改行と空白が入る（`<a href="/users/1">\n  Profile\n</a>`）
 - 出典: [erb-and-rubocop.md 6 章](../research/erb-and-rubocop.md#6-erb-の書き方に合わない指摘)、`cases/control_flow/single_line_link_to`
 
-### 14. レイアウトへの指摘
+### 15. レイアウトへの指摘
 
 - ERB の中の Ruby の位置は、Ruby の構造ではなく、開始タグの幅と HTML の構造で決まる
 - 開始タグの幅: `<%=` は 4 文字、`<%` は 3 文字なので、`form_with` と `end` は必ず 1 文字ずれる（`Layout/BlockAlignment`）
@@ -235,7 +260,7 @@
 - どちらも ERB として正しい書き方なので誤検知。一方で、同じ Layout の cop は 1 つのタグの中の Ruby の配置（複数行の `link_to` の引数の揃えなど）も検査する
 - 出典: [erb-and-rubocop.md 7 章](../research/erb-and-rubocop.md#7-配置への指摘)、`cases/control_flow/form_block`、`cases/style/html_nesting`
 
-### 15. rubocop-erb 0.8 系の戦略: cop の除外
+### 16. rubocop-erb 0.8 系の戦略: cop の除外
 
 - rubocop-erb 0.8 系は、4 つの問題による誤検知を避けるために、cop を除外した（65 個）
 - その副作用で、本来検出したい問題も見逃す
@@ -247,22 +272,20 @@
 | 除外しないと誤検知（`hello` が空白になり、本文が空に見える） | 除外しないと検出できる |
 | 0.8 系: 出ない | 0.8 系: 出ない（見逃す） |
 
-- 左の誤検知を避けるための除外が、右の本当の問題まで見えなくしている。スライド 3 の空の `else` に `Style/EmptyElse` が出ないのも、同じ理由
+- 左の誤検知を避けるための除外が、右の本当の問題まで見えなくしている。スライド 4 の空の `else` に `Style/EmptyElse` が出ないのも、同じ理由
 - 出典: [comparison.md 4.2 節](../research/comparison.md#42-rubocop-erb-08-系)、[5.2 節](../research/comparison.md#52-erb-として正しいものと直すべきものの区別)の `cases/marker/empty_conditional_*`。上の 2 つの ERB を、0.8 系と除外を外した 0.8 系（`rubocop-erb-0.8-noexclude`）にかけた結果
 
-## 4. tk0miya-rubocop-herb: Ruby パートの lint の精度を上げる（3:30）
-
-### 16. 文書全体方式の精度を上げる
+### 17. 文書全体方式の精度を上げる
 
 - 文書全体方式で、誤検知も見逃しも減らすために、RuboCop のプラグイン rubocop-herb（tk0miya/rubocop-herb）を作った
 - 3 つのアプローチ
-  1. `<%=` と HTML を Ruby に残す（スライド 17）
-  2. 変換で書いた文字への指摘を捨てる（スライド 18）
-  3. タグの中に書いたコードだけを検査する（スライド 19）
+  1. `<%=` と HTML を Ruby に残す（スライド 18）
+  2. 変換で書いた文字への指摘を捨てる（スライド 19）
+  3. タグの中に書いたコードだけを検査する（スライド 20）
 
-### 17. 消えた HTML が産む指摘: `<%=` と HTML を Ruby に残す
+### 18. 消えた HTML が産む指摘: `<%=` と HTML を Ruby に残す
 
-- スライド 11 の ERB は、次の Ruby になる（行末の空白は省略）
+- スライド 12 の ERB は、次の Ruby になる（行末の空白は省略）
 
 ```erb
 <% if morning? %>
@@ -288,12 +311,12 @@
   - `<%=` は代入文（`_ =`）に変換する → 「値を出力に使う」という意味が残る
 - これにより、次の誤検知がなくなる
   - `Lint/DuplicateBranch`: 挨拶が違う上の ERB に出ない
-  - `Lint/EmptyConditionalBody`、`Style/EmptyElse` など: HTML だけの本文が空に見えない（スライド 15 の `hello`）
+  - `Lint/EmptyConditionalBody`、`Style/EmptyElse` など: HTML だけの本文が空に見えない（スライド 16 の `hello`）
   - `Lint/Void`: `<%= total %>` が値を捨てる式（`total`）に見えない
 - 直すべき側（両方の分岐が `<%= user.name %>` だけ、本当に空の `if`）は、これまでどおり検出する
 - 出典: [tk0miya-rubocop-herb.md 2.1 節、3.1 節](../research/tk0miya-rubocop-herb.md#2-erb-から-ruby-への変換)、`cases/marker/duplicate_branch_*`、`cases/marker/empty_conditional_*`、`cases/variables/cross_tag_variables`
 
-### 18. タグ変換への指摘: 変換で書いた文字への指摘を捨てる
+### 19. タグ変換への指摘: 変換で書いた文字への指摘を捨てる
 
 - 原因として、変換例を上に小さく置く
 
@@ -316,7 +339,7 @@ p; _ = link_to "Home",  root_path;  p;
   5. 「指摘 6 件 → タグの中の 1 件だけ報告」と要約する
 - 出典: [tk0miya-rubocop-herb.md 5.2 節](../research/tk0miya-rubocop-herb.md#52-変換で書いた文字への指摘を除く-cop)、`cases/output/spacing_in_tag`
 
-### 19. ERB 風の書き方・レイアウトへの指摘: タグの中に書いたコードだけを検査する
+### 20. ERB 風の書き方・レイアウトへの指摘: タグの中に書いたコードだけを検査する
 
 - ERB 風の書き方とレイアウトへの指摘は、変換をどう工夫しても残る。形が ERB の構文（タグに跨がる構造、開始タグの幅、HTML の入れ子）で決まるから
 - そこで、ERB の構文で形が決まる部分（タグに跨がる構造）では、その行だけで cop を止める。書き手が 1 つのタグの中に書いた Ruby は検査を続ける
@@ -350,9 +373,9 @@ ERB 風の書き方:
 - 図: ERB のコメントの中に `%>` は書けないので、スライドではコメントではなく注釈の吹き出しにする
 - 出典: [tk0miya-rubocop-herb.md 5.2 節、5.3 節](../research/tk0miya-rubocop-herb.md#5-erb-で止めている-cop出典)、`cases/control_flow/single_line_link_to`、`cases/control_flow/single_line_block_in_tag`、`cases/control_flow/form_block`、`cases/style/argument_alignment`
 
-### 20. Before / After（rubocop-erb 0.8 系と並べる）
+### 21. Before / After（rubocop-erb 0.8 系と並べる）
 
-- スライド 3 の ERB をもう一度見せる
+- スライド 4 の ERB をもう一度見せる
 
 | ツール | `Lint/UselessAssignment` | `Style/NilComparison` | `Style/EmptyElse` |
 |---|---|---|---|
@@ -363,9 +386,7 @@ ERB 風の書き方:
 - ファイル全体で除外する cop は 9 個（0.8 系は 65 個）
 - 出典: [comparison.md 5.2 節](../research/comparison.md#52-erb-として正しいものと直すべきものの区別)
 
-## 5. Ruby パートから ERB ファイル全体へ（0:45）
-
-### 21. HTML パートの検査も rubocop に統合する
+### 22. HTML パートの検査も rubocop に統合する
 
 - rubocop-erb は、ERB の Ruby パートだけを検査する。HTML パートを検査するには、別に herb-lint を実行する必要がある
 - tk0miya/rubocop-herb は、herb-lint と herb-format を内部で実行する
@@ -375,9 +396,7 @@ ERB 風の書き方:
 - 図: 1 つの ERB が、Ruby パートは RuboCop、HTML パートは herb-lint / herb-format に分かれ、`rubocop` の 1 つの出力に合流する
 - 出典: [tk0miya-rubocop-herb.md 7 章](../research/tk0miya-rubocop-herb.md#7-tk0miya-rubocop-herb-の-cop)
 
-## 6. autocorrect の歩み（1:15）
-
-### 22. タグ単位 → 文書全体 → 修正後の ERB の検査
+### 23. タグ単位 → 文書全体 → 修正後の ERB の検査
 
 | 時代 | autocorrect |
 |---|---|
@@ -387,7 +406,7 @@ ERB 風の書き方:
 
 - 出典: [comparison.md 5.3 節](../research/comparison.md#53-autocorrect実測)
 
-### 23. 修正後の ERB を検査する
+### 24. 修正後の ERB を検査する
 
 - 問題: Ruby では空白でも、ERB では区切りや HTML の部分を corrector が書き換える
   - 例: `Lint/Void` が `<% 1 %>` の `1` を左の空白ごと消す → `<% ` も消え、` %>` だけが残る
@@ -395,9 +414,7 @@ ERB 風の書き方:
 - cop を個別に除外しなくても、未知の cop の壊れ方も止められる
 - 確実でない修正はせず、指摘だけ残す（誤検知ゼロを最優先）
 
-## 7. 現状とまとめ（1:15）
-
-### 24. 現状と課題
+### 25. 現状と課題
 
 - できていること: RuboCop の cop の autocorrect は、検証用 ERB でも実際のビュー 333 ファイルでもテンプレートを壊さなかった
 - 課題
@@ -408,7 +425,7 @@ ERB 風の書き方:
 - 今後: Herb の linter / formatter を Rust で書き直す計画がある（動くプロトタイプあり、未リリース）。実現すれば、子プロセスを介さずに herb-lint / herb-format を呼べ、Node.js も要らなくなる
 - 出典: [v0.9 のリリース記事](https://herb-tools.dev/blog/whats-new-in-herb-v0-9)、[herb#1239 のコメント](https://github.com/marcoroth/herb/issues/1239#issuecomment-4013290572)
 
-### 25. まとめ
+### 26. まとめ
 
 - タグ単位の lint は、文脈を失うので見逃し・誤検知・壊れる autocorrect が起きていた
 - 文書全体方式への移行で、タグを跨いで検査できるようになった（rubocop-erb 0.8 系）
