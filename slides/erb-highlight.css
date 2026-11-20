@@ -1,0 +1,143 @@
+/*
+ * ERB のタグ構造のハイライト（erb-highlight.js と組で使う）。
+ * 色はテンプレートの変数（--code-keyword、--accent）とテキスト色だけを使う。
+ */
+
+/* タグの区切り */
+.slide code .erb-delim {
+  color: var(--code-keyword);
+  font-weight: 700;
+}
+
+/* タグの中のコード: 通常の文字 */
+.slide code .erb-code {
+  color: var(--text);
+}
+
+/* タグの外（HTML とテキスト）: 文書全体方式で空白にされる部分なので薄くする */
+.slide code .erb-html {
+  color: #858585;
+}
+
+/* <pre class="box-code">: タグの中のコードを枠で囲う（タグ単位で取り出される範囲を示す）。outline なので文字の位置は変わらない */
+.slide pre.box-code {
+  line-height: 1.5;
+}
+
+/* 上下の行の枠が重ならないよう、枠の高さを文字の高さ（1.1em）に抑える */
+.slide pre.box-code .erb-code {
+  display: inline-block;
+  line-height: 1.1;
+  outline: 2px solid #d32f2f;
+  outline-offset: 1px;
+}
+
+/* <pre class="box-code no-box">: 枠を付ける前の状態。行の間は box-code と同じにして、次のスライドと位置を揃える */
+.slide pre.box-code.no-box .erb-code {
+  outline: none;
+}
+
+/*
+ * <div class="code-compare">: 変換前の ERB と変換後の Ruby を左右に並べる（.slide.content の .body の中で使う）。
+ * 説明の箇条書きは、この下に 1 カラムで置く。
+ * 1 列は 440px。32 文字の行が入るよう、コードは 16pt、左右の余白は 10px にする（18pt では約 27 文字）。
+ */
+.slide .code-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 15px;
+  margin-bottom: 0.5em;
+}
+
+.slide .code-compare pre {
+  margin: 0;
+}
+
+body.projection .slide .code-compare pre {
+  padding: 12px 10px;
+  font-size: 16pt;
+}
+
+/* 「変換前」「変換後」の見出し: 目立たせないよう、小さく薄い文字にする */
+.slide .code-compare .code-label {
+  display: block;
+  margin: 0 0 2px;
+  font-size: 12pt;
+  line-height: 1.3;
+  color: #858585;
+}
+
+/*
+ * <pre class="verbatim-demo">: ERB（1 行目）、変換後の Ruby（2 行目）、RuboCop の指摘の位置（3 行目）を桁をそろえて並べる。
+ * 指摘を受けた文字は赤い背景、3 行目の ~ は赤い太字で示す。
+ * 除外を示すスライドでは、指摘を残す範囲（ERB タグの中）を赤枠で囲み、捨てる範囲をグレーで覆う。
+ * .mask と .tag-box の left と width は ch 単位で、スライドの側で指定する（16px は pre の左の余白）。
+ */
+body.projection .slide pre.verbatim-demo {
+  font-size: 22pt;
+  line-height: 1.5;
+}
+
+/* RuboCop の指摘を受けた文字（赤い背景）。指摘の除外の図と、4 つの問題のスライドで使う */
+.slide pre .off {
+  background: rgba(211, 47, 47, 0.25);
+}
+
+.slide pre.verbatim-demo .mark {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.slide pre.verbatim-demo .mask,
+.slide pre.verbatim-demo .tag-box {
+  position: absolute;
+  top: 8px;
+  height: calc(3 * 1.5em + 8px); /* 3 行ぶん（行の高さは上の 1.5） */
+}
+
+/* 捨てる範囲: 背景に近い色で覆い、指摘ごと薄く見せる */
+.slide pre.verbatim-demo .mask {
+  background: rgba(220, 220, 220, 0.85);
+}
+
+.slide pre.verbatim-demo .tag-box {
+  outline: 3px solid #d32f2f;
+  outline-offset: 0;
+}
+
+/* 図の下の注記: 目立たせないよう、小さく薄い文字にする */
+.slide .demo-label {
+  display: block;
+  margin: -0.4em 0 0.4em;
+  font-size: 12pt;
+  color: #858585;
+}
+
+/* 比較表をコードの横（.code-compare の右の列）に置くとき: 列に収まるよう文字を小さくする */
+body.projection .slide .compare-table {
+  font-size: 16pt;
+}
+
+.slide .compare-table th,
+.slide .compare-table td {
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+/*
+ * <pre class="cop-hits">: ERB に RuboCop の指摘の位置を書き込む。
+ * erb-highlight.js は通さず、.erb-delim などの span を HTML に直接書く（<code class="language-erb-marked">）。
+ * .hit は指摘を受けたコード（赤枠）、.cop-note は行末に置く cop 名（薄い文字）。
+ * 行の間は普通の pre と同じにして、前のスライドとコードの位置をそろえる。
+ */
+/* 行の間を広げずに上下の行と枠が重ならないよう、枠の高さを文字の高さ（1.1em）に抑える */
+.slide pre.cop-hits .hit {
+  display: inline-block;
+  line-height: 1.1;
+  outline: 2px solid #d32f2f;
+  outline-offset: 1px;
+}
+
+.slide pre.cop-hits .cop-note {
+  color: #858585;
+}

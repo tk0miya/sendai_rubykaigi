@@ -1,0 +1,935 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Building a Unified Ecosystem for ERB Development Experience</title>
+<link rel="stylesheet" href="tim-slides.css">
+<link rel="stylesheet" href="erb-highlight.css">
+<style>
+/* テンプレートにない、自己紹介スライド専用の装飾 */
+.slide .profile-photo {
+  position: absolute;
+  left: 730px;
+  top: 104px;
+  width: 180px;
+  height: 180px;
+  margin: 0;
+}
+
+.slide .profile-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide .icon {
+  width: 1em;
+  height: 1em;
+  margin-left: 0.2em;
+  vertical-align: -0.1em;
+  fill: currentColor;
+}
+</style>
+</head>
+<body class="projection">
+
+<!-- 0. 導入 -->
+
+<section class="slide cover">
+  <h1>Building a Unified<br>Ecosystem for ERB<br>Development Experience</h1>
+  <p class="subtitle">Takeshi KOMIYA (@tk0miya)</p>
+  <img class="logo" src="images/logo-white.png" alt="TIMEINTERMEDIA">
+</section>
+
+<section class="slide content">
+  <h2>自己紹介</h2>
+  <div class="body">
+    <ul>
+      <li>小宮 健（Takeshi KOMIYA）
+        <ul>
+          <li>@tk0miya
+            <svg class="icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.070 3.633 17.700 3.633 17.700c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.070 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.930 0-1.310.465-2.380 1.235-3.220-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.300 1.230.96-.267 1.980-.399 3-.405 1.020.006 2.040.138 3 .405 2.280-1.552 3.285-1.230 3.285-1.230.645 1.653.24 2.873.12 3.176.765.840 1.230 1.910 1.230 3.220 0 4.610-2.805 5.625-5.475 5.920.42.36.81 1.096.81 2.220 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            <svg class="icon" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>X</title><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+          </li>
+        </ul>
+      </li>
+      <li>CTO of TIME INTERMEDIA, Inc.</li>
+      <li>OSS Developer
+        <ul>
+          <li>Sphinx（Python 製ドキュメンテーションツール）</li>
+          <li>rbs_rails メンテナ（Rails アプリ用型生成ツール）</li>
+        </ul>
+      </li>
+      <li>書籍: Sphinx をはじめよう（オライリー・ジャパン）</li>
+    </ul>
+  </div>
+  <figure class="profile-photo"><img src="images/tk0miya.jpg" alt=""></figure>
+</section>
+
+<section class="slide content">
+  <h2>あなたの ERB に RuboCop は効いていますか?</h2>
+  <div class="body">
+    <ul>
+      <li>ERB ファイルに RuboCop を効かせる gem がある
+        <ul>
+          <li>erb_lint</li>
+          <li>rubocop-erb</li>
+        </ul>
+      </li>
+      <li>どちらも ERB の中の Ruby を RuboCop で検査する</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>あなたの ERB に RuboCop は効いていますか?</h2>
+  <div class="body">
+    <p>次の ERB に rubocop-erb をかけてみる</p>
+    <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>あなたの ERB に RuboCop は効いていますか?</h2>
+  <div class="body">
+    <p>次の ERB に rubocop-erb をかけてみる</p>
+    <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+    <ul>
+      <li>指摘件数: <strong>1 件</strong>（Style/NilComparison）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>あなたの ERB に RuboCop は効いていますか?</h2>
+  <div class="body">
+    <p>次の ERB に rubocop-erb をかけてみる</p>
+    <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+    <ul>
+      <li>指摘件数: <strong>1 件</strong>（Style/NilComparison）</li>
+      <li><strong>取りこぼし</strong>がある</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>あなたの ERB に RuboCop は効いていますか?</h2>
+  <div class="body">
+    <p>次の ERB に rubocop-erb をかけてみる</p>
+    <pre class="cop-hits"><code class="language-erb-marked"><span class="erb-delim">&lt;%</span> <span class="hit"><span class="erb-code">count = items.size</span></span> <span class="erb-delim">%&gt;</span>    <span class="cop-note"># Lint/UselessAssignment</span>
+<span class="erb-delim">&lt;%</span> <span class="erb-code">if </span><span class="hit"><span class="erb-code">foo == nil</span></span> <span class="erb-delim">%&gt;</span>         <span class="cop-note"># Style/NilComparison</span>
+<span class="erb-html">  &lt;p&gt;yes&lt;/p&gt;</span>
+<span class="erb-delim">&lt;%</span> <span class="hit"><span class="erb-code">else</span></span> <span class="erb-delim">%&gt;</span>                  <span class="cop-note"># Style/EmptyElse</span>
+<span class="erb-delim">&lt;%</span> <span class="erb-code">end</span> <span class="erb-delim">%&gt;</span></code></pre>
+    <ul>
+      <li>指摘件数: <strong>1 件</strong>（Style/NilComparison）</li>
+      <li><strong>取りこぼし</strong>がある</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>なぜ取りこぼすのか</h2>
+  <div class="body">
+    <p>rubocop-erb は ERB タグごとに Lint をかけている</p>
+    <pre class="box-code no-box"><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>なぜ取りこぼすのか</h2>
+  <div class="body">
+    <p>rubocop-erb は ERB タグごとに Lint をかけている</p>
+    <pre class="box-code"><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+    <ul>
+      <li>タグ単位の分析では<strong>文脈が失われる</strong></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>Lint の際に文脈が失われている</h2>
+  <div class="body">
+    <ul>
+      <li><strong>制御構造</strong>
+        <ul>
+          <li><code>if</code> のみ、<code>else</code> のみのタグは検査できない</li>
+          <li>制御構造全体を俯瞰した cop は失敗する</li>
+          <li>rubocop-erb は <code>if</code> や <code>do</code> を削って検査を強行する</li>
+        </ul>
+      </li>
+      <li><strong>変数スコープ</strong>
+        <ul>
+          <li>タグごとに Lint をかけるので参照箇所がわからない</li>
+        </ul>
+      </li>
+      <li>→ 誤検知が多いため、多くの cop を無効化している</li>
+    </ul>
+  </div>
+</section>
+
+<!-- rubocop-erb 0.8: 文書全体へ -->
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <ul>
+      <li>そんな中、先日 rubocop-erb 0.8 がリリースされた
+        <ul>
+          <li>2026/10/29</li>
+          <li>"Change ERB=&gt;Ruby Processing Strategy"<br>（r7kamura/rubocop-erb#70）</li>
+        </ul>
+      </li>
+      <li>ERB の処理方式が大きく変わった
+        <ul>
+          <li>0.7 まで: ERB タグ単位で Lint</li>
+          <li>0.8 から: ERB ファイルを <strong>Ruby に変換し、文書全体で</strong> Lint</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div></div>
+    </div>
+    <ul>
+      <li>ERB ファイルを Ruby に変換する</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   count = items.size  ;
+   if foo == nil  ;
+
+   else  ;
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>ERB ファイルを Ruby に変換する
+        <ul>
+          <li>HTML、ERB 開始タグは空白に</li>
+          <li>ERB 終了タグはセミコロンに</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   count = items.size  ;
+   if foo == nil  ;
+
+   else  ;
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>文書全体で Lint することで情報が増えた</li>
+      <li>指摘件数が増加: <strong>1 件 → 2 件</strong>
+        <ul>
+          <li>未使用変数を検出（Lint/UselessAssignment）</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   count = items.size  ;
+   if foo == nil  ;
+
+   else  ;
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>else ブロックが空という指摘は出てこない（Style/EmptyElse）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   count = items.size  ;
+   if foo == nil  ;
+
+   else  ;
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>else ブロックが空という指摘は出てこない（Style/EmptyElse）
+        <ul>
+          <li>rubocop-erb-0.8 では <strong>65 個の cop を無効化</strong>している</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 文書全体方式と誤検知 -->
+
+<section class="slide content">
+  <h2>なぜ cop を無効化するのか</h2>
+  <div class="body">
+    <ul>
+      <li>Ruby コードへの変換により誤検知を生んでいる</li>
+      <li>rubocop-erb は誤検知を避けるため cop を無効化している</li>
+      <li>発生しうる問題
+        <ul>
+          <li>1. コード変換による問題</li>
+          <li>2. HTML 消去による問題</li>
+          <li>3. ERB 風の Ruby の書き方の問題</li>
+          <li>4. レイアウトに対する指摘</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>1. コード変換による問題 (1)</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;%= link_to "Home", root_path %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">    link_to "Home", root_path<span class="off">  ;</span></code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>変換で生まれたスペースやセミコロンに対する指摘
+        <ul>
+          <li>Layout/ExtraSpacing: <code>;</code> の前の 2 つの空白</li>
+          <li>Style/Semicolon: 文の終わりの <code>;</code></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>1. コード変換による問題 (2)</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;h1&gt;&lt;%= @title %&gt;&lt;/h1&gt;
+&lt;p&gt;&lt;%= @description %&gt;&lt;/p&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">        <span class="off">@title</span>  ;
+       @description  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li><code>&lt;%=</code> で出力している式に Lint/Void（値を使わない式）
+        <ul>
+          <li>変換で <code>&lt;%=</code> が消え、値を捨てる文に見える</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>2. HTML 消去による問題</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% if morning? %&gt;
+  Good morning, &lt;%= user.name %&gt;
+&lt;% else %&gt;
+  Hello, &lt;%= user.name %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   if morning?  ;
+                    user.name  ;
+   <span class="off">else</span>  ;
+             user.name  ;
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>Ruby に変換すると HTML が消え、HTML だけが違う分岐が同じに見える</li>
+      <li>→ Lint/DuplicateBranch（<strong>誤検知</strong>）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>3. ERB 風の Ruby の書き方の問題</h2>
+  <div class="body">
+    <pre><code class="language-erb-marked"><span class="erb-delim">&lt;%=</span> <span class="erb-code">link_to(user_path(user)) </span><span class="erb-code"><span class="off">do</span></span> <span class="erb-delim">%&gt;</span><span class="erb-html">Profile</span><span class="erb-delim">&lt;%</span> <span class="erb-code"><span class="off">end</span></span> <span class="erb-delim">%&gt;</span></code></pre>
+    <ul>
+      <li>ERB では <code>{ … }</code> より <code>do</code>/<code>end</code> の方が自然に見える</li>
+      <li>Ruby 向けの cop では ERB に不向きなものがある
+        <ul>
+          <li>Style/BlockDelimiters: <code>{ … }</code> にせよ</li>
+          <li>Style/SingleLineDoEndBlock: 複数行にせよ</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>4. レイアウトに対する指摘 (1)</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% if admin %&gt;
+  &lt;div class="admin"&gt;
+    &lt;%= render "admin" %&gt;
+  &lt;/div&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   if admin  ;
+
+   <span class="off">     </span>render "admin"  ;
+
+   end  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>HTML パートによって ERB タグの記述位置が変化する</li>
+      <li>インデントに対する指摘は<strong>誤検知</strong>
+        <ul>
+          <li>例: Layout/IndentationWidth</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>4. レイアウトに対する指摘 (2)</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;%= form_with do |f| %&gt;
+  &lt;%= f.text_field :name %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">    form_with do |f|  ;
+      f.text_field :name  ;
+   <span class="off">end</span>  ;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li><code>form_with</code> と <code>end</code> の位置のズレを指摘される
+        <ul>
+          <li>Layout/BlockAlignment</li>
+        </ul>
+      </li>
+      <li>ERB の開始タグの文字数によるもので<strong>誤検知</strong></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-erb-0.8 の cop の無効化</h2>
+  <div class="body">
+    <ul>
+      <li>rubocop-erb-0.8 では <strong>65 個の cop を無効化</strong>している</li>
+      <li>4 つの問題による誤検知を回避するため
+        <ul>
+          <li>1. コード変換による問題</li>
+          <li>2. HTML 消去による問題</li>
+          <li>3. ERB 風の Ruby の書き方の問題</li>
+          <li>4. レイアウトに対する指摘</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>cop の無効化による副作用 (1)</h2>
+  <div class="body">
+    <ul>
+      <li>本来検出したい問題を見逃す</li>
+    </ul>
+    <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+    <ul>
+      <li>中身のない else 節（Style/EmptyElse）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>cop の無効化による副作用 (2)</h2>
+  <div class="body">
+    <ul>
+      <li>本来検出したい問題を見逃す</li>
+    </ul>
+    <pre><code class="language-erb">&lt;%= link_to "Profile",
+      user_path(user),
+        class: "btn" %&gt;</code></pre>
+    <ul>
+      <li>Ruby コード片内のアラート
+        <ul>
+          <li>Layout/ArgumentAlignment: 複数行のメソッド呼び出しで引数の揃えがずれている</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- tk0miya/rubocop-herb: Ruby パートの lint の精度を上げる -->
+
+<section class="slide content">
+  <h2>さらなる精度を求めて</h2>
+  <div class="body">
+    <ul>
+      <li>誤検知は抑えたまま、見逃しは減らしたい
+        <ul>
+          <li>誤検知（false positive）</li>
+          <li>見逃し（false negative）</li>
+        </ul>
+      </li>
+      <li>オリジナルの RuboCop プラグインを開発した
+        <ul>
+          <li><strong>tk0miya/rubocop-herb</strong></li>
+          <li>（未リリース）</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>tk0miya/rubocop-herb</h2>
+  <div class="body">
+    <ul>
+      <li>文書全体方式を採用</li>
+      <li>検知精度を上げるため 4 つのアプローチを採用
+        <ul>
+          <li>1. 埋め込みブロックを代入に変換</li>
+          <li>2. HTML を Ruby 式に変換</li>
+          <li>3. 変換で生まれた文字への指摘を除外</li>
+          <li>4. タグをまたいだ構造への指摘を除外</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>1. 埋め込みブロックを代入に変換</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;%= @title %&gt;
+&lt;%= @description %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">_ = @title;
+_ = @description;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li><code>&lt;%=</code> は代入文（<code>_ =</code>）に変換する
+        <ul>
+          <li>「値を出力に使う」という意味が残る</li>
+        </ul>
+      </li>
+      <li>Lint/Void の<strong>誤検知が出ない</strong></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>2. HTML を Ruby 式に変換</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% if morning? %&gt;
+  Good morning, &lt;%= user.name %&gt;
+&lt;% else %&gt;
+  Hello, &lt;%= user.name %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   if morning?;
+  _a;           _ = user.name;
+   else;
+  _a;    _ = user.name;
+   end;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>HTML のタグは <code>div;</code> に、テキストは <code>_a;</code> に変換する
+        <ul>
+          <li>さらに AST 上では HTML ごとに別の識別子を与え、区別可能とする</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>2. HTML を Ruby 式に変換</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% if morning? %&gt;
+  Good morning, &lt;%= user.name %&gt;
+&lt;% else %&gt;
+  Hello, &lt;%= user.name %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   if morning?;
+  _a;           _ = user.name;
+   else;
+  _a;    _ = user.name;
+   end;</code></pre>
+      </div>
+    </div>
+    <ul>
+      <li>これにより次の誤検知がなくなる
+        <ul>
+          <li>Lint/DuplicateBranch</li>
+          <li>Lint/EmptyConditionalBody、Style/EmptyElse</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>3. 変換で生まれた文字への指摘を除外</h2>
+  <div class="body">
+    <pre class="verbatim-demo"><code class="language-converted">&lt;p&gt;&lt;% @title = 'Home';  @nav = :home %&gt;&lt;/p&gt;
+p<span class="off">;   </span> @title = 'Home'<span class="off">; </span> @nav = :home<span class="off">; </span> p<span class="off">;  </span>
+ <span class="mark">~~~~</span>                <span class="mark">~~</span>             <span class="mark">~~</span>  <span class="mark">~~~</span></code></pre>
+    <span class="demo-label">1 行目: ERB、2 行目: 変換後の Ruby、3 行目: RuboCop の指摘の位置</span>
+    <ul>
+      <li>変換後の Ruby に RuboCop をかけると <strong>8 件</strong>の指摘
+        <ul>
+          <li>Style/Semicolon、Layout/ExtraSpacing、Layout/TrailingWhitespace</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>3. 変換で生まれた文字への指摘を除外</h2>
+  <div class="body">
+    <pre class="verbatim-demo"><code class="language-converted">&lt;p&gt;&lt;% @title = 'Home';  @nav = :home %&gt;&lt;/p&gt;
+p<span class="off">;   </span> @title = 'Home'<span class="off">; </span> @nav = :home<span class="off">; </span> p<span class="off">;  </span>
+ <span class="mark">~~~~</span>                <span class="mark">~~</span>             <span class="mark">~~</span>  <span class="mark">~~~</span></code><span class="mask" style="left: calc(16px + 0ch); width: 6ch;"></span><span class="mask" style="left: calc(16px + 36ch); width: 7ch;"></span><span class="tag-box" style="left: calc(16px + 6ch); width: 30ch;"></span></pre>
+    <span class="demo-label">1 行目: ERB、2 行目: 変換後の Ruby、3 行目: RuboCop の指摘の位置</span>
+    <ul>
+      <li>変換コードに関わる cop は ERB タグ内のみ指摘を受け付ける
+        <ul>
+          <li>Style/Semicolon、Layout/ExtraSpacing など（23 個）</li>
+        </ul>
+      </li>
+      <li>報告するのはタグの中の <strong>2 件</strong>だけ</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>4. タグをまたいだ構造への指摘を除外</h2>
+  <div class="body">
+    <p style="margin-bottom: 0.3em">タグをまたいだブロック → 指摘しない</p>
+    <pre style="margin-bottom: 0.5em"><code class="language-erb">&lt;%= form_with do |f| %&gt;
+  &lt;%= f.text_field :name %&gt;
+&lt;% end %&gt;</code></pre>
+    <p style="margin-bottom: 0.3em">1 つのタグで閉じたブロック → <strong>指摘する</strong></p>
+    <pre style="margin-bottom: 0"><code class="language-erb">&lt;%= form_with do |f|
+      f.text_field :name
+    end %&gt;</code></pre>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>4. タグをまたいだ構造への指摘を除外</h2>
+  <div class="body">
+    <ul>
+      <li>制御構造が複数のERBタグをまたぐ場合の誤検知を減らす
+        <ul>
+          <li>レイアウトに対する指摘: Layout 系 7 個<br>（Layout/BlockAlignment など）</li>
+          <li>ERB 風の書き方の問題: Style 系 4 個<br>（Style/BlockDelimiters など）</li>
+        </ul>
+      </li>
+      <li>1 つのタグ内に書いた場合は指摘をする</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-herb と rubocop-erb の比較 (1)</h2>
+  <div class="body">
+    <div class="code-compare">
+      <div>
+        <pre><code class="language-erb">&lt;% count = items.size %&gt;
+&lt;% if foo == nil %&gt;
+  &lt;p&gt;yes&lt;/p&gt;
+&lt;% else %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <table class="compare-table">
+          <tr><th></th><th>rubocop-erb</th><th>rubocop-herb</th></tr>
+          <tr><td>未使用の変数</td><td>出る</td><td>出る</td></tr>
+          <tr><td>nil 比較</td><td>出る</td><td>出る</td></tr>
+          <tr><td>空の else</td><td>出ない</td><td><strong>出る</strong></td></tr>
+        </table>
+      </div>
+    </div>
+    <ul>
+      <li>tk0miya/rubocop-herb では <strong>3 件すべて</strong>が出る</li>
+      <li>ファイル全体で除外する cop は 9 個
+        <ul>
+          <li>rubocop-erb は 65 個</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-herb と rubocop-erb の比較 (2)</h2>
+  <div class="body">
+    <ul>
+      <li>kaigionrails/conference-app の ERB（76 ファイル）
+        <ul>
+          <li>rubocop-erb: 指摘 0 件、誤検知 0 件</li>
+          <li>rubocop-herb: 指摘 <strong>2 件</strong>、誤検知 0 件</li>
+        </ul>
+      </li>
+      <li>rubocop-herb が検出した 2 件の指摘は妥当なもの
+        <ul>
+          <li>Lint/EmptyFile</li>
+          <li>Lint/EmptyBlock</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-herb の課題 (1)</h2>
+  <div class="body">
+    <ul>
+      <li>1〜2 文字の短いテキストでは <code>_a;</code> を出力できず、誤検知が残ってしまう
+        <ul>
+          <li>Style/IdenticalConditionalBranches</li>
+        </ul>
+      </li>
+    </ul>
+    <div class="code-compare">
+      <div>
+        <span class="code-label">変換前</span>
+        <pre><code class="language-erb">&lt;% if admin? %&gt;
+*&lt;%= user.name %&gt;
+&lt;% else %&gt;
+&lt;%= user.name %&gt;
+&lt;% end %&gt;</code></pre>
+      </div>
+      <div>
+        <span class="code-label">変換後</span>
+        <pre><code class="language-converted">   if admin?;
+ <span class="off">_ = user.name</span>;
+   else;
+<span class="off">_ = user.name</span>;
+   end;</code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>rubocop-herb の課題 (2)</h2>
+  <div class="body">
+    <ul>
+      <li>きめ細かく対応しているので RuboCop と密結合になっている
+        <ul>
+          <li>コード量は rubocop-erb の約 9 倍</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>tk0miya/rubocop-herb: その他の機能</h2>
+  <div class="body">
+    <ul>
+      <li>herb-lint、herb-format との連携
+        <ul>
+          <li>HTML パートの Lint / Format を両ツールで実施</li>
+          <li>RuboCop を実行するだけで、HTML パート、Ruby パートを検査できる</li>
+        </ul>
+      </li>
+      <li>AutoCorrect に対応
+        <ul>
+          <li>誤修正や破損を防ぐ仕組みを持たせている</li>
+          <li>うまく適用できない場合は修正をスキップし、指摘だけ残す</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>tk0miya/rubocop-herb の今後</h2>
+  <div class="body">
+    <ul>
+      <li>開発を進めている中で rubocop-erb 0.8 がリリースされた</li>
+      <li>Herb 本家でも rubocop プラグインを開発中
+        <ul>
+          <li>marcoroth/herb#2260</li>
+          <li>rubocop-herb という gem 名を確保済み</li>
+        </ul>
+      </li>
+      <li>当初は独自の gem を作るつもりであった
+        <ul>
+          <li>いまは rubocop-erb、herb への合流も視野に</li>
+          <li>誤検知と見逃し、そして gem の複雑さのバランスを見つける</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide content">
+  <h2>まとめ</h2>
+  <div class="body">
+    <ul>
+      <li>かつての gem は見逃しが多かった（タグ単位方式）</li>
+      <li>rubocop-erb 0.8 で大きな改善があった（文書全体方式）</li>
+      <li>tk0miya/rubocop-herb
+        <ul>
+          <li>4 つのアプローチで誤検知を抑え、見逃しを減らす</li>
+          <li>RuboCop ひとつで ERB 全体を検査する</li>
+        </ul>
+      </li>
+      <li>今こそ ERB でもモダンな開発を</li>
+      <li>https://github.com/tk0miya/rubocop-herb</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide closing">
+  <h1>ご清聴ありがとう<br>ございました</h1>
+  <img class="slogan" src="images/slogan.png" alt="SYSTEM LIFE SOLUTION! www.timedia.co.jp">
+</section>
+
+<script src="erb-highlight.js"></script>
+<script src="tim-slides.js"></script>
+</body>
+</html>
