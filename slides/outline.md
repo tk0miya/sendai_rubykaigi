@@ -55,8 +55,9 @@
 ### 4. Big thanks to my sponsors
 
 - GitHub Sponsors のスポンサーへの感謝（2026-11-21 時点のスポンサー）
-  - Monthly sponsors: @hbbayrak、@simon-ritchie、@moriyoshi、@kazamori
-  - One-time sponsors: @intra-mart-dh（スポットでの支援）
+  - Gold Sponsor: @kazamori
+  - Silver Sponsor: @intra-mart-dh（スポットでの支援）
+  - Tea Sponsors: @hbbayrak、@simon-ritchie、@moriyoshi
 - アイコンは GitHub のアバター（`images/sponsors/`）
 
 ### 5. あなたの ERB に RuboCop は効いていますか?
