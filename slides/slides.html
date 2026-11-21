@@ -29,6 +29,14 @@
   vertical-align: -0.1em;
   fill: currentColor;
 }
+/* 画像 1 枚だけのスライド（hiring、スポンサーへの感謝）。上下のラインは画像に含まれる */
+.slide.full-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 </style>
 </head>
 <body class="projection">
@@ -64,6 +72,14 @@
     </ul>
   </div>
   <figure class="profile-photo"><img src="images/tk0miya.jpg" alt=""></figure>
+</section>
+
+<section class="slide full-image">
+  <img src="images/hiring.webp" alt="We're hiring: TIME INTERMEDIA, Inc. — We're system integrator in Japan. Visit https://timedia.co.jp/">
+</section>
+
+<section class="slide full-image">
+  <img src="images/sponsors.webp" alt="Big thanks to my sponsors: Gold sponsors (Kazamori LLC., Dreadnought, Inc.) and Tea sponsors">
 </section>
 
 <section class="slide content">
