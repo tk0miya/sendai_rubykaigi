@@ -54,10 +54,10 @@
 
 ### 4. Big thanks to my sponsors
 
-- GitHub Sponsors のスポンサーへの感謝
-  - Gold sponsors: Kazamori LLC.、Dreadnought, Inc.
-  - Tea sponsors
-- 画像 1 枚のスライド（`images/sponsors.webp`）
+- GitHub Sponsors のスポンサーへの感謝（2026-11-21 時点のスポンサー）
+  - Monthly sponsors: @hbbayrak、@simon-ritchie、@moriyoshi、@kazamori
+  - One-time sponsors: @intra-mart-dh（スポットでの支援）
+- アイコンは GitHub のアバター（`images/sponsors/`）
 
 ### 5. あなたの ERB に RuboCop は効いていますか?
 

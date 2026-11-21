@@ -37,6 +37,63 @@
   height: 100%;
   object-fit: contain;
 }
+/* スポンサーへの感謝のスライド。GitHub Sponsors のアイコンをグループごとに横に並べる */
+.slide .sponsor-groups {
+  position: absolute;
+  left: 33px;
+  top: 135px;
+  width: 895px;
+  display: flex;
+  justify-content: center;
+  gap: 64px;
+}
+
+.slide .sponsor-groups h3 {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 18pt;
+  font-weight: 400;
+}
+
+.slide .sponsor-groups ul {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+}
+
+.slide .sponsor-groups li {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 13pt;
+}
+
+.slide .sponsor-groups li::before {
+  content: none;
+}
+
+.slide .sponsor-groups img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  object-fit: cover;
+}
+
+.slide .sponsors-note {
+  position: absolute;
+  left: 33px;
+  top: 420px;
+  width: 895px;
+  margin: 0;
+  text-align: center;
+  font-size: 14pt;
+  color: var(--muted);
+}
 </style>
 </head>
 <body class="projection">
@@ -78,8 +135,26 @@
   <img src="images/hiring.webp" alt="We're hiring: TIME INTERMEDIA, Inc. — We're system integrator in Japan. Visit https://timedia.co.jp/">
 </section>
 
-<section class="slide full-image">
-  <img src="images/sponsors.webp" alt="Big thanks to my sponsors: Gold sponsors (Kazamori LLC., Dreadnought, Inc.) and Tea sponsors">
+<section class="slide content">
+  <h2>Big thanks to my sponsors</h2>
+  <div class="sponsor-groups">
+    <section>
+      <h3>Monthly sponsors</h3>
+      <ul>
+        <li><img src="images/sponsors/hbbayrak.png" alt=""><span>@hbbayrak</span></li>
+        <li><img src="images/sponsors/simon-ritchie.png" alt=""><span>@simon-ritchie</span></li>
+        <li><img src="images/sponsors/moriyoshi.png" alt=""><span>@moriyoshi</span></li>
+        <li><img src="images/sponsors/kazamori.png" alt=""><span>@kazamori</span></li>
+      </ul>
+    </section>
+    <section>
+      <h3>One-time sponsors</h3>
+      <ul>
+        <li><img src="images/sponsors/intra-mart-dh.png" alt=""><span>@intra-mart-dh</span></li>
+      </ul>
+    </section>
+  </div>
+  <p class="sponsors-note">GitHub Sponsors: github.com/sponsors/tk0miya</p>
 </section>
 
 <section class="slide content">
